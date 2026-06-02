@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Standards alignment · Verana Council</title>
+<meta name="description" content="How Verana specifications compose W3C, DIF, Hyperledger, OpenWallet Foundation, OpenID Foundation, and Trust over IP primitives.">
+<meta property="og:title" content="Standards alignment · Verana Council">
+<meta property="og:image" content="/assets/img/og-default.svg">
+<link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg"><link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32.png"><link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon-16.png"><link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest">
+<link rel="canonical" href="https://veranacouncil.org/standards/">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config={theme:{extend:{colors:{'indigo-primary':'#2E2A8F','indigo-primary-dark':'#211e6a','verana-purple':'#763EF0',surface:'#FAFAF8',ink:'#111111',muted:'#5B5B5B',rule:'#E8E6E0'},fontFamily:{sans:['Inter','ui-sans-serif','system-ui','sans-serif'],mono:['"IBM Plex Mono"','ui-monospace','monospace']}}}};</script>
+</head>
+<body class="font-sans bg-surface text-ink">
+
+<div data-include="/assets/partials/header.html"></div>
+
+<main>
+  <section class="border-b border-rule">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+      <nav class="text-sm text-muted mb-6" aria-label="Breadcrumb"><a href="/" class="hover:text-indigo-primary">Home</a> · <span class="text-ink">Standards alignment</span></nav>
+      <p class="eyebrow mb-4">Composition, not replacement</p>
+      <h1 class="text-4xl sm:text-5xl font-semibold tracking-tight leading-tight max-w-4xl">The Council composes standards. It does not replace them.</h1>
+      <p class="mt-6 text-lg text-muted max-w-3xl leading-relaxed">The Verana network is built on open standards authored by chartered standards bodies. The Council's role is to <strong class="text-ink">compose</strong> those primitives into two CC-BY-SA 4.0 composition specs (the Verifiable Trust spec and the VPR spec) and to govern the infrastructure those specs operate on. The Council intends to upstream both composition specs to a chartered standards body (W3C or DIF, by Council decision) once the network is operational.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <h2 class="text-2xl font-semibold mb-6">Standards composed</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm border border-rule bg-white">
+          <thead>
+            <tr>
+              <th class="p-4 border-b border-rule text-left font-semibold w-1/3">Standards body</th>
+              <th class="p-4 border-b border-rule text-left font-semibold">Primitives Verana composes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="p-4 border-b border-rule align-top font-medium">W3C</td><td class="p-4 border-b border-rule align-top">Decentralized Identifiers (DIDs), Verifiable Credentials Data Model</td></tr>
+            <tr><td class="p-4 border-b border-rule align-top font-medium">DIF</td><td class="p-4 border-b border-rule align-top">Presentation Exchange, did:webvh, Linked Verifiable Presentations</td></tr>
+            <tr><td class="p-4 border-b border-rule align-top font-medium">Hyperledger</td><td class="p-4 border-b border-rule align-top">AnonCreds (ZK-based credentials)</td></tr>
+            <tr><td class="p-4 border-b border-rule align-top font-medium">OpenWallet Foundation</td><td class="p-4 border-b border-rule align-top">credo-ts (reference wallet agent library)</td></tr>
+            <tr><td class="p-4 border-b border-rule align-top font-medium">OpenID Foundation</td><td class="p-4 border-b border-rule align-top">OpenID4VCI, OpenID4VP</td></tr>
+            <tr><td class="p-4 align-top font-medium">Trust over IP Foundation</td><td class="p-4 align-top">Layered governance model</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-t border-rule">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 prose-body">
+      <h2>The Council's standards coordination role</h2>
+      <p>The <strong>Standards Liaison Committee</strong> maintains working relationships with each of the above bodies. Its scope:</p>
+      <ul>
+        <li>Track normative changes to upstream specifications and assess impact on the Verifiable Trust spec and VPR spec.</li>
+        <li>Represent Verana's composition work in upstream working groups.</li>
+        <li>Coordinate the eventual upstream of the Verifiable Trust and VPR composition specs to a chartered body.</li>
+      </ul>
+
+      <h2>License and attribution</h2>
+      <ul>
+        <li><strong>Verifiable Trust spec</strong>: CC-BY-SA 4.0. Canonical: <a href="https://verana-labs.github.io/verifiable-trust-spec/">verana-labs.github.io/verifiable-trust-spec/</a></li>
+        <li><strong>Verifiable Public Registry spec</strong>: CC-BY-SA 4.0. Canonical: <a href="https://verana-labs.github.io/verifiable-trust-vpr-spec/">verana-labs.github.io/verifiable-trust-vpr-spec/</a></li>
+        <li><strong>Network GF, ECS-EGF, and Template EGF</strong>: CC-BY-SA 4.0. Canonical repository at <a href="https://github.com/verana-labs/verana-council-gov">github.com/verana-labs/verana-council-gov</a> (<a href="https://github.com/verana-labs/verana-council-gov/tree/main/network-gf">network-gf</a>, <a href="https://github.com/verana-labs/verana-council-gov/tree/main/ecs-egf">ecs-egf</a>, <a href="https://github.com/verana-labs/verana-council-gov/tree/main/template-egf">template-egf</a>).</li>
+      </ul>
+      <p>All normative text is versioned in git with permanent URLs and SRI hashes for each published version.</p>
+
+      <p class="not-prose mt-8 flex flex-wrap gap-4">
+        <a href="/governance/network-gf/" class="btn btn-secondary">Network GF</a>
+        <a href="/governance/ecs-egf/" class="btn btn-secondary">ECS-EGF</a>
+      </p>
+    </div>
+  </section>
+</main>
+
+<div data-include="/assets/partials/footer.html"></div>
+<script src="/assets/js/site.js"></script>
+</body>
+</html>

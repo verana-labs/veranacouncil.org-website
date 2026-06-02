@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Governance · Verana Council</title>
+<meta name="description" content="The Verana Council authors and operates two governance frameworks: the Network GF and the ECS-EGF. The normative documents live in the verana-council-gov repository.">
+<meta property="og:title" content="Governance · Verana Council">
+<meta property="og:image" content="/assets/img/og-default.svg">
+<link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg"><link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32.png"><link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon-16.png"><link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest">
+<link rel="canonical" href="https://veranacouncil.org/governance/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config={theme:{extend:{colors:{'indigo-primary':'#2E2A8F','indigo-primary-dark':'#211e6a','verana-purple':'#763EF0',surface:'#FAFAF8',ink:'#111111',muted:'#5B5B5B',rule:'#E8E6E0'},fontFamily:{sans:['Inter','ui-sans-serif','system-ui','sans-serif'],mono:['"IBM Plex Mono"','ui-monospace','monospace']}}}};</script>
+</head>
+<body class="font-sans bg-surface text-ink">
+
+<div data-include="/assets/partials/header.html"></div>
+
+<main>
+  <section class="border-b border-rule">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+      <nav class="text-sm text-muted mb-6" aria-label="Breadcrumb"><a href="/" class="hover:text-indigo-primary">Home</a> · <span class="text-ink">Governance</span></nav>
+      <p class="eyebrow mb-4">Two frameworks, one chain</p>
+      <h1 class="text-4xl sm:text-5xl font-semibold tracking-tight leading-tight max-w-4xl">What the Council governs.</h1>
+      <p class="mt-6 text-lg text-muted max-w-3xl leading-relaxed">The Council authors and operates two governance frameworks and secures the chain they run on. The normative text is maintained in the <a href="https://github.com/verana-labs/verana-council-gov" class="underline text-indigo-primary">verana-council-gov</a> repository; this page summarizes and links to it.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 prose-body">
+      <h2>Network Governance Framework</h2>
+      <p>The constitutional layer of the network. Every Ecosystem Governance Framework (EGF) on Verana, including the Council's own ECS-EGF, MUST respect it. It defines the permission lifecycle, Trust Deposit rules, the graduated risk-management rubric, dispute resolution, validator standards, and the chain-evolution process.</p>
+      <p><a href="https://github.com/verana-labs/verana-council-gov/tree/main/network-gf">Read the Network GF →</a></p>
+
+      <h2>ECS Ecosystem Governance Framework</h2>
+      <p>The Council's own ecosystem framework. It covers the four fixed Essential Credential Schemas and the rules under which the Council selects Issuer Grantors and Issuers per (schema × jurisdiction).</p>
+      <table>
+        <thead><tr><th>Schema</th><th>Identifies</th><th>Permission mode</th><th>Definition</th></tr></thead>
+        <tbody>
+          <tr><td><code>Service</code></td><td>Verifiable Services (incl. AI agents)</td><td><code>ECOSYSTEM_VALIDATION_PROCESS</code></td><td><a href="https://verana-labs.github.io/verifiable-trust-spec/schemas/v4/service.json"><code>service.json</code></a></td></tr>
+          <tr><td><code>Organization</code></td><td>Legal entities controlling services</td><td><code>GRANTOR_VALIDATION_PROCESS</code></td><td><a href="https://verana-labs.github.io/verifiable-trust-spec/schemas/v4/org.json"><code>org.json</code></a></td></tr>
+          <tr><td><code>Persona</code></td><td>Individuals controlling services</td><td><code>GRANTOR_VALIDATION_PROCESS</code></td><td><a href="https://verana-labs.github.io/verifiable-trust-spec/schemas/v4/persona.json"><code>persona.json</code></a></td></tr>
+          <tr><td><code>UserAgent</code></td><td>End-user wallets and applications</td><td><code>OPEN</code></td><td><a href="https://verana-labs.github.io/verifiable-trust-spec/schemas/v4/ua.json"><code>ua.json</code></a></td></tr>
+        </tbody>
+      </table>
+      <p><a href="https://github.com/verana-labs/verana-council-gov/tree/main/ecs-egf">Read the ECS-EGF →</a></p>
+
+      <h2>Template EGF</h2>
+      <p>A scaffold, not a gate. Any ecosystem can author and operate its own EGF on Verana with no Council approval. The Template EGF makes authoring a sector EGF cheaper and more interoperable.</p>
+      <p><a href="https://github.com/verana-labs/verana-council-gov/tree/main/template-egf">Get the Template EGF →</a></p>
+
+      <h2>Bylaws &amp; Code of Conduct</h2>
+      <ul>
+        <li><strong>Bylaws</strong> — the Verein statutes. <a href="https://github.com/verana-labs/verana-council-gov/tree/main/bylaws">Read →</a></li>
+        <li><strong>Code of Conduct</strong> — binding on all participants. <a href="https://github.com/verana-labs/verana-council-gov/tree/main/code-of-conduct">Read →</a></li>
+      </ul>
+
+      <h2>Risk management &amp; disputes</h2>
+      <p>Participant conduct is enforced through a graduated-sanctions process (notice → remediation → suspension → slashing), applied uniformly across all EGFs. Every sanction is public record and appealable to the General Assembly.</p>
+
+      <p class="not-prose mt-8 flex flex-wrap gap-4">
+        <a href="https://github.com/verana-labs/verana-council-gov" class="btn btn-secondary">All governance documents ↗</a>
+        <a href="/join/" class="btn btn-primary">Join the Council</a>
+      </p>
+    </div>
+  </section>
+</main>
+
+<div data-include="/assets/partials/footer.html"></div>
+<script src="/assets/js/site.js"></script>
+</body>
+</html>

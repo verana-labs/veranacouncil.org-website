@@ -1,0 +1,479 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+   Theme tokens. Defining them in @theme makes the matching utilities
+   (bg-surface, text-ink, text-muted, border-rule, bg-indigo-primary, …)
+   available AND emits the CSS variables, which we then re-bind under
+   [data-theme="dark"] so utilities flip automatically in dark mode.
+--------------------------------------------------------------------------- */
+@theme {
+  --color-indigo-primary: #2e2a8f;
+  --color-indigo-primary-dark: #211e6a;
+  --color-verana-purple: #763ef0;
+  --color-surface: #fafaf8;
+  --color-ink: #111111;
+  --color-muted: #5b5b5b;
+  --color-rule: #e8e6e0;
+  --color-card: #ffffff;
+  --color-elevated: #ffffff;
+
+  --font-sans: var(--font-inter), "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-ibm-plex-mono), "IBM Plex Mono", ui-monospace,
+    monospace;
+}
+
+:root {
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  --color-indigo-primary: #8a85ff;
+  --color-indigo-primary-dark: #b3afff;
+  --color-verana-purple: #a892ff;
+  --color-surface: #0e0e12;
+  --color-ink: #ececec;
+  --color-muted: #9a9aa3;
+  --color-rule: #2a2a33;
+  --color-card: #16161c;
+  --color-elevated: #1b1b22;
+  color-scheme: dark;
+}
+
+html {
+  background: var(--color-surface);
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-feature-settings: "ss01" 1, "cv11" 1;
+}
+
+/* Wordmark -------------------------------------------------- */
+.wordmark {
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--color-ink);
+  white-space: nowrap;
+}
+.wordmark .dot {
+  color: var(--color-indigo-primary);
+}
+
+/* Prose-ish body copy ------------------------------------------------------ */
+.prose-body h2 {
+  font-size: 1.875rem;
+  line-height: 1.2;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  margin-top: 3rem;
+  margin-bottom: 1rem;
+  color: var(--color-ink);
+}
+.prose-body h3 {
+  font-size: 1.25rem;
+  line-height: 1.3;
+  font-weight: 600;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+  color: var(--color-ink);
+}
+.prose-body h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: var(--color-ink);
+}
+.prose-body p,
+.prose-body li {
+  color: var(--color-ink);
+  line-height: 1.65;
+}
+.prose-body p {
+  margin: 0 0 1rem;
+}
+.prose-body ul,
+.prose-body ol {
+  margin: 0 0 1.25rem 1.25rem;
+}
+.prose-body ul {
+  list-style: disc;
+}
+.prose-body ol {
+  list-style: decimal;
+}
+.prose-body li + li {
+  margin-top: 0.375rem;
+}
+.prose-body a {
+  color: var(--color-indigo-primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
+}
+.prose-body a:hover {
+  color: var(--color-indigo-primary-dark);
+  text-decoration-thickness: 2px;
+}
+.prose-body hr {
+  border: 0;
+  border-top: 1px solid var(--color-rule);
+  margin: 3rem 0;
+}
+.prose-body blockquote {
+  border-left: 2px solid var(--color-indigo-primary);
+  padding-left: 1rem;
+  color: var(--color-muted);
+  margin: 1.5rem 0;
+}
+.prose-body table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  font-size: 0.95rem;
+}
+.prose-body table th,
+.prose-body table td {
+  border: 1px solid var(--color-rule);
+  padding: 0.625rem 0.875rem;
+  text-align: left;
+  vertical-align: top;
+}
+.prose-body table th {
+  background: var(--color-card);
+  font-weight: 600;
+}
+.prose-body code {
+  font-family: var(--font-mono);
+  background: var(--color-card);
+  border: 1px solid var(--color-rule);
+  padding: 0.1rem 0.35rem;
+  border-radius: 3px;
+  font-size: 0.85em;
+}
+.prose-body pre {
+  background: var(--color-card);
+  border: 1px solid var(--color-rule);
+  border-radius: 4px;
+  padding: 1rem 1.25rem;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  line-height: 1.55;
+  margin: 1.5rem 0;
+}
+.prose-body pre code {
+  background: none;
+  border: 0;
+  padding: 0;
+  font-size: inherit;
+}
+
+/* Button primitives ------------------------------------------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  font-weight: 500;
+  font-size: 0.9375rem;
+  line-height: 1;
+  border-radius: 2px;
+  border: 1px solid transparent;
+  transition: background-color 120ms ease, border-color 120ms ease,
+    color 120ms ease;
+  cursor: pointer;
+  text-decoration: none;
+}
+.btn-primary {
+  background: var(--color-indigo-primary);
+  color: #fff;
+  border-color: var(--color-indigo-primary);
+}
+.btn-primary:hover {
+  background: var(--color-indigo-primary-dark);
+  border-color: var(--color-indigo-primary-dark);
+  color: #fff;
+}
+.btn-secondary {
+  background: transparent;
+  color: var(--color-ink);
+  border-color: var(--color-ink);
+}
+.btn-secondary:hover {
+  background: var(--color-ink);
+  color: var(--color-surface);
+}
+.btn-inverse {
+  background: #fff;
+  color: var(--color-indigo-primary);
+  border-color: #fff;
+}
+.btn-inverse:hover {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(255, 255, 255, 0.9);
+  color: var(--color-indigo-primary);
+}
+.btn-ghost {
+  background: transparent;
+  color: var(--color-indigo-primary);
+  border-color: transparent;
+  padding-left: 0;
+  padding-right: 0;
+}
+.btn-ghost:hover {
+  text-decoration: underline;
+}
+.prose-body a.btn {
+  text-decoration: none;
+}
+.prose-body a.btn-primary,
+.prose-body a.btn-primary:hover {
+  color: #fff;
+}
+.prose-body a.btn-secondary {
+  color: var(--color-ink);
+}
+.prose-body a.btn-secondary:hover {
+  color: var(--color-surface);
+}
+.prose-body a.btn-ghost {
+  color: var(--color-indigo-primary);
+}
+
+/* Header / nav --------------------------------------------------- */
+.site-header {
+  border-bottom: 1px solid var(--color-rule);
+  background: var(--color-surface);
+}
+.site-header a.nav-link {
+  color: var(--color-ink);
+  font-weight: 500;
+  font-size: 0.9375rem;
+  padding: 0.5rem 0;
+  display: inline-block;
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+}
+.site-header a.nav-link:hover,
+.site-header a.nav-link[aria-current="page"] {
+  border-bottom-color: var(--color-indigo-primary);
+  color: var(--color-indigo-primary);
+}
+
+/* Announcement bar ------------------------------------------------ */
+.announcement {
+  background: var(--color-indigo-primary);
+  color: #fafaf8;
+  font-size: 0.875rem;
+}
+.announcement a {
+  color: #fff;
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Footer ---------------------------------------------------------- */
+.site-footer {
+  background: var(--color-card);
+  border-top: 1px solid var(--color-rule);
+  color: var(--color-ink);
+}
+.site-footer h3 {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  margin-bottom: 0.75rem;
+}
+.site-footer a {
+  color: var(--color-ink);
+  text-decoration: none;
+  font-size: 0.9375rem;
+}
+.site-footer a:hover {
+  color: var(--color-indigo-primary);
+  text-decoration: underline;
+}
+
+/* Cards --------------------------------------------------------- */
+.card {
+  background: var(--color-card);
+  border: 1px solid var(--color-rule);
+  border-radius: 4px;
+  padding: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.card h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--color-ink);
+}
+
+/* Eyebrow label ---------------------------------------------- */
+.eyebrow {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-indigo-primary);
+}
+
+/* Form fields --------------------------------------------------- */
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  margin-bottom: 1rem;
+}
+.form-field label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-ink);
+}
+.form-field label .req {
+  color: var(--color-indigo-primary);
+}
+.form-field input,
+.form-field select,
+.form-field textarea {
+  border: 1px solid var(--color-rule);
+  background: var(--color-card);
+  padding: 0.625rem 0.75rem;
+  border-radius: 3px;
+  font: inherit;
+  color: var(--color-ink);
+}
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus {
+  outline: 2px solid var(--color-indigo-primary);
+  outline-offset: 2px;
+}
+.form-field .hint {
+  font-size: 0.8125rem;
+  color: var(--color-muted);
+}
+
+/* Focus states ---------------------------------------------- */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--color-indigo-primary);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Cookie banner ------------------------------------------------- */
+.cookie-banner {
+  position: fixed;
+  bottom: 1rem;
+  left: 1rem;
+  right: 1rem;
+  max-width: 56rem;
+  margin-left: auto;
+  margin-right: auto;
+  background: var(--color-card);
+  border: 1px solid var(--color-rule);
+  border-radius: 4px;
+  padding: 1rem 1.25rem;
+  box-shadow: 0 4px 24px rgba(17, 17, 17, 0.08);
+  z-index: 50;
+  font-size: 0.875rem;
+}
+
+/* Print --------------------------------------------------------- */
+@media print {
+  .site-header,
+  .site-footer,
+  .announcement,
+  .cookie-banner {
+    display: none !important;
+  }
+  a {
+    color: var(--color-ink);
+    text-decoration: none;
+  }
+}
+
+/* Theme toggle button ---------------------------------------------- */
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 999px;
+  border: 1px solid var(--color-rule);
+  background: transparent;
+  color: var(--color-ink);
+  cursor: pointer;
+  transition: background-color 120ms ease, border-color 120ms ease,
+    color 120ms ease;
+}
+.theme-toggle:hover {
+  border-color: var(--color-indigo-primary);
+  color: var(--color-indigo-primary);
+}
+.theme-toggle .icon-sun {
+  display: none;
+}
+.theme-toggle .icon-moon {
+  display: block;
+}
+[data-theme="dark"] .theme-toggle .icon-sun {
+  display: block;
+}
+[data-theme="dark"] .theme-toggle .icon-moon {
+  display: none;
+}
+
+/* Dark-mode overrides for static Tailwind colors used inline -------- */
+[data-theme="dark"] .bg-white {
+  background-color: var(--color-card) !important;
+}
+[data-theme="dark"] [stroke="#2E2A8F"] {
+  stroke: var(--color-indigo-primary);
+}
+[data-theme="dark"] [fill="#2E2A8F"] {
+  fill: var(--color-indigo-primary);
+}
+[data-theme="dark"] [stroke="#111111"] {
+  stroke: var(--color-ink);
+}
+[data-theme="dark"] [fill="#111111"] {
+  fill: var(--color-ink);
+}
+
+/* Buttons in dark mode use dark ink on the lighter indigo ----------- */
+[data-theme="dark"] .btn-primary {
+  background: var(--color-indigo-primary);
+  border-color: var(--color-indigo-primary);
+  color: #0e0e12;
+}
+[data-theme="dark"] .btn-primary:hover {
+  background: var(--color-indigo-primary-dark);
+  border-color: var(--color-indigo-primary-dark);
+  color: #0e0e12;
+}
+[data-theme="dark"] .prose-body a.btn-primary,
+[data-theme="dark"] .prose-body a.btn-primary:hover {
+  color: #0e0e12;
+}
+[data-theme="dark"] .form-field select option {
+  background: var(--color-card);
+  color: var(--color-ink);
+}

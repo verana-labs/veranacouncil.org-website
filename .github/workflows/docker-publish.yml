@@ -80,3 +80,24 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  # ---------------------------------------------------------------------------
+  # Deploy to Kubernetes (OVH) on push to main only.
+  # ---------------------------------------------------------------------------
+  deploy:
+    needs: docker
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v4
+
+      - name: Deploy
+        env:
+          KUBECONFIG_DATA: ${{ secrets.OVH_KUBECONFIG }}
+        run: |
+          echo "$KUBECONFIG_DATA" > /tmp/kubeconfig
+          export KUBECONFIG=/tmp/kubeconfig
+          kubectl rollout restart deployment/veranacouncil-website -n web
+          kubectl rollout status deployment/veranacouncil-website -n web --timeout=120s

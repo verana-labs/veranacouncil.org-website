@@ -90,6 +90,9 @@ jobs:
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Set up kubectl
         uses: azure/setup-kubectl@v4
 
@@ -99,5 +102,7 @@ jobs:
         run: |
           echo "$KUBECONFIG_DATA" > /tmp/kubeconfig
           export KUBECONFIG=/tmp/kubeconfig
+          kubectl apply -f k8s/
+          # imagePullPolicy: Always + restart => new pods repull the :latest tag.
           kubectl rollout restart deployment/veranacouncil-website -n web
           kubectl rollout status deployment/veranacouncil-website -n web --timeout=120s

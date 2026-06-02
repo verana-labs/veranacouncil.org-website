@@ -1,0 +1,37 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: veranacouncil-website
+  namespace: web
+  labels:
+    app.kubernetes.io/name: veranacouncil-website
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - veranacouncil.org
+        - www.veranacouncil.org
+      secretName: veranacouncil-website-tls
+  rules:
+    - host: veranacouncil.org
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: veranacouncil-website
+                port:
+                  number: 80
+    - host: www.veranacouncil.org
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: veranacouncil-website
+                port:
+                  number: 80

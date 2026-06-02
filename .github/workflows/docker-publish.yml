@@ -9,7 +9,7 @@ on:
 
 env:
   DOCKER_HUB_NAMESPACE: veranalabs
-  IMAGE_NAME: veranacouncil-website
+  IMAGE_NAME: veranacouncil.org-website
 
 jobs:
   # ---------------------------------------------------------------------------

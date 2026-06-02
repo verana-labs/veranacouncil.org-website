@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cookies · Verana Council</title>
+<meta name="description" content="Cookie policy and consent preferences for veranacouncil.org.">
+<meta property="og:title" content="Cookies · Verana Council">
+<meta property="og:image" content="/assets/img/og-default.svg">
+<link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg"><link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32.png"><link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon-16.png"><link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest">
+<link rel="canonical" href="https://veranacouncil.org/legal/cookies/">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config={theme:{extend:{colors:{'indigo-primary':'#2E2A8F','indigo-primary-dark':'#211e6a','verana-purple':'#763EF0',surface:'#FAFAF8',ink:'#111111',muted:'#5B5B5B',rule:'#E8E6E0'},fontFamily:{sans:['Inter','ui-sans-serif','system-ui','sans-serif'],mono:['"IBM Plex Mono"','ui-monospace','monospace']}}}};</script>
+</head>
+<body class="font-sans bg-surface text-ink">
+
+<div data-include="/assets/partials/header.html"></div>
+
+<main>
+  <section class="border-b border-rule">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+      <nav class="text-sm text-muted mb-6" aria-label="Breadcrumb"><a href="/" class="hover:text-indigo-primary">Home</a> · <span>Legal</span> · <span class="text-ink">Cookies</span></nav>
+      <p class="eyebrow mb-4">Cookie policy</p>
+      <h1 class="text-4xl sm:text-5xl font-semibold tracking-tight leading-tight max-w-4xl">Cookies.</h1>
+      <p class="mt-6 text-lg text-muted max-w-3xl leading-relaxed">This site uses a small, auditable set of cookies. We do not use advertising cookies and we do not sell data.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <h2 class="text-2xl font-semibold mb-6">Cookies in use</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm border border-rule bg-white">
+          <thead>
+            <tr>
+              <th class="p-4 border-b border-rule text-left font-semibold">Cookie / storage key</th>
+              <th class="p-4 border-b border-rule text-left font-semibold">Purpose</th>
+              <th class="p-4 border-b border-rule text-left font-semibold">Duration</th>
+              <th class="p-4 border-b border-rule text-left font-semibold">Category</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="p-4 border-b border-rule align-top font-mono text-xs">vc_cookie_decision</td><td class="p-4 border-b border-rule align-top">Records your consent choice.</td><td class="p-4 border-b border-rule align-top">Persistent (localStorage)</td><td class="p-4 border-b border-rule align-top">Essential</td></tr>
+            <tr><td class="p-4 border-b border-rule align-top font-mono text-xs">vc_announce_dismissed</td><td class="p-4 border-b border-rule align-top">Remembers that you dismissed the site-wide announcement bar.</td><td class="p-4 border-b border-rule align-top">Persistent (localStorage)</td><td class="p-4 border-b border-rule align-top">Essential</td></tr>
+            <tr><td class="p-4 border-b border-rule align-top font-mono text-xs">_pk_*</td><td class="p-4 border-b border-rule align-top">Plausible (self-hosted), IP-anonymized page-view analytics. Only set if you accept analytics.</td><td class="p-4 border-b border-rule align-top">Session</td><td class="p-4 border-b border-rule align-top">Analytics</td></tr>
+            <tr><td class="p-4 align-top font-mono text-xs">calendly_*</td><td class="p-4 align-top">Calendly booking widget on <a href="/contact/" class="underline text-indigo-primary">/contact</a>. Only set if you accept scheduling.</td><td class="p-4 align-top">Session</td><td class="p-4 align-top">Scheduling</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="mt-10 prose-body">
+        <h2>Your choice</h2>
+        <p>You may accept all categories, accept only essential cookies, or change preferences at any time. Clearing your browser storage resets your choice.</p>
+        <p class="not-prose flex flex-wrap gap-3 mt-4">
+          <button type="button" class="btn btn-primary" onclick="localStorage.setItem('vc_cookie_decision','all');location.reload();">Accept all</button>
+          <button type="button" class="btn btn-secondary" onclick="localStorage.setItem('vc_cookie_decision','essential');location.reload();">Essential only</button>
+          <button type="button" class="btn btn-ghost" onclick="localStorage.removeItem('vc_cookie_decision');location.reload();">Reset choice</button>
+        </p>
+
+        <h2>What we do not use</h2>
+        <ul>
+          <li>No third-party marketing or advertising cookies.</li>
+          <li>No cross-site tracking pixels.</li>
+          <li>No YouTube, Facebook, LinkedIn, or X embeds on this site.</li>
+        </ul>
+
+        <h2>Questions</h2>
+        <p>Write to <a href="mailto:privacy@verana.io">privacy@verana.io</a>.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div data-include="/assets/partials/footer.html"></div>
+<script src="/assets/js/site.js"></script>
+</body>
+</html>

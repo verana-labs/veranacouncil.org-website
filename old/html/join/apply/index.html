@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Apply · Verana Council</title>
+<meta name="description" content="Submit an expression of interest for Council membership or Observer status.">
+<meta property="og:title" content="Apply · Verana Council">
+<meta property="og:image" content="/assets/img/og-default.svg">
+<link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg"><link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32.png"><link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon-16.png"><link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest">
+<link rel="canonical" href="https://veranacouncil.org/join/apply/">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config={theme:{extend:{colors:{'indigo-primary':'#2E2A8F','indigo-primary-dark':'#211e6a','verana-purple':'#763EF0',surface:'#FAFAF8',ink:'#111111',muted:'#5B5B5B',rule:'#E8E6E0'},fontFamily:{sans:['Inter','ui-sans-serif','system-ui','sans-serif'],mono:['"IBM Plex Mono"','ui-monospace','monospace']}}}};</script>
+<style>
+  .form-field { display:flex; flex-direction:column; gap:0.375rem; }
+  .form-field label { font-size:0.875rem; font-weight:500; color:#111111; }
+  .form-field label .req { color:#2E2A8F; }
+  .form-field input, .form-field select, .form-field textarea { border:1px solid #E8E6E0; background:#fff; padding:0.625rem 0.75rem; border-radius:3px; font:inherit; color:#111111; }
+  .form-field input:focus, .form-field select:focus, .form-field textarea:focus { outline:2px solid #2E2A8F; outline-offset:2px; }
+  .form-field .hint { font-size:0.8125rem; color:#5B5B5B; }
+</style>
+</head>
+<body class="font-sans bg-surface text-ink">
+
+<div data-include="/assets/partials/header.html"></div>
+
+<main>
+  <section class="border-b border-rule">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+      <nav class="text-sm text-muted mb-6" aria-label="Breadcrumb"><a href="/" class="hover:text-indigo-primary">Home</a> · <a href="/join/" class="hover:text-indigo-primary">Join</a> · <span class="text-ink">Apply</span></nav>
+      <p class="eyebrow mb-4">Expression of interest</p>
+      <h1 class="text-4xl sm:text-5xl font-semibold tracking-tight leading-tight max-w-4xl">Apply to the Verana Council.</h1>
+      <p class="mt-6 text-lg text-muted max-w-3xl leading-relaxed">Two short forms. Pick your track. The Founding Steward responds within 5 business days with next-step scheduling.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 grid md:grid-cols-2 gap-10">
+
+      <!-- Founding Member form -->
+      <form class="card" action="mailto:council@verana.io" method="post" enctype="text/plain" id="founding-member">
+        <p class="eyebrow">Voting track</p>
+        <h2 class="text-xl font-semibold text-ink">Founding Member</h2>
+        <p class="text-sm text-muted">2-minute form. Private and confidential until LOI signing.</p>
+
+        <div class="form-field mt-4">
+          <label for="fm-org">Organization name <span class="req">*</span></label>
+          <input id="fm-org" name="organization" type="text" required>
+        </div>
+        <div class="form-field">
+          <label for="fm-sector">Primary sector <span class="req">*</span></label>
+          <select id="fm-sector" name="sector" required>
+            <option value="">Select…</option>
+            <option>Financial services</option>
+            <option>Workforce / employment</option>
+            <option>Communications</option>
+            <option>Industrial / IoT</option>
+            <option>Energy / Sustainability</option>
+            <option>Logistics / Supply-chain</option>
+            <option>AI / Agentic (Identity)</option>
+            <option>AI / Agentic (Commerce)</option>
+            <option>IDV / KYC orchestration</option>
+            <option>Markets / commodities</option>
+            <option>Legal</option>
+            <option>Academic / research</option>
+            <option>Standards-body liaison</option>
+            <option>Public-sector / sovereign issuers</option>
+          </select>
+          <p class="hint">If you operate across several, nominate the one you most strongly represent.</p>
+        </div>
+        <div class="form-field">
+          <label for="fm-region">Operational region <span class="req">*</span></label>
+          <select id="fm-region" name="region" required>
+            <option value="">Select…</option>
+            <option>Americas</option>
+            <option>EMEA</option>
+            <option>APAC</option>
+            <option>LATAM</option>
+            <option>Africa</option>
+          </select>
+          <p class="hint">Your operational centre of gravity, not your legal HQ.</p>
+        </div>
+        <div class="form-field">
+          <label for="fm-contact">Primary contact (name, title, email) <span class="req">*</span></label>
+          <input id="fm-contact" name="contact" type="text" required>
+        </div>
+        <div class="form-field">
+          <label for="fm-rationale">Brief rationale (&lt; 500 chars)</label>
+          <textarea id="fm-rationale" name="rationale" rows="4" maxlength="500"></textarea>
+          <p class="hint">Why your organization; what you bring to the seat; what you expect to contribute.</p>
+        </div>
+        <button type="submit" class="btn btn-primary mt-2">Submit Founding Member application</button>
+      </form>
+
+      <!-- Public-Sector Observer form -->
+      <form class="card" action="mailto:council@verana.io" method="post" enctype="text/plain" id="observer">
+        <p class="eyebrow">Non-voting track</p>
+        <h2 class="text-xl font-semibold text-ink">Public-Sector Observer</h2>
+        <p class="text-sm text-muted">2-minute form. Designed for sovereign bodies and multilaterals.</p>
+
+        <div class="form-field mt-4">
+          <label for="ob-body">Public body name <span class="req">*</span></label>
+          <input id="ob-body" name="body" type="text" required>
+        </div>
+        <div class="form-field">
+          <label for="ob-country">Country / region <span class="req">*</span></label>
+          <input id="ob-country" name="country" type="text" required>
+        </div>
+        <div class="form-field">
+          <label for="ob-contact">Primary contact (name, title, email) <span class="req">*</span></label>
+          <input id="ob-contact" name="contact" type="text" required>
+        </div>
+        <div class="form-field">
+          <label for="ob-scope">Scope of engagement</label>
+          <textarea id="ob-scope" name="scope" rows="4" maxlength="500"></textarea>
+          <p class="hint">What kind of engagement you seek: open-session attendance, MoU endorsement, committee observation, etc.</p>
+        </div>
+        <button type="submit" class="btn btn-primary mt-2">Submit Observer application</button>
+      </form>
+    </div>
+  </section>
+
+  <section class="border-t border-rule">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-muted text-sm">
+      <p>All submissions are treated as strictly confidential pre-incorporation. The Founding Steward responds within 5 business days with next-step scheduling.</p>
+      <p class="mt-4">The <code>mailto:</code> form submit is a placeholder; production deployment wires this to the Council's intake endpoint (form service or ticket system).</p>
+    </div>
+  </section>
+</main>
+
+<div data-include="/assets/partials/footer.html"></div>
+<script src="/assets/js/site.js"></script>
+<script>
+  // Auto-select the track based on ?track query param.
+  (function(){
+    var qs = new URLSearchParams(window.location.search);
+    var track = qs.get('track');
+    if (track === 'founding-member') {
+      document.getElementById('founding-member')?.scrollIntoView({behavior:'smooth'});
+    } else if (track === 'observer') {
+      document.getElementById('observer')?.scrollIntoView({behavior:'smooth'});
+    }
+  })();
+</script>
+</body>
+</html>

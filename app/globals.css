@@ -20,6 +20,8 @@
   --font-sans: var(--font-inter), "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-ibm-plex-mono), "IBM Plex Mono", ui-monospace,
     monospace;
+  --font-display: var(--font-space-grotesk), "Space Grotesk", var(--font-inter),
+    "Inter", ui-sans-serif, system-ui, sans-serif;
 }
 
 :root {
@@ -50,6 +52,13 @@ html {
 body {
   font-family: var(--font-sans);
   font-feature-settings: "ss01" 1, "cv11" 1;
+}
+
+/* Hero and section titles use the display typeface (Space Grotesk) ---------- */
+h1,
+h2 {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
 }
 
 /* Wordmark -------------------------------------------------- */

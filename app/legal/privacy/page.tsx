@@ -53,7 +53,10 @@ export default function PrivacyPage() {
         <h2>Retention &amp; transfers</h2>
         <p>
           Application data is retained for the application process plus 24
-          months for audit, then anonymized. Personal data is stored in
+          months for audit, then anonymized. Contact-form submissions are stored
+          in our self-hosted Relaticle CRM (crm.2060.io), operated on our own
+          infrastructure, so we can respond to and manage your inquiry — no
+          third-party CRM receives this data. Personal data is stored in
           Switzerland and the EEA.
         </p>
       </div>

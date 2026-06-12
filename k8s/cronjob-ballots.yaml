@@ -1,0 +1,45 @@
+# Daily ballot-settlement backstop: closes admission ballots whose async
+# window has ended (insufficient accepts ⇒ refused). Idempotent — ballots also
+# settle early in-app when the ⅔ threshold is reached or unreachable.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: ballots
+  namespace: web
+  labels:
+    app.kubernetes.io/name: veranacouncil-website
+spec:
+  schedule: "15 6 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 300
+      backoffLimit: 1
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: curl
+              image: curlimages/curl:8.10.1
+              env:
+                - name: CRON_SECRET
+                  valueFrom:
+                    secretKeyRef:
+                      name: veranacouncil-website-secrets
+                      key: CRON_SECRET
+                      optional: true
+              command: ["/bin/sh", "-c"]
+              args:
+                - >-
+                  curl -fsS --max-time 240 -X POST
+                  -H "Authorization: Bearer ${CRON_SECRET}"
+                  http://veranacouncil-website.web.svc.cluster.local/api/cron/ballots
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 16Mi
+                limits:
+                  cpu: 100m
+                  memory: 64Mi

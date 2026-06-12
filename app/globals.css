@@ -1,15 +1,25 @@
 @import "tailwindcss";
 
-/* ---------------------------------------------------------------------------
-   Theme tokens. Defining them in @theme makes the matching utilities
-   (bg-surface, text-ink, text-muted, border-rule, bg-indigo-primary, …)
-   available AND emits the CSS variables, which we then re-bind under
-   [data-theme="dark"] so utilities flip automatically in dark mode.
---------------------------------------------------------------------------- */
+/* ===========================================================================
+   Verana Council — design tokens.
+
+   Sister sub-brand of the Foundation, with its own "constitution / governance
+   body" personality: deep indigo as the PRIMARY (authority, permanence),
+   Verana purple demoted to accent, NO green anywhere, all-Inter type
+   (no display face — that absence is the signal), IBM Plex Mono used
+   sparingly (seat-matrix states, schema names, dates of record).
+
+   Tokens live in @theme so the matching utilities (bg-surface, text-ink,
+   text-muted, border-rule, bg-indigo, text-purple, …) are generated AND the
+   CSS variables are emitted, which we re-bind under [data-theme="dark"] so
+   utilities flip automatically in dark mode.
+=========================================================================== */
 @theme {
-  --color-indigo-primary: #2e2a8f;
-  --color-indigo-primary-dark: #211e6a;
-  --color-verana-purple: #763ef0;
+  --color-indigo: #2e2a8f; /* primary — deep indigo */
+  --color-indigo-dark: #232066; /* primary hover */
+  --color-purple: #763ef0; /* accent — the shared Verana purple */
+  --color-purple-dark: #5b2fc9; /* accent hover */
+
   --color-surface: #fafaf8;
   --color-ink: #111111;
   --color-muted: #5b5b5b;
@@ -18,10 +28,12 @@
   --color-elevated: #ffffff;
 
   --font-sans: var(--font-inter), "Inter", ui-sans-serif, system-ui, sans-serif;
+  /* All-Inter: the Council has no display face (vs. the Foundation's
+     Space Grotesk) — .display stays as a weight/tracking treatment only. */
+  --font-display: var(--font-inter), "Inter", ui-sans-serif, system-ui,
+    sans-serif;
   --font-mono: var(--font-ibm-plex-mono), "IBM Plex Mono", ui-monospace,
     monospace;
-  --font-display: var(--font-space-grotesk), "Space Grotesk", var(--font-inter),
-    "Inter", ui-sans-serif, system-ui, sans-serif;
 }
 
 :root {
@@ -29,10 +41,12 @@
 }
 
 [data-theme="dark"] {
-  --color-indigo-primary: #8a85ff;
-  --color-indigo-primary-dark: #b3afff;
-  --color-verana-purple: #a892ff;
-  --color-surface: #0e0e12;
+  --color-indigo: #8a85ff;
+  --color-indigo-dark: #a6a2ff;
+  --color-purple: #a892ff;
+  --color-purple-dark: #c4b6ff;
+
+  --color-surface: #0d0d11;
   --color-ink: #ececec;
   --color-muted: #9a9aa3;
   --color-rule: #2a2a33;
@@ -54,47 +68,62 @@ body {
   font-feature-settings: "ss01" 1, "cv11" 1;
 }
 
-/* Hero and section titles use the display typeface (Space Grotesk) ---------- */
-h1,
-h2 {
+/* Display type — Inter, tight tracking (all-Inter institutional look) ----- */
+.display {
   font-family: var(--font-display);
   letter-spacing: -0.02em;
+  font-weight: 600;
 }
 
-/* Wordmark -------------------------------------------------- */
+/* Wordmark — Inter, the proper typeface for the Verana logo lockup ------- */
 .wordmark {
+  font-family: var(--font-sans);
   font-weight: 600;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.02em;
   color: var(--color-ink);
   white-space: nowrap;
 }
 .wordmark .dot {
-  color: var(--color-indigo-primary);
+  color: var(--color-purple);
 }
 
-/* Prose-ish body copy ------------------------------------------------------ */
+/* Accent line — solid indigo, the Council's austere rule ------------------ */
+.accent-line {
+  width: 3.5rem;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--color-indigo);
+}
+
+/* Eyebrow / tag label ------------------------------------------------- */
+.tag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-indigo);
+}
+
+/* Prose body copy (legal + long-form pages) -------------------------- */
 .prose-body h2 {
+  font-family: var(--font-display);
   font-size: 1.875rem;
   line-height: 1.2;
   font-weight: 600;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.02em;
   margin-top: 3rem;
   margin-bottom: 1rem;
   color: var(--color-ink);
 }
 .prose-body h3 {
+  font-family: var(--font-display);
   font-size: 1.25rem;
   line-height: 1.3;
   font-weight: 600;
   margin-top: 2rem;
   margin-bottom: 0.75rem;
-  color: var(--color-ink);
-}
-.prose-body h4 {
-  font-size: 1rem;
-  font-weight: 600;
-  margin-top: 1.5rem;
-  margin-bottom: 0.5rem;
   color: var(--color-ink);
 }
 .prose-body p,
@@ -119,13 +148,13 @@ h2 {
   margin-top: 0.375rem;
 }
 .prose-body a {
-  color: var(--color-indigo-primary);
+  color: var(--color-purple);
   text-decoration: underline;
   text-underline-offset: 2px;
   text-decoration-thickness: 1px;
 }
 .prose-body a:hover {
-  color: var(--color-indigo-primary-dark);
+  color: var(--color-purple-dark);
   text-decoration-thickness: 2px;
 }
 .prose-body hr {
@@ -133,11 +162,13 @@ h2 {
   border-top: 1px solid var(--color-rule);
   margin: 3rem 0;
 }
-.prose-body blockquote {
-  border-left: 2px solid var(--color-indigo-primary);
-  padding-left: 1rem;
-  color: var(--color-muted);
-  margin: 1.5rem 0;
+.prose-body code {
+  font-family: var(--font-mono);
+  background: var(--color-card);
+  border: 1px solid var(--color-rule);
+  padding: 0.1rem 0.35rem;
+  border-radius: 3px;
+  font-size: 0.85em;
 }
 .prose-body table {
   width: 100%;
@@ -156,33 +187,8 @@ h2 {
   background: var(--color-card);
   font-weight: 600;
 }
-.prose-body code {
-  font-family: var(--font-mono);
-  background: var(--color-card);
-  border: 1px solid var(--color-rule);
-  padding: 0.1rem 0.35rem;
-  border-radius: 3px;
-  font-size: 0.85em;
-}
-.prose-body pre {
-  background: var(--color-card);
-  border: 1px solid var(--color-rule);
-  border-radius: 4px;
-  padding: 1rem 1.25rem;
-  overflow-x: auto;
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  line-height: 1.55;
-  margin: 1.5rem 0;
-}
-.prose-body pre code {
-  background: none;
-  border: 0;
-  padding: 0;
-  font-size: inherit;
-}
 
-/* Button primitives ------------------------------------------- */
+/* Buttons --------------------------------------------------------- */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -192,51 +198,64 @@ h2 {
   font-weight: 500;
   font-size: 0.9375rem;
   line-height: 1;
-  border-radius: 2px;
+  border-radius: 6px;
   border: 1px solid transparent;
   transition: background-color 120ms ease, border-color 120ms ease,
-    color 120ms ease;
+    color 120ms ease, transform 120ms ease;
   cursor: pointer;
   text-decoration: none;
 }
+.btn:hover {
+  transform: translateY(-1px);
+}
 .btn-primary {
-  background: var(--color-indigo-primary);
+  background: var(--color-indigo);
   color: #fff;
-  border-color: var(--color-indigo-primary);
+  border-color: var(--color-indigo);
 }
 .btn-primary:hover {
-  background: var(--color-indigo-primary-dark);
-  border-color: var(--color-indigo-primary-dark);
+  background: var(--color-indigo-dark);
+  border-color: var(--color-indigo-dark);
   color: #fff;
 }
 .btn-secondary {
   background: transparent;
   color: var(--color-ink);
-  border-color: var(--color-ink);
+  border-color: var(--color-rule);
 }
 .btn-secondary:hover {
-  background: var(--color-ink);
-  color: var(--color-surface);
+  border-color: var(--color-ink);
+}
+/* OAuth provider buttons: thin grey border, indigo on hover. */
+.btn-oauth {
+  background: transparent;
+  color: var(--color-ink);
+  border-color: var(--color-rule);
+}
+.btn-oauth:hover {
+  border-color: var(--color-indigo);
+  color: var(--color-indigo);
 }
 .btn-inverse {
   background: #fff;
-  color: var(--color-indigo-primary);
+  color: var(--color-indigo);
   border-color: #fff;
 }
 .btn-inverse:hover {
   background: rgba(255, 255, 255, 0.9);
   border-color: rgba(255, 255, 255, 0.9);
-  color: var(--color-indigo-primary);
+  color: var(--color-indigo);
 }
 .btn-ghost {
   background: transparent;
-  color: var(--color-indigo-primary);
+  color: var(--color-indigo);
   border-color: transparent;
   padding-left: 0;
   padding-right: 0;
 }
 .btn-ghost:hover {
   text-decoration: underline;
+  transform: none;
 }
 .prose-body a.btn {
   text-decoration: none;
@@ -245,20 +264,12 @@ h2 {
 .prose-body a.btn-primary:hover {
   color: #fff;
 }
-.prose-body a.btn-secondary {
-  color: var(--color-ink);
-}
-.prose-body a.btn-secondary:hover {
-  color: var(--color-surface);
-}
-.prose-body a.btn-ghost {
-  color: var(--color-indigo-primary);
-}
 
 /* Header / nav --------------------------------------------------- */
 .site-header {
   border-bottom: 1px solid var(--color-rule);
-  background: var(--color-surface);
+  background: color-mix(in srgb, var(--color-surface) 85%, transparent);
+  backdrop-filter: saturate(140%) blur(8px);
 }
 .site-header a.nav-link {
   color: var(--color-ink);
@@ -271,19 +282,19 @@ h2 {
 }
 .site-header a.nav-link:hover,
 .site-header a.nav-link[aria-current="page"] {
-  border-bottom-color: var(--color-indigo-primary);
-  color: var(--color-indigo-primary);
+  border-bottom-color: var(--color-purple);
+  color: var(--color-purple);
 }
 
 /* Announcement bar ------------------------------------------------ */
 .announcement {
-  background: var(--color-indigo-primary);
+  background: var(--color-indigo);
   color: #fafaf8;
   font-size: 0.875rem;
 }
 .announcement a {
   color: #fff;
-  font-weight: 500;
+  font-weight: 600;
   text-decoration: underline;
   text-underline-offset: 2px;
 }
@@ -305,41 +316,203 @@ h2 {
 .site-footer a {
   color: var(--color-ink);
   text-decoration: none;
-  font-size: 0.9375rem;
+  /* Inherit the surrounding size so links match their context (the nav
+     columns are text-sm; the bottom copyright/legal bar is text-xs). */
+  font-size: inherit;
 }
 .site-footer a:hover {
-  color: var(--color-indigo-primary);
+  color: var(--color-purple);
   text-decoration: underline;
 }
 
-/* Cards --------------------------------------------------------- */
+/* Cards ----------------------------------------------------------- */
 .card {
   background: var(--color-card);
   border: 1px solid var(--color-rule);
-  border-radius: 4px;
-  padding: 1.75rem;
+  border-radius: 10px;
+  padding: 1.5rem;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.625rem;
 }
 .card h3 {
+  font-family: var(--font-display);
   font-size: 1.125rem;
   font-weight: 600;
+  letter-spacing: -0.01em;
   margin: 0;
   color: var(--color-ink);
 }
 
-/* Eyebrow label ---------------------------------------------- */
-.eyebrow {
-  display: inline-block;
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--color-indigo-primary);
+/* Repo / software card — GitHub-flavored, with a mono header ------- */
+.repo-card {
+  background: var(--color-card);
+  border: 1px solid var(--color-rule);
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+  transition: border-color 120ms ease, transform 120ms ease;
+}
+.repo-card:hover {
+  border-color: var(--color-purple);
+  transform: translateY(-2px);
+}
+.repo-card .repo-name {
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--color-ink);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-/* Form fields --------------------------------------------------- */
+/* Working-group tile --------------------------------------------- */
+.wg-tile {
+  background: var(--color-card);
+  border: 1px solid var(--color-rule);
+  border-left: 3px solid var(--color-indigo);
+  border-radius: 8px;
+  padding: 1.25rem 1.5rem;
+}
+
+/* Badge / pill --------------------------------------------------- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid var(--color-rule);
+  color: var(--color-muted);
+}
+.badge-indigo {
+  color: var(--color-indigo);
+  border-color: color-mix(in srgb, var(--color-indigo) 45%, transparent);
+  background: color-mix(in srgb, var(--color-indigo) 10%, transparent);
+}
+.badge-purple {
+  color: var(--color-purple);
+  border-color: color-mix(in srgb, var(--color-purple) 40%, transparent);
+  background: color-mix(in srgb, var(--color-purple) 10%, transparent);
+}
+/* Status tones — amber (pending / past due) and red (suspended / expired). */
+.badge-amber {
+  color: #b45309;
+  border-color: color-mix(in srgb, #f59e0b 45%, transparent);
+  background: color-mix(in srgb, #f59e0b 14%, transparent);
+}
+.badge-red {
+  color: #b91c1c;
+  border-color: color-mix(in srgb, #ef4444 45%, transparent);
+  background: color-mix(in srgb, #ef4444 12%, transparent);
+}
+[data-theme="dark"] .badge-amber {
+  color: #fbbf24;
+}
+[data-theme="dark"] .badge-red {
+  color: #f87171;
+}
+
+/* Logo tile — placeholder slots for member / founder logos -------- */
+.logo-tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 5rem;
+  padding: 1rem 1.25rem;
+  background: var(--color-card);
+  border: 1px dashed var(--color-rule);
+  border-radius: 10px;
+  color: var(--color-ink);
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+  transition: border-color 120ms ease, color 120ms ease;
+}
+.logo-tile:hover {
+  border-color: var(--color-purple);
+  border-style: solid;
+  color: var(--color-purple);
+}
+
+/* Logo wall — member / founder logos on a steady light chip so colored or
+   dark-ink logos always read, in both themes ----------------------------- */
+.logo-wall-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 6rem;
+  padding: 1.5rem 2rem;
+  background: #ffffff;
+  border: 1px solid var(--color-rule);
+  border-radius: 10px;
+  transition: border-color 120ms ease, transform 120ms ease;
+}
+.logo-wall-item:hover {
+  border-color: var(--color-purple);
+  transform: translateY(-2px);
+}
+.logo-wall-item img {
+  max-height: 2.25rem;
+  width: auto;
+  max-width: 100%;
+  display: block;
+}
+
+/* Contributor avatar (placeholder) -------------------------------- */
+.avatar {
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #fff;
+  border: 2px solid var(--color-surface);
+}
+
+/* Real contributor avatar (image) -------------------------------- */
+.avatar-img {
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 999px;
+  object-fit: cover;
+  display: block;
+  border: 2px solid var(--color-surface);
+  background: var(--color-rule);
+}
+
+/* Stat / metric tile --------------------------------------------- */
+.stat {
+  font-family: var(--font-mono);
+  font-size: 2rem;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--color-ink);
+}
+.stat-tile {
+  background: var(--color-card);
+  border: 1px solid var(--color-rule);
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+}
+.stat-label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  margin-top: 0.4rem;
+}
+
+/* Form fields ----------------------------------------------------- */
 .form-field {
   display: flex;
   flex-direction: column;
@@ -352,22 +525,30 @@ h2 {
   color: var(--color-ink);
 }
 .form-field label .req {
-  color: var(--color-indigo-primary);
+  color: var(--color-purple);
 }
+.form-field .opt {
+  color: var(--color-muted);
+  font-weight: 400;
+  font-size: 0.8125rem;
+}
+.field,
 .form-field input,
 .form-field select,
 .form-field textarea {
   border: 1px solid var(--color-rule);
   background: var(--color-card);
   padding: 0.625rem 0.75rem;
-  border-radius: 3px;
+  border-radius: 6px;
   font: inherit;
   color: var(--color-ink);
+  width: 100%;
 }
 .form-field input:focus,
 .form-field select:focus,
-.form-field textarea:focus {
-  outline: 2px solid var(--color-indigo-primary);
+.form-field textarea:focus,
+.field:focus {
+  outline: 2px solid var(--color-purple);
   outline-offset: 2px;
 }
 .form-field .hint {
@@ -375,18 +556,18 @@ h2 {
   color: var(--color-muted);
 }
 
-/* Focus states ---------------------------------------------- */
+/* Focus states --------------------------------------------------- */
 a:focus-visible,
 button:focus-visible,
 input:focus-visible,
 textarea:focus-visible,
 select:focus-visible {
-  outline: 2px solid var(--color-indigo-primary);
+  outline: 2px solid var(--color-purple);
   outline-offset: 2px;
-  border-radius: 2px;
+  border-radius: 4px;
 }
 
-/* Cookie banner ------------------------------------------------- */
+/* Cookie banner -------------------------------------------------- */
 .cookie-banner {
   position: fixed;
   bottom: 1rem;
@@ -397,28 +578,14 @@ select:focus-visible {
   margin-right: auto;
   background: var(--color-card);
   border: 1px solid var(--color-rule);
-  border-radius: 4px;
+  border-radius: 10px;
   padding: 1rem 1.25rem;
-  box-shadow: 0 4px 24px rgba(17, 17, 17, 0.08);
+  box-shadow: 0 4px 24px rgba(17, 17, 17, 0.1);
   z-index: 50;
   font-size: 0.875rem;
 }
 
-/* Print --------------------------------------------------------- */
-@media print {
-  .site-header,
-  .site-footer,
-  .announcement,
-  .cookie-banner {
-    display: none !important;
-  }
-  a {
-    color: var(--color-ink);
-    text-decoration: none;
-  }
-}
-
-/* Theme toggle button ---------------------------------------------- */
+/* Theme toggle --------------------------------------------------- */
 .theme-toggle {
   display: inline-flex;
   align-items: center;
@@ -434,8 +601,8 @@ select:focus-visible {
     color 120ms ease;
 }
 .theme-toggle:hover {
-  border-color: var(--color-indigo-primary);
-  color: var(--color-indigo-primary);
+  border-color: var(--color-purple);
+  color: var(--color-purple);
 }
 .theme-toggle .icon-sun {
   display: none;
@@ -450,39 +617,96 @@ select:focus-visible {
   display: none;
 }
 
-/* Dark-mode overrides for static Tailwind colors used inline -------- */
-[data-theme="dark"] .bg-white {
-  background-color: var(--color-card) !important;
+/* Reveal-on-scroll (progressive enhancement) --------------------- */
+.reveal {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 500ms ease, transform 500ms ease;
 }
-[data-theme="dark"] [stroke="#2E2A8F"] {
-  stroke: var(--color-indigo-primary);
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
 }
-[data-theme="dark"] [fill="#2E2A8F"] {
-  fill: var(--color-indigo-primary);
-}
-[data-theme="dark"] [stroke="#111111"] {
-  stroke: var(--color-ink);
-}
-[data-theme="dark"] [fill="#111111"] {
-  fill: var(--color-ink);
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .btn:hover,
+  .repo-card:hover {
+    transform: none;
+  }
 }
 
-/* Buttons in dark mode use dark ink on the lighter indigo ----------- */
+/* Print ---------------------------------------------------------- */
+@media print {
+  .site-header,
+  .site-footer,
+  .announcement,
+  .cookie-banner {
+    display: none !important;
+  }
+  a {
+    color: var(--color-ink);
+    text-decoration: none;
+  }
+}
+
+/* Dark-mode helpers ---------------------------------------------- */
 [data-theme="dark"] .btn-primary {
-  background: var(--color-indigo-primary);
-  border-color: var(--color-indigo-primary);
-  color: #0e0e12;
+  color: #0d0d11;
 }
 [data-theme="dark"] .btn-primary:hover {
-  background: var(--color-indigo-primary-dark);
-  border-color: var(--color-indigo-primary-dark);
-  color: #0e0e12;
+  color: #0d0d11;
 }
-[data-theme="dark"] .prose-body a.btn-primary,
-[data-theme="dark"] .prose-body a.btn-primary:hover {
-  color: #0e0e12;
+[data-theme="dark"] .btn-inverse {
+  background: var(--color-card);
+  border-color: var(--color-card);
+  color: var(--color-purple);
 }
 [data-theme="dark"] .form-field select option {
   background: var(--color-card);
   color: var(--color-ink);
 }
+
+/* Agreement preview (apply review step) -------------------------- */
+.agreement-prose {
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  color: var(--color-ink);
+}
+.agreement-prose h1,
+.agreement-prose h2,
+.agreement-prose h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1.25;
+  margin: 1.25em 0 0.4em;
+}
+.agreement-prose h1 { font-size: 1.15rem; }
+.agreement-prose h2 { font-size: 1.05rem; }
+.agreement-prose h3 { font-size: 0.95rem; }
+.agreement-prose h1:first-child,
+.agreement-prose h2:first-child {
+  margin-top: 0;
+}
+.agreement-prose p { margin: 0.5em 0; }
+.agreement-prose strong { font-weight: 600; }
+.agreement-prose hr {
+  border: 0;
+  border-top: 1px solid var(--color-rule);
+  margin: 1em 0;
+}
+.agreement-prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.75em 0;
+}
+.agreement-prose th,
+.agreement-prose td {
+  border: 1px solid var(--color-rule);
+  padding: 0.35em 0.6em;
+  text-align: left;
+}
+.agreement-prose th { font-weight: 600; }

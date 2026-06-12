@@ -1,0 +1,30 @@
+# Local development dependencies (NOT used in production — the in-cluster
+# Postgres is managed via k8s/postgres.yaml).
+#
+# From the repo root:
+#   npm run db:up      # start Postgres
+#   npm run db:down    # stop it
+#   npm run db:migrate # apply migrations
+# or directly: docker compose -f docker/compose.yaml up -d
+name: verana
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: verana-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: verana
+      POSTGRES_PASSWORD: verana # local dev only — never used in production
+      POSTGRES_DB: verana
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U verana"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  pgdata:

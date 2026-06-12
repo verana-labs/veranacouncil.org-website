@@ -1,0 +1,116 @@
+/**
+ * Personalises a Candidate Agreement template (a file in legal/) for a specific
+ * signer. Council candidates are always organizations; the template is driven by
+ * the org's details and the seat (sector × region) the candidacy targets.
+ * The template content is supplied by the caller (the active version is
+ * resolved in agreement-versions.ts).
+ *
+ * Template syntax:
+ *   {{value}}                          — substituted with a context value
+ *   <!--IF:flag-->A<!--ELSE-->B<!--ENDIF-->  — A when `flag` is true, else B (ELSE optional)
+ * IF blocks may be nested. Flags and values both come from buildAgreementValues().
+ */
+
+export type AgreementContext = {
+  memberLegalName: string;
+  /** e.g. "corporation"; falls back to "legal entity". */
+  entityForm?: string | null;
+  /** Country/jurisdiction of organization. */
+  jurisdiction?: string | null;
+  /** Registered address. */
+  memberAddress?: string | null;
+  signerName: string;
+  /** The signer's role. */
+  signerTitle?: string | null;
+  /** The member's email (the signed-in user's verified email). */
+  memberEmail?: string | null;
+  /** The seat this candidacy targets. */
+  seatSector: string;
+  seatRegion: string;
+  /** Track: founding_member candidacies sign; observers join contractually. */
+  observer?: boolean;
+  effectiveDate: Date;
+};
+
+const MONTHS = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
+];
+
+function ordinal(n: number): string {
+  const rem100 = n % 100;
+  if (rem100 >= 11 && rem100 <= 13) return `${n}th`;
+  switch (n % 10) {
+    case 1: return `${n}st`;
+    case 2: return `${n}nd`;
+    case 3: return `${n}rd`;
+    default: return `${n}th`;
+  }
+}
+
+/** Resolve the template context into boolean flags and string values. */
+export function buildAgreementValues(ctx: AgreementContext): {
+  flags: Record<string, boolean>;
+  values: Record<string, string>;
+} {
+  const address = (ctx.memberAddress ?? "").trim();
+  const d = ctx.effectiveDate;
+
+  const flags = {
+    has_member_address: address.length > 0,
+    is_observer: !!ctx.observer,
+    is_founding_member: !ctx.observer,
+  };
+
+  const values = {
+    member_legal_name: ctx.memberLegalName.trim(),
+    entity_form: (ctx.entityForm ?? "").trim() || "legal entity",
+    jurisdiction: (ctx.jurisdiction ?? "").trim(),
+    member_address: address,
+    signer_name: ctx.signerName.trim(),
+    signer_title: (ctx.signerTitle ?? "").trim(),
+    member_email: (ctx.memberEmail ?? "").trim(),
+    seat_sector: ctx.seatSector.trim(),
+    seat_region: ctx.seatRegion.trim(),
+    seat_label: `${ctx.seatSector.trim()} — ${ctx.seatRegion.trim()}`,
+    effective_day: ordinal(d.getUTCDate()),
+    effective_month: MONTHS[d.getUTCMonth()],
+    effective_year: String(d.getUTCFullYear()),
+    effective_date: `${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`,
+  };
+
+  return { flags, values };
+}
+
+/** Resolve <!--IF:flag-->...<!--ELSE-->...<!--ENDIF--> blocks, innermost first. */
+function resolveConditionals(text: string, flags: Record<string, boolean>): string {
+  // Matches an IF block whose body contains no further IF/ENDIF — i.e. the
+  // innermost block — so repeated passes collapse arbitrary nesting bottom-up.
+  const innermost = /<!--IF:(\w+)-->((?:(?!<!--IF:|<!--ENDIF-->)[\s\S])*?)<!--ENDIF-->/;
+  let out = text;
+  let guard = 0;
+  while (innermost.test(out)) {
+    if (++guard > 1000) throw new Error("agreement template: unbalanced IF/ENDIF");
+    out = out.replace(innermost, (_m, flag: string, body: string) => {
+      const elseIdx = body.indexOf("<!--ELSE-->");
+      const whenTrue = elseIdx === -1 ? body : body.slice(0, elseIdx);
+      const whenFalse = elseIdx === -1 ? "" : body.slice(elseIdx + "<!--ELSE-->".length);
+      if (!(flag in flags)) throw new Error(`agreement template: unknown flag "${flag}"`);
+      return flags[flag] ? whenTrue : whenFalse;
+    });
+  }
+  return out;
+}
+
+/** Apply a fully-built context to a raw template string. */
+export function resolveTemplate(template: string, ctx: AgreementContext): string {
+  const { flags, values } = buildAgreementValues(ctx);
+  let out = resolveConditionals(template, flags);
+  out = out.replace(/\{\{(\w+)\}\}/g, (_m, key: string) => {
+    if (!(key in values)) throw new Error(`agreement template: unknown placeholder "${key}"`);
+    return values[key];
+  });
+  const leftover = out.match(/\{\{[^}]+\}\}|<!--(?:IF:|ELSE|ENDIF)/);
+  if (leftover) throw new Error(`agreement template: unresolved token "${leftover[0]}"`);
+  return out;
+}

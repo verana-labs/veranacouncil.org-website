@@ -46,7 +46,10 @@ export default function Footer() {
               <h3>Participate</h3>
               <ul className="space-y-2">
                 <li>
-                  <Link href="/join">Join the Council</Link>
+                  <Link href="/join">Apply for a seat</Link>
+                </li>
+                <li>
+                  <Link href="/account">Member console</Link>
                 </li>
                 <li>
                   <Link href="/contact">Contact</Link>
@@ -54,45 +57,14 @@ export default function Footer() {
               </ul>
             </div>
             <div>
-              <h3>Documents</h3>
+              <h3>Governance documents</h3>
               <ul className="space-y-2">
                 <li>
                   <a
                     href="https://github.com/verana-labs/verana-council-gov"
                     rel="noopener"
                   >
-                    Governance docs ↗
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="https://github.com/verana-labs/verana-council-gov/tree/main/bylaws"
-                    rel="noopener"
-                  >
-                    Bylaws ↗
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="https://github.com/verana-labs/verana-council-gov/tree/main/code-of-conduct"
-                    rel="noopener"
-                  >
-                    Code of Conduct ↗
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h3>Related sites</h3>
-              <ul className="space-y-2">
-                <li>
-                  <a href="https://verana.io" rel="noopener">
-                    Verana network ↗
-                  </a>
-                </li>
-                <li>
-                  <a href="https://docs.verana.io" rel="noopener">
-                    Verana docs ↗
+                    verana-council-gov ↗
                   </a>
                 </li>
                 <li>
@@ -111,6 +83,26 @@ export default function Footer() {
                     VPR spec ↗
                   </a>
                 </li>
+              </ul>
+            </div>
+            <div>
+              <h3>Related sites</h3>
+              <ul className="space-y-2">
+                <li>
+                  <a href="https://veranafoundation.org" rel="noopener">
+                    Verana Foundation ↗
+                  </a>
+                </li>
+                <li>
+                  <a href="https://verana.io" rel="noopener">
+                    Verana.io ↗
+                  </a>
+                </li>
+                <li>
+                  <a href="https://docs.verana.io" rel="noopener">
+                    Documentation ↗
+                  </a>
+                </li>
                 <li>
                   <a href="https://github.com/verana-labs" rel="noopener">
                     GitHub ↗
@@ -121,17 +113,24 @@ export default function Footer() {
           </div>
           <div className="mt-14 pt-8 border-t border-rule flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-xs text-muted">
             <p>
-              © {year} Verana Council Association (consortium-in-formation)
+              © {year} Verana Council Association (in formation, stewarded by{" "}
+              <a href="https://2060.io" rel="noopener">
+                2060 OÜ
+              </a>
+              )
             </p>
             <ul className="flex flex-wrap gap-4">
               <li>
-                <Link href="/legal/privacy">Privacy</Link>
+                <Link href="/members">Members</Link>
               </li>
               <li>
-                <Link href="/legal/terms">Terms</Link>
+                <Link href="/privacy">Privacy</Link>
               </li>
               <li>
-                <Link href="/legal/cookies">Cookies</Link>
+                <Link href="/terms">Terms</Link>
+              </li>
+              <li>
+                <Link href="/cookies">Cookies</Link>
               </li>
             </ul>
           </div>
@@ -147,7 +146,11 @@ export default function Footer() {
         >
           <p className="mb-3 text-ink text-sm">
             We use essential cookies to run this site and, with your consent,
-            analytics cookies to improve it. We do not sell data.
+            analytics cookies to improve it. We do not sell data. See the{" "}
+            <Link href="/privacy" className="text-indigo underline">
+              Privacy Policy
+            </Link>
+            .
           </p>
           <div className="flex flex-wrap gap-2">
             <button
@@ -164,7 +167,7 @@ export default function Footer() {
             >
               Essential only
             </button>
-            <Link href="/legal/cookies" className="btn btn-ghost text-sm">
+            <Link href="/cookies" className="btn btn-ghost text-sm">
               Preferences
             </Link>
           </div>

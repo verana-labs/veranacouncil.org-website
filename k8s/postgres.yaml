@@ -1,0 +1,88 @@
+# In-cluster Postgres for the Council membership/candidacy features.
+# Named `council-postgres` to coexist with the Foundation's `postgres` in the
+# same `web` namespace. Password comes from the veranacouncil-website-secrets
+# Secret (key POSTGRES_PASSWORD), which CI upserts from a GitHub Actions
+# secret — no credentials are stored in this manifest.
+apiVersion: v1
+kind: Service
+metadata:
+  name: council-postgres
+  namespace: web
+  labels:
+    app.kubernetes.io/name: council-postgres
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: council-postgres
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: 5432
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: council-postgres
+  namespace: web
+  labels:
+    app.kubernetes.io/name: council-postgres
+spec:
+  serviceName: council-postgres
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: council-postgres
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: council-postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:16-alpine
+          ports:
+            - name: postgres
+              containerPort: 5432
+          env:
+            - name: POSTGRES_USER
+              value: verana
+            - name: POSTGRES_DB
+              value: veranacouncil
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: veranacouncil-website-secrets
+                  key: POSTGRES_PASSWORD
+            # Keep data off the volume root so initdb is happy on restored PVCs.
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          livenessProbe:
+            exec:
+              command: ["pg_isready", "-U", "verana"]
+            initialDelaySeconds: 20
+            periodSeconds: 30
+            timeoutSeconds: 5
+          readinessProbe:
+            exec:
+              command: ["pg_isready", "-U", "verana"]
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 3
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 5Gi

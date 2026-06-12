@@ -2,16 +2,12 @@
  * Server-only client for the Relaticle CRM REST API (https://crm.2060.io,
  * in-cluster). Turns a contact-form submission into CRM records.
  *
- * Mapping (mirrors the Verana Foundation site):
+ * Mapping (per product decision):
  *   organization   -> Company    (always created when present; no dedupe)
  *   name/email/…   -> Person      (linked to the company)
  *   full inquiry   -> Note        (linked to the person + company)
- *   lead inquiries -> Opportunity (founding-member / observer; stage = Prospecting)
- *   every inquiry  -> Task        ("To do", Low priority, due in 3 days,
- *                                   assigned to the connected account)
- *
- * Records are created by the API token's user — a "veranacouncil.org" service
- * account on the 2060 team — so the CRM shows them as created by the site.
+ *   lead inquiries -> Opportunity (membership / partnership / grant; stage = Prospecting)
+ *   every inquiry  -> Task        ("To do", assigned to the connected account)
  *
  * Relaticle API contract (v1):
  *   POST /api/v1/people        { name, company_id?, custom_fields:{<code>:value} }
@@ -22,14 +18,15 @@
  *                                opportunity_ids?[], custom_fields }
  *   GET  /api/v1/custom-fields?entity_type=…  (JSON:API: data[].attributes.{code,name,type,options})
  *   GET  /api/v1/user          (connected account; data.id)
- *   Auth: Authorization: Bearer <token>.
+ *   Auth: Authorization: Bearer <token> (token bound to the "2060" team).
  *
  * `custom_fields` is keyed by each field's *code*. Field codes/types/options are
  * discovered at runtime. Value shape depends on the field type: email/phone/link
  * fields take an ARRAY of values; text/rich-editor/select take a scalar (select
  * = the chosen option's value/id). Each create falls back to a
  * custom-field-free payload if the CRM rejects the custom fields, so a mapping
- * mismatch never loses the core record.
+ * mismatch never loses the core record — and the full inquiry is always in the
+ * Note body (and the logs).
  *
  * Never import this from a client component.
  */
@@ -64,15 +61,22 @@ export type CrmResult = {
 };
 
 const TOPIC_LABELS: Record<string, string> = {
-  "founding-member": "Founding Council seat",
-  observer: "Public-Sector Observer",
-  governance: "Governance / framework question",
+  "membership-associate": "Membership — Associate",
+  "membership-contributor": "Membership — Contributor",
+  "working-group": "Working group participation",
+  grant: "Grant / ecosystem",
+  partnership: "Partnership / integration",
   press: "Press or analyst",
   general: "General inquiry",
 };
 
 // Inquiry types that should also open an Opportunity (a lead in the pipeline).
-const LEAD_TOPICS = new Set(["founding-member", "observer"]);
+const LEAD_TOPICS = new Set([
+  "membership-associate",
+  "membership-contributor",
+  "partnership",
+  "grant",
+]);
 
 // Custom-field types whose value must be sent as an array (verified against the
 // live API: email/phone/link reject scalars; text/select/rich-editor are scalar).
@@ -256,7 +260,7 @@ function noteBody(inq: Inquiry): string {
     `Email: ${inq.email}`,
     inq.linkedin ? `LinkedIn: ${inq.linkedin}` : null,
     inq.organization ? `Organization: ${inq.organization}` : null,
-    inq.companyWebsite ? `Organization website: ${inq.companyWebsite}` : null,
+    inq.companyWebsite ? `Company website: ${inq.companyWebsite}` : null,
     inq.role ? `Role: ${inq.role}` : null,
     inq.source ? `Heard about us: ${inq.source}` : null,
     `Consent: yes (${inq.consentAt})`,
@@ -273,8 +277,8 @@ export async function submitInquiry(inq: Inquiry): Promise<CrmResult> {
   const result: CrmResult = {};
 
   // 1) Company (always create when an organization is given; no dedupe). The
-  // "organization website" goes to the company LinkedIn field for linkedin.com
-  // URLs, otherwise to the company domains/website field.
+  // "company website" goes to the company LinkedIn field for linkedin.com URLs,
+  // otherwise to the company domains/website field.
   if (inq.organization?.trim()) {
     const cf = await customFields("company");
     const fields: AnyJson = {};
@@ -360,8 +364,8 @@ export async function submitInquiry(inq: Inquiry): Promise<CrmResult> {
     result.opportunityId = idOf(opp);
   }
 
-  // 5) Follow-up Task (every inquiry): status "To do", Low priority, due in
-  // 3 days, assigned to the connected account, linked to the records above.
+  // 5) Follow-up Task (every inquiry): status "To do", assigned to the
+  // connected account, linked to the person/company/opportunity.
   {
     const cf = await customFields("task");
     const fields: AnyJson = {};
@@ -373,6 +377,7 @@ export async function submitInquiry(inq: Inquiry): Promise<CrmResult> {
     if (priority && low) fields[priority.code] = low;
     const dueField = findField(cf, ["due_date", "due"], /due/i);
     if (dueField) {
+      // Due in 3 days, ISO-8601 (e.g. 2026-06-10T23:36:03Z).
       const due = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
       fields[dueField.code] = due.toISOString().replace(/\.\d{3}Z$/, "Z");
     }

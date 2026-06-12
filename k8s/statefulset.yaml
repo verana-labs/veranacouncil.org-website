@@ -1,0 +1,202 @@
+# StatefulSet (not Deployment) because the pod owns a ReadWriteOnce data volume
+# (signed candidate-agreement PDFs, org logos). On OVH (Cinder RWO) a volume
+# mounts to one node at a time; the StatefulSet's per-ordinal PVC +
+# delete-before-create rollout guarantees a single mounter, where a Deployment's
+# RollingUpdate would spin up a second pod and deadlock on the mount.
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: veranacouncil-website
+  namespace: web
+  labels:
+    app.kubernetes.io/name: veranacouncil-website
+spec:
+  replicas: 1
+  serviceName: veranacouncil-website
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: veranacouncil-website
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: veranacouncil-website
+    spec:
+      # The app runs as uid 1001 (`nextjs`, Dockerfile) but a fresh PVC mounts
+      # root-owned; fsGroup makes kubelet chown the volume to the app's group
+      # on mount; OnRootMismatch skips the walk once ownership is right.
+      securityContext:
+        fsGroup: 1001
+        fsGroupChangePolicy: OnRootMismatch
+      containers:
+        - name: veranacouncil-website
+          # Mutable tag; paired with imagePullPolicy: Always so a
+          # `kubectl rollout restart` in CI always repulls the newest build.
+          image: veranalabs/veranacouncil.org-website:latest
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          env:
+            - name: NODE_ENV
+              value: production
+            - name: PORT
+              value: "3000"
+            - name: HOSTNAME
+              value: 0.0.0.0
+            # Persistent volume for member-generated files (signed
+            # candidate-agreement PDFs, org logos). Mounted from the PVC below.
+            - name: STORAGE_DIR
+              value: /data
+            # Relaticle CRM (in-cluster). The contact form posts inquiries here.
+            - name: RELATICLE_API_URL
+              value: http://relaticle.relaticle.svc.cluster.local
+            - name: RELATICLE_API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: veranacouncil-website-secrets
+                  key: RELATICLE_API_TOKEN
+                  # Optional so the pod still starts if the secret is absent;
+                  # the contact route degrades to best-effort (logs only).
+                  optional: true
+            # ── Membership / candidacies / accounts ──────────────────────────
+            # Secrets come from veranacouncil-website-secrets (CI-injected from
+            # GitHub Actions secrets). optional:true keeps the pod bootable
+            # before a secret exists.
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: veranacouncil-website-secrets
+                  key: DATABASE_URL
+                  optional: true
+            - name: AUTH_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: veranacouncil-website-secrets
+                  key: AUTH_SECRET
+                  optional: true
+            - name: AUTH_URL
+              value: https://veranacouncil.org
+            - name: AUTH_GOOGLE_ID
+              valueFrom:
+                secretKeyRef:
+                  name: veranacouncil-website-secrets
+                  key: AUTH_GOOGLE_ID
+                  optional: true
+            - name: AUTH_GOOGLE_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: veranacouncil-website-secrets
+                  key: AUTH_GOOGLE_SECRET
+                  optional: true
+            - name: AUTH_GITHUB_ID
+              valueFrom:
+                secretKeyRef:
+                  name: veranacouncil-website-secrets
+                  key: AUTH_GITHUB_ID
+                  optional: true
+            - name: AUTH_GITHUB_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: veranacouncil-website-secrets
+                  key: AUTH_GITHUB_SECRET
+                  optional: true
+            # SMTP — host/port + from are plain; username + app password are secrets.
+            - name: MAIL_HOST
+              value: smtp.gmail.com
+            - name: MAIL_PORT
+              value: "587"
+            - name: MAIL_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: veranacouncil-website-secrets
+                  key: MAIL_USERNAME
+                  optional: true
+            - name: MAIL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: veranacouncil-website-secrets
+                  key: MAIL_PASSWORD
+                  optional: true
+            - name: MAIL_FROM_ADDRESS
+              value: no-reply@veranacouncil.org
+            - name: MAIL_FROM_NAME
+              value: Verana Council
+            # ── Admission ballots (provisional, pre-mainnet) ─────────────────
+            # Window length is plain config; CRON_SECRET guards /api/cron/ballots.
+            - name: BALLOT_WINDOW_DAYS
+              value: "14"
+            - name: CRON_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: veranacouncil-website-secrets
+                  key: CRON_SECRET
+                  optional: true
+            # ── Council bodies & committees (meetings machinery) ─────────────
+            # Google Calendar sync (service account with domain-wide delegation
+            # impersonating the meetings@ role account) + the public minutes
+            # repository. All optional: schedules save with a visible "not
+            # configured" notice and minutes stay drafts until these exist.
+            - name: GOOGLE_SA_EMAIL
+              valueFrom:
+                secretKeyRef:
+                  name: veranacouncil-website-secrets
+                  key: GOOGLE_SA_EMAIL
+                  optional: true
+            - name: GOOGLE_SA_PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: veranacouncil-website-secrets
+                  key: GOOGLE_SA_PRIVATE_KEY
+                  optional: true
+            - name: GOOGLE_CALENDAR_IMPERSONATE
+              valueFrom:
+                secretKeyRef:
+                  name: veranacouncil-website-secrets
+                  key: GOOGLE_CALENDAR_IMPERSONATE
+                  optional: true
+            - name: MINUTES_REPO
+              value: verana-labs/verana-council-gov
+            - name: MINUTES_GITHUB_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: veranacouncil-website-secrets
+                  key: MINUTES_GITHUB_TOKEN
+                  optional: true
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 30
+            timeoutSeconds: 3
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 3
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          volumeMounts:
+            - name: data
+              mountPath: /data
+  # Per-pod persistent storage for member-generated files (signed
+  # candidate-agreement PDFs, org logos). RWO: only ever mounted by this
+  # single replica.
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 1Gi

@@ -22,5 +22,5 @@
     "**/*.tsx",
     ".next/types/**/*.ts"
   ],
-  "exclude": ["node_modules", "html", "html2"]
+  "exclude": ["node_modules"]
 }

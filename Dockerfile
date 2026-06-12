@@ -53,3 +53,32 @@ USER nextjs
 EXPOSE 3000
 
 CMD ["node", "server.js"]
+
+# -----------------------------------------------------------------------------
+# Stage 4 — migration runner (used only by the one-off k8s migrate Job)
+# Full dependency tree + Prisma CLI + schema/migrations. Kept out of the lean
+# runtime image above; built/pushed under a separate :migrate tag.
+#
+# ⚠ This is the LAST stage, so it is the DEFAULT `docker build` target. The app
+# image MUST be built with `--target runner` (the CI app build does) — otherwise
+# you ship the migrator (which runs `migrate deploy` and exits → crash loop).
+# -----------------------------------------------------------------------------
+FROM node:22-alpine AS migrator
+
+WORKDIR /app
+
+ENV NODE_ENV=production
+
+COPY --from=deps /app/node_modules ./node_modules
+COPY prisma ./prisma
+COPY package.json ./
+# The seed activates a Membership Agreement version file from legal/.
+COPY legal ./legal
+
+# Generate the Prisma client so this image can also run the seed
+# (node prisma/seed.mjs uses @prisma/client), not just `migrate deploy`.
+RUN node node_modules/prisma/build/index.js generate
+
+USER node
+
+CMD ["node", "node_modules/prisma/build/index.js", "migrate", "deploy"]

@@ -82,14 +82,14 @@ export async function POST(req: NextRequest) {
     organization: String(data.organization ?? "").trim() || undefined,
     role: String(data.role ?? "").trim() || undefined,
     linkedin: String(data.linkedin ?? "").trim() || undefined,
-    companyWebsite: String(data.company_website ?? "").trim() || undefined,
+    companyWebsite:
+      String(data.company_website ?? data.website ?? "").trim() || undefined,
     message,
     source: String(data.source ?? "").trim() || undefined,
     consentAt: new Date().toISOString(),
   };
 
-  // If the CRM isn't configured (e.g. local dev without a token), don't fail
-  // the user — log and report success.
+  // Best-effort: a CRM problem must never fail the user's submission.
   if (!crmConfigured()) {
     console.warn(
       "[contact] Relaticle not configured; inquiry not sent to CRM:",
@@ -109,7 +109,7 @@ export async function POST(req: NextRequest) {
       organization: inquiry.organization,
     });
     await alertOps(
-      `Contact form (veranacouncil.org): CRM write failed for ${name} <${email}> (${topic}). ${String(
+      `Contact form: CRM write failed for ${name} <${email}> (${topic}). ${String(
         err
       ).slice(0, 300)}`
     );

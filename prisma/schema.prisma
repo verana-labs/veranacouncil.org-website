@@ -1,0 +1,645 @@
+// Verana Council — membership, seats, admission ballots & accounts
+// Ported from the veranafoundation.org-website platform; billing removed
+// (Council membership is free), Council domain added (seat matrix, candidacies,
+// provisional admission ballots, public record, ECS expressions of interest).
+//
+// The provisional ballot machinery exists solely to assemble the initial
+// Council before mainnet; at mainnet launch it sunsets and all Council voting
+// moves on-chain (see spec.md).
+//
+// Conventions: cuid() ids, UTC DateTimes, explicit enums for closed sets.
+
+generator client {
+  provider      = "prisma-client-js"
+  // "native" for local dev; the musl/openssl-3 target is for the node:22-alpine runtime.
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Auth.js (NextAuth v5) standard models — field names are required by the adapter
+// ─────────────────────────────────────────────────────────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  name          String? // provider-supplied; refreshed on OAuth sign-in
+  displayName   String? // user-chosen; never touched by providers
+  email         String?   @unique // the verified email is the identity key
+  emailVerified DateTime?
+  image         String?
+
+  accounts         Account[]
+  sessions         Session[]
+  memberships      UserMember[] // orgs this user can act for
+  adminActions     AdminAction[]
+  notifications    Notification[]
+  wgLeads          WgLead[]
+  wgParticipations WgParticipant[]
+  wgSessions       WgSession[] // sessions this user recorded
+  ballotVotes      BallotVote[] // votes this user cast (as an org's voting rep)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String // "google" | "github" | "email" (magic link)
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String // email magic-link / OTP
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Council admin allowlist — the only grant of site-admin rights
+// (the steward pre-incorporation; the Board's secretariat thereafter)
+// ─────────────────────────────────────────────────────────────────────────────
+
+model AdminAllowlistEntry {
+  id            String   @id @default(cuid())
+  email         String   @unique // verified email granted `admin`
+  addedByUserId String?
+  addedAt       DateTime @default(now())
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Members (contracting party) — organizations only (Founding Members & Observers)
+// ─────────────────────────────────────────────────────────────────────────────
+
+model Member {
+  id   String     @id @default(cuid())
+  type MemberType @default(organization)
+
+  legalName String
+
+  entityType        String?
+  jurisdiction      String?
+  registeredAddress String?
+  noticeEmail       String? // formal notices
+  logoUri           String? // storage key of the uploaded logo (logos/{id}.{ext})
+
+  // consent
+  socialAnnouncementConsent Boolean @default(false) // ok to announce on our social networks
+  logoDisplayConsent        Boolean @default(false) // ok to display the logo on veranacouncil.org
+
+  primaryEmail String
+
+  // One membership per member: the durable party + its current Council status.
+  membership       Membership?
+  access           MemberAccess[]
+  userLinks        UserMember[]
+  signatureRecords SignatureRecord[]
+  candidacies      Candidacy[]
+  seat             SeatCell? // the seat this member holds (Founding Members)
+  ballotVotes      BallotVote[] // admission votes this member (as a seated voter) cast
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Membership {
+  id       String @id @default(cuid())
+  memberId String @unique // one membership per member (1:1)
+  member   Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  track  MembershipTrack
+  status MembershipStatus @default(pending)
+  listed Boolean          @default(false) // admin-curated: shown on the public /members page
+
+  // How the member was admitted (provisional mechanism, pre-mainnet)
+  admission   AdmissionKind?
+  seatedAt    DateTime? // Founding Members: when the seat was taken
+  ratifiedAt  DateTime? // ratified at the constitutive General Assembly
+  // Validator readiness & terms
+  testnetValidator ValidatorStatus @default(none) // SHOULD run a testnet node during formation
+  termStart        DateTime? // fixed validator term (mechanics activate at mainnet)
+  termEnd          DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+}
+
+// Who can act for a Member, and how. Derived from MemberAccess on first verified login.
+model UserMember {
+  id       String     @id @default(cuid())
+  userId   String
+  memberId String
+  role     MemberRole
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  member Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, memberId])
+  @@index([memberId])
+}
+
+// Org-managed email allowlist. Admins (`manager`) maintain both lists.
+// Exactly one entry per member may be the voting representative (enforced in actions).
+model MemberAccess {
+  id            String       @id @default(cuid())
+  memberId      String
+  member        Member       @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  email         String
+  role          MemberRole
+  status        AccessStatus @default(invited)
+  votingRep     Boolean      @default(false) // casts the org's admission-ballot vote
+  addedByUserId String?
+  addedAt       DateTime     @default(now())
+
+  @@unique([memberId, email])
+  @@index([email])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// The seat matrix (sector × region) — the Council's signature public element.
+// A row exists only for cells that are open or seated ("n/a" cells have no row);
+// `candidate pending` is derived from queued candidacies. Opening a new cell is
+// itself a Council decision.
+// ─────────────────────────────────────────────────────────────────────────────
+
+model SeatCell {
+  id     String @id @default(cuid())
+  sector Sector
+  region Region
+
+  seatedMemberId String?   @unique
+  seatedMember   Member?   @relation(fields: [seatedMemberId], references: [id])
+  seatedAt       DateTime?
+
+  candidacies Candidacy[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([sector, region])
+}
+
+// A candidacy for a specific open seat. FIFO per seat: ballots run one at a
+// time in order of completedAt (agreement signed + vetting passed).
+model Candidacy {
+  id       String @id @default(cuid())
+  memberId String
+  member   Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  seatId   String
+  seat     SeatCell @relation(fields: [seatId], references: [id])
+
+  status      CandidacyStatus @default(applied)
+  signatureId String? // SignatureRecord of the e-signed candidate agreement
+  vettedAt    DateTime? // Membership & Seats Committee (steward pre-incorporation)
+  completedAt DateTime? // signed + vetted → joins the seat's FIFO queue
+
+  ballot Ballot?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([seatId, status])
+  @@index([memberId])
+}
+
+// One admission ballot per candidacy: accept / refuse, ⅔ supermajority of
+// seated Founding Members, async window (default 14 days). Provisional —
+// sunsets at mainnet launch.
+model Ballot {
+  id          String    @id @default(cuid())
+  candidacyId String    @unique
+  candidacy   Candidacy @relation(fields: [candidacyId], references: [id], onDelete: Cascade)
+
+  opensAt  DateTime  @default(now())
+  closesAt DateTime // opensAt + BALLOT_WINDOW_DAYS
+  status   BallotStatus  @default(open)
+  outcome  BallotOutcome?
+  closedAt DateTime?
+
+  // Snapshot of the electorate size when the ballot opened (⅔ denominator).
+  electorate Int
+
+  votes BallotVote[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+}
+
+// One vote per seated member per ballot, cast by that org's voting representative.
+model BallotVote {
+  id       String @id @default(cuid())
+  ballotId String
+  ballot   Ballot @relation(fields: [ballotId], references: [id], onDelete: Cascade)
+  memberId String // the seated member org whose vote this is
+  member   Member @relation(fields: [memberId], references: [id])
+  userId   String // the representative who cast it
+  user     User   @relation(fields: [userId], references: [id])
+
+  choice VoteChoice
+  castAt DateTime   @default(now())
+
+  @@unique([ballotId, memberId])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// The public record (/news) — generated by console actions and steward acts,
+// never written editorially.
+// ─────────────────────────────────────────────────────────────────────────────
+
+model RecordEntry {
+  id    String          @id @default(cuid())
+  type  RecordEntryType
+  title String
+  body  String?         @db.Text
+  // pointer to the underlying artifact
+  refType String?
+  refId   String?
+  url     String? // e.g. gov-repo commit / minutes file
+
+  publishedAt DateTime @default(now())
+
+  @@index([publishedAt])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ECS Ecosystem Participant — expressions of interest (non-binding waitlist).
+// The formal selection process opens once the Council delivers the ECS-EGF.
+// ─────────────────────────────────────────────────────────────────────────────
+
+model EcsInterest {
+  id           String  @id @default(cuid())
+  orgName      String
+  sector       String
+  intendedRole String // e.g. issuer / grantor / orchestrator per ECS-EGF draft roles
+  contactName  String
+  contactEmail String
+  message      String? @db.Text
+  userId       String? // set when submitted signed-in
+
+  createdAt DateTime @default(now())
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Candidate Agreement (admin-configurable PDF) + e-signature record
+// ─────────────────────────────────────────────────────────────────────────────
+
+// Catalog of agreement template versions. One row per version file in legal/.
+// The hash is pinned at first activation: a filename, once activated, is bound to
+// that hash forever, so candidates who signed "vN" can trust it never changed.
+model AgreementDocument {
+  id            String   @id @default(cuid())
+  filename      String   @unique // version file in legal/, e.g. "candidate-agreement-v1.md"
+  version       String // label derived from filename, e.g. "v1"
+  hash          String // pinned sha384 of the file, SRI form ("sha384-…")
+  hashAlgo      String   @default("sha384")
+  active        Boolean  @default(false)
+  effectiveFrom DateTime @default(now())
+  createdAt     DateTime @default(now())
+}
+
+model SignatureRecord {
+  id       String @id @default(cuid())
+  memberId String
+  member   Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  signerName    String
+  signerTitle   String?
+  emailVerified Boolean @default(false)
+
+  // the AgreementDocument that was accepted (snapshot — survives later config changes)
+  agreementVersion String
+  agreementUrl     String
+  agreementHash    String? // sha256 of the signed PDF
+
+  // Storage key (path under STORAGE_DIR volume) of the exact personalised PDF
+  // that was signed, kept verbatim so the member can re-download it and so later
+  // template edits never alter a signed copy.
+  agreementPdfPath String?
+
+  signedAt  DateTime @default(now())
+  ip        String?
+  userAgent String?
+
+  @@index([memberId])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Council bodies & committees (General Assembly, Membership & Seats, Technical…)
+// Reuses the foundation platform's working-group machinery: schedules synced to
+// Google Calendar, sessions with attendance + Markdown minutes published to the
+// public governance repo. Model names keep the Wg* prefix from the port.
+// ─────────────────────────────────────────────────────────────────────────────
+
+model WorkingGroup {
+  id            String            @id @default(cuid())
+  slug          String            @unique // URL + minutes-repo folder name
+  name          String
+  description   String?
+  requiredClass RequiredClass     @default(any)
+  link          String // external URL to the body's space
+  showOnHome    Boolean           @default(false) // featured on the public home page
+  state         WorkingGroupState @default(enabled) // disabled = hidden from public pages
+  priority      Int               @default(0) // higher shows first in public listings
+  disabledAt    DateTime? // when state last became disabled (admin grace window)
+
+  leads        WgLead[]
+  participants WgParticipant[]
+  schedule     WgSchedule?
+  sessions     WgSession[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum WorkingGroupState {
+  enabled
+  disabled
+}
+
+// Leads run the body. Invariant (enforced in actions): never zero leads.
+model WgLead {
+  id            String       @id @default(cuid())
+  wgId          String
+  wg            WorkingGroup @relation(fields: [wgId], references: [id], onDelete: Cascade)
+  userId        String
+  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  addedByUserId String?
+  createdAt     DateTime     @default(now())
+
+  @@unique([wgId, userId])
+  @@index([userId])
+}
+
+// Explicit membership in a body: who gets Calendar invites and appears in the
+// attendance picker. Access is still re-checked per request.
+model WgParticipant {
+  id       String       @id @default(cuid())
+  wgId     String
+  wg       WorkingGroup @relation(fields: [wgId], references: [id], onDelete: Cascade)
+  userId   String
+  user     User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  joinedAt DateTime     @default(now())
+  leftAt   DateTime?
+
+  @@unique([wgId, userId])
+  @@index([userId])
+}
+
+// One recurring meeting series per body. The DB is canonical; Google Calendar is
+// the delivery rail (event on the meetings@ role account, one-way DB→Google).
+model WgSchedule {
+  id          String       @id @default(cuid())
+  wgId        String       @unique
+  wg          WorkingGroup @relation(fields: [wgId], references: [id], onDelete: Cascade)
+  startsAt    DateTime // first occurrence (DTSTART)
+  durationMin Int
+  timezone    String // IANA, e.g. "Europe/Paris"
+  rrule       String // RFC 5545, e.g. "FREQ=WEEKLY;BYDAY=WE"
+
+  // Google sync state — set after a successful Calendar API push.
+  googleEventId String?
+  meetLink      String? // auto-created Meet link, participants-only
+  syncedAt      DateTime?
+  syncError     String? // last push failure; UI offers retry while set
+
+  exceptions WgScheduleException[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// A cancelled occurrence ("skip next week"), mirrored to the Calendar instance.
+model WgScheduleException {
+  id            String     @id @default(cuid())
+  scheduleId    String
+  schedule      WgSchedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+  originalStart DateTime // the occurrence's scheduled start (UTC)
+  note          String?
+  createdAt     DateTime   @default(now())
+
+  @@unique([scheduleId, originalStart])
+}
+
+// A meeting's record: attendance + Markdown minutes. Published minutes are
+// committed to the public governance repo; the DB copy renders history pages.
+model WgSession {
+  id           String          @id @default(cuid())
+  wgId         String
+  wg           WorkingGroup    @relation(fields: [wgId], references: [id], onDelete: Cascade)
+  occurredAt   DateTime
+  status       WgSessionStatus @default(draft)
+  notesMd      String          @default("") @db.Text
+  recordedById String
+  recordedBy   User            @relation(fields: [recordedById], references: [id])
+
+  // GitHub publish state (minutes repo path + commit, for the citable record)
+  notesPath      String?
+  notesCommitSha String?
+
+  attendees WgSessionAttendee[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([wgId, occurredAt])
+  @@index([wgId, status])
+}
+
+// Attendance snapshot: name is frozen at recording time; guests have no userId.
+model WgSessionAttendee {
+  id        String    @id @default(cuid())
+  sessionId String
+  session   WgSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  userId    String?
+  name      String
+
+  @@index([sessionId])
+}
+
+enum WgSessionStatus {
+  draft
+  published
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Audit + notifications
+// ─────────────────────────────────────────────────────────────────────────────
+
+model AdminAction {
+  id          String   @id @default(cuid())
+  actorUserId String?
+  actor       User?    @relation(fields: [actorUserId], references: [id])
+  actorEmail  String
+  action      String // e.g. "candidacy.vet", "ballot.open", "access.remove"
+  targetType  String?
+  targetId    String?
+  before      Json?
+  after       Json?
+  at          DateTime @default(now())
+  ip          String?
+
+  @@index([actorUserId])
+  @@index([targetType, targetId])
+}
+
+model Notification {
+  id        String              @id @default(cuid())
+  userId    String
+  user      User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String // "added_to_org" | "ballot_opened" | "candidacy_result" | ...
+  channel   NotificationChannel @default(in_app)
+  payload   Json?
+  readAt    DateTime?
+  createdAt DateTime            @default(now())
+
+  @@index([userId, readAt])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Enums
+// ─────────────────────────────────────────────────────────────────────────────
+
+enum MemberType {
+  organization
+}
+
+enum MembershipTrack {
+  founding_member // voting; Verein member; runs a validator
+  observer // Public-Sector Observer: contractual, non-voting
+}
+
+enum MembershipStatus {
+  pending
+  active // seated (founding member) / accepted (observer)
+  suspended
+  ended // left / term not renewed (records retained)
+}
+
+enum AdmissionKind {
+  seed // steward-designated seed cohort (first 3, published rationale)
+  ballot // ⅔ peer vote (provisional mechanism)
+  board // observers: steward pre-incorporation, Board thereafter
+}
+
+enum ValidatorStatus {
+  none
+  in_progress
+  online
+}
+
+enum CandidacyStatus {
+  applied // seat picked, agreement not yet signed
+  signed // agreement e-signed, vetting underway
+  queued // signed + vetted; in the seat's FIFO queue
+  ballot_open
+  accepted
+  refused
+  lapsed // another candidate took the seat
+  withdrawn
+}
+
+enum BallotStatus {
+  open
+  closed
+}
+
+enum BallotOutcome {
+  accepted
+  refused // includes window close without the ⅔ threshold
+}
+
+enum VoteChoice {
+  accept
+  refuse
+}
+
+enum Sector {
+  financial_services
+  workforce
+  communications
+  industrial_iot
+  energy_sustainability
+  logistics_supply_chain
+  ai_agentic_identity
+  ai_agentic_commerce
+  idv_kyc
+  markets_commodities
+  legal
+  crypto_validators
+  academic_research
+  standards_liaison
+  public_sector
+}
+
+enum Region {
+  americas
+  emea
+  apac
+  latam
+  africa
+}
+
+enum MemberRole {
+  manager // org admin: manage profile, access list, candidacy
+  representative // participation access only
+}
+
+enum AccessStatus {
+  invited // email allowlisted, no account yet
+  active // linked to a signed-in user
+  removed
+}
+
+enum RequiredClass {
+  any
+  associate // legacy port artifact; council bodies use `any` + explicit participants
+}
+
+enum RecordEntryType {
+  candidacy_opened
+  ballot_opened
+  ballot_result
+  member_seated
+  observer_accepted
+  seed_designation
+  minutes_published
+  framework
+  milestone
+}
+
+enum NotificationChannel {
+  in_app
+  email
+}

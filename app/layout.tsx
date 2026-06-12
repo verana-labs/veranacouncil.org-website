@@ -1,9 +1,16 @@
 import type { Metadata } from "next";
-import { Inter, IBM_Plex_Mono, Space_Grotesk } from "next/font/google";
+import { Inter, IBM_Plex_Mono } from "next/font/google";
+import { config } from "@fortawesome/fontawesome-svg-core";
+import "@fortawesome/fontawesome-svg-core/styles.css";
 import "./globals.css";
 import Nav from "./components/Nav";
 import Footer from "./components/Footer";
 
+// We import the Font Awesome CSS ourselves (above); stop it auto-injecting.
+config.autoAddCss = false;
+
+// All-Inter: the Council has no display face (the absence is the signal vs.
+// the Foundation's Space Grotesk).
 const inter = Inter({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
@@ -18,46 +25,38 @@ const ibmPlexMono = IBM_Plex_Mono({
   display: "swap",
 });
 
-const spaceGrotesk = Space_Grotesk({
-  subsets: ["latin"],
-  weight: ["500", "600", "700"],
-  variable: "--font-space-grotesk",
-  display: "swap",
-});
-
 const SITE_URL = "https://veranacouncil.org";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default:
-      "Verana Council: the governance body of the open public trust layer",
+    default: "Verana Council: the governance body of the open public trust layer",
     template: "%s · Verana Council",
   },
   description:
-    "The Verana Council Association is a non-profit Swiss Verein that authors and operates the governance frameworks every ecosystem on the Verana network must respect, and secures the chain on which they run.",
+    "The Verana Council Association authors and operates the governance frameworks of the Verana network and is the sole body that governs and secures it. Non-profit Swiss Verein, in formation, stewarded by 2060 OÜ. Founding Council recruitment open through Q4 2026.",
   alternates: { canonical: "/" },
-  manifest: "/site.webmanifest",
   icons: {
-    icon: [
-      { url: "/assets/img/favicon.svg", type: "image/svg+xml" },
-      { url: "/assets/img/favicon-32.png", type: "image/png", sizes: "32x32" },
-      { url: "/assets/img/favicon-16.png", type: "image/png", sizes: "16x16" },
-    ],
-    apple: [
-      { url: "/assets/img/apple-touch-icon.png", sizes: "180x180" },
-    ],
+    icon: [{ url: "/assets/img/favicon.svg", type: "image/svg+xml" }],
   },
   openGraph: {
     type: "website",
     url: SITE_URL,
-    title:
-      "Verana Council: the governance body of the open public trust layer",
+    title: "Verana Council: the governance body of the open public trust layer",
     description:
-      "Non-profit Swiss Verein. One-member-one-vote. Founding Members co-author the rules through Q3 2026.",
+      "One member, one vote. Authors and operates the frameworks. Sole securer of the network. Membership is free — apply for a Founding Council Seat.",
+    images: [
+      {
+        url: "/assets/img/og-default.svg",
+        width: 1200,
+        height: 630,
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
     images: ["/assets/img/og-default.svg"],
   },
-  twitter: { card: "summary_large_image" },
 };
 
 // Set the theme before paint to avoid a flash of the wrong color scheme.
@@ -80,7 +79,11 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${ibmPlexMono.variable} ${spaceGrotesk.variable}`}
+      // The inline themeInitScript sets data-theme on <html> before React
+      // hydrates, so the attribute intentionally differs from the server HTML.
+      // Scope hydration-mismatch suppression to this element only.
+      suppressHydrationWarning
+      className={`${inter.variable} ${ibmPlexMono.variable}`}
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />

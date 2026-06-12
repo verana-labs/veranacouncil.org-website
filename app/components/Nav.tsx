@@ -3,6 +3,10 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { signOut } from "next-auth/react";
+import UserMenu, { type MeUser, type MeAction } from "@/app/components/UserMenu";
+
+type Me = { user: MeUser | null; actions: MeAction[]; isMember: boolean };
 
 const NAV_LINKS = [
   { href: "/about", label: "About" },
@@ -19,16 +23,21 @@ export default function Nav() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [announcementVisible, setAnnouncementVisible] = useState(false);
   const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [me, setMe] = useState<Me | undefined>(undefined);
 
   useEffect(() => {
-    setAnnouncementVisible(
-      localStorage.getItem(ANNOUNCEMENT_KEY) !== "true"
-    );
+    setAnnouncementVisible(localStorage.getItem(ANNOUNCEMENT_KEY) !== "true");
     const current = document.documentElement.getAttribute("data-theme");
     setTheme(current === "dark" ? "dark" : "light");
   }, []);
 
-  // Close the mobile menu whenever the route changes.
+  useEffect(() => {
+    fetch("/api/me")
+      .then((r) => r.json())
+      .then(setMe)
+      .catch(() => setMe({ user: null, actions: [], isMember: false }));
+  }, [pathname]);
+
   useEffect(() => {
     setMenuOpen(false);
   }, [pathname]);
@@ -57,12 +66,10 @@ export default function Nav() {
     <>
       {announcementVisible && (
         <aside className="announcement">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex items-center gap-4 justify-center text-center text-sm">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex items-center gap-4 justify-center text-center">
             <span>
-              ◆ Founding Council recruitment is open through Q3 2026. Founding
-              Members co-author the Network GF, the ECS-EGF, and the Association
-              bylaws.{" "}
-              <Link href="/join" className="font-medium underline">
+              ◆ Founding Council recruitment is open through Q4 2026.{" "}
+              <Link href="/join" className="underline">
                 Apply →
               </Link>
             </span>
@@ -84,19 +91,26 @@ export default function Nav() {
             <Link
               href="/"
               className="flex items-center gap-2.5 wordmark text-xl text-ink"
-              aria-label="VeranaCouncil home"
+              aria-label="Verana Council home"
             >
               <svg
                 width="22"
                 height="22"
                 viewBox="0 0 54 52"
-                fill="currentColor"
                 aria-hidden="true"
               >
-                <path d="M26.9932 51.6972L5.805 11.0977L2.91263 16.2161L0 10.6048L5.98725 0L26.9932 40.2483L47.9993 0L54 10.6217L51.0773 16.2161L48.1849 11.0977L26.9932 51.6972Z" />
-                <path d="M13.696 0L26.9935 25.4637L39.9367 0H13.696Z" />
+                <path
+                  fill="var(--color-indigo)"
+                  d="M26.9932 51.6972L5.805 11.0977L2.91263 16.2161L0 10.6048L5.98725 0L26.9932 40.2483L47.9993 0L54 10.6217L51.0773 16.2161L48.1849 11.0977L26.9932 51.6972Z"
+                />
+                <path
+                  fill="var(--color-purple)"
+                  d="M13.696 0L26.9935 25.4637L39.9367 0H13.696Z"
+                />
               </svg>
-              <span>VeranaCouncil</span>
+              <span>
+                Verana<span className="dot">Council</span>
+              </span>
             </Link>
 
             <nav
@@ -115,16 +129,19 @@ export default function Nav() {
               ))}
             </nav>
 
-            <div className="hidden md:flex items-center gap-4">
-              <Link
-                href="/contact"
-                className="text-sm text-muted hover:text-indigo-primary"
-              >
-                Contact
-              </Link>
-              <Link href="/join" className="btn btn-primary text-sm px-4 py-2">
-                Join
-              </Link>
+            <div className="hidden md:flex items-center gap-3">
+              {me === undefined ? null : me.user ? (
+                <UserMenu user={me.user} actions={me.actions} />
+              ) : (
+                <Link href="/login" className="nav-link text-sm">
+                  Sign in
+                </Link>
+              )}
+              {!me?.isMember && (
+                <Link href="/join" className="btn btn-primary text-sm px-4 py-2">
+                  Apply
+                </Link>
+              )}
               <button
                 type="button"
                 onClick={toggleTheme}
@@ -240,15 +257,42 @@ export default function Nav() {
                   {link.label}
                 </Link>
               ))}
-              <Link href="/contact" className="block w-full py-2 nav-link">
-                Contact
-              </Link>
-              <Link
-                href="/join"
-                className="block w-full py-2 nav-link font-medium text-indigo-primary"
-              >
-                Join →
-              </Link>
+              {!me?.isMember && (
+                <Link
+                  href="/join"
+                  className="block w-full py-2 nav-link font-medium text-indigo"
+                >
+                  Apply →
+                </Link>
+              )}
+              <div className="w-full border-t border-rule my-2" />
+              {me?.user ? (
+                <>
+                  <span className="text-xs text-muted py-1 truncate w-full">
+                    {me.user.email}
+                  </span>
+                  {me.actions.map((a) => (
+                    <Link
+                      key={a.href}
+                      href={a.href}
+                      className="block w-full py-2 nav-link"
+                    >
+                      {a.label}
+                    </Link>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => signOut({ callbackUrl: "/" })}
+                    className="block w-full text-left py-2 nav-link"
+                  >
+                    Sign out
+                  </button>
+                </>
+              ) : (
+                <Link href="/login" className="block w-full py-2 nav-link">
+                  Sign in
+                </Link>
+              )}
             </div>
           )}
         </div>

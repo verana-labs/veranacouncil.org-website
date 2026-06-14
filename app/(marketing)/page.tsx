@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { latestRecord } from "@/app/lib/record";
-import SeatMatrix from "@/app/components/SeatMatrix";
+import SeatBoard from "@/app/components/SeatBoard";
 
-// Live data (seat matrix / record) on every request — never prerender.
+// Live data (seat board / record) on every request — never prerender.
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
@@ -51,8 +51,9 @@ export default async function HomePage() {
             <div className="card">
               <h3>One member, one vote</h3>
               <p className="text-sm text-muted leading-relaxed">
-                Seat-diversity rule — one voice per sector × region. A ⅔
-                supermajority for any protocol-governance change.
+                Seat-diversity rule — a broad spread across sectors and regions,
+                capped at 25 members. A ⅔ supermajority for any
+                protocol-governance change.
               </p>
             </div>
             <div className="card">
@@ -73,16 +74,17 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Seat matrix */}
+      {/* Seats */}
       <section className="border-b border-rule">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <p className="tag mb-3">Seats</p>
-          <h2 className="display text-3xl">The seat matrix</h2>
+          <h2 className="display text-3xl">Founding Council seats</h2>
           <div className="accent-line mt-4 mb-4" />
           <p className="text-muted text-sm max-w-2xl mb-8">
-            One voice per sector × region. An open cell is an invitation.
+            A capped, diverse council — broad spread across sectors and regions.
+            An open seat is an invitation.
           </p>
-          <SeatMatrix compact />
+          <SeatBoard compact />
           <p className="text-sm mt-6">
             <Link href="/members" className="text-indigo hover:underline">
               Members &amp; how seats work →

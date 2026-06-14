@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import SeatMatrix from "@/app/components/SeatMatrix";
+import SeatBoard from "@/app/components/SeatBoard";
 
-// Live data (seat matrix / record) on every request — never prerender.
+// Live data (seat board / record) on every request — never prerender.
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = { title: "Apply for a Founding Council Seat" };
@@ -82,8 +82,8 @@ export default function JoinPage() {
           <ol className="grid gap-4 max-w-3xl text-sm leading-relaxed list-decimal pl-5">
             <li>
               <strong>Apply</strong> — sign in (Google, GitHub, or an email
-              code), select an open seat from the matrix, and e-sign the
-              Candidate Agreement for that seat.
+              code), pick the sector and region that fit your organization, and
+              e-sign the Candidate Agreement.
             </li>
             <li>
               <strong>Vetting</strong> — the Membership &amp; Seats Committee
@@ -93,13 +93,12 @@ export default function JoinPage() {
             <li>
               <strong>Ballot</strong> — one vote per candidate, accept or
               refuse, by a ⅔ supermajority of seated members, in an async
-              14-day window. Ballots for the same seat run one at a time, in
-              order of completed candidacy.
+              14-day window. Admissions stop at the 25-seat cap.
             </li>
             <li>
-              <strong>Seated</strong> — the seat flips to <em>seated</em> on
-              the public record. Refused or lapsed candidates may switch to
-              another open seat (re-sign only) or stand by as successor.
+              <strong>Seated</strong> — your organization is named on the
+              public record only once accepted/seated. A refused candidate may
+              re-apply under another sector/region.
             </li>
           </ol>
           <p className="max-w-3xl text-sm text-muted leading-relaxed mt-6">
@@ -118,12 +117,15 @@ export default function JoinPage() {
       <section className="border-b border-rule">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <p className="tag mb-3">Open seats</p>
-          <h2 className="display text-3xl">Pick a seat to start</h2>
+          <h2 className="display text-3xl">Seats at a glance</h2>
           <div className="accent-line mt-4 mb-8" />
-          <SeatMatrix compact />
+          <SeatBoard compact />
           <p className="text-sm text-muted mt-4">
-            Click an open cell to start the candidacy for that seat.
-            Pre-incorporation submissions are confidential.
+            <Link href="/apply" className="text-indigo hover:underline">
+              Start a candidacy →
+            </Link>{" "}
+            — pick your sector and region in the form. Pre-incorporation
+            submissions are confidential.
           </p>
         </div>
       </section>

@@ -3,9 +3,9 @@
 import { revalidatePath } from "next/cache";
 import { db } from "@/app/lib/db";
 import { currentUser, isAdmin } from "@/app/lib/authz";
-import { openNextBallotForSeat, seatedVoters } from "@/app/lib/ballots";
+import { openBallotForCandidacy, seatedCount } from "@/app/lib/ballots";
 import { addRecord } from "@/app/lib/record";
-import { seatLabel } from "@/app/lib/seats";
+import { seatLabel, COUNCIL_SEAT_CAP } from "@/app/lib/seats";
 
 /** Seed designations end as soon as the ⅔ mechanism can function. */
 const SEED_COHORT_MAX = 3;
@@ -16,7 +16,7 @@ async function assertAdmin() {
   return user;
 }
 
-/** Vetting passed: the candidacy joins the seat's FIFO queue. */
+/** Vetting passed: the candidacy becomes eligible for a ballot. */
 export async function vetCandidacy(candidacyId: string) {
   const actor = await assertAdmin();
   const c = await db.candidacy.findUnique({ where: { id: candidacyId } });
@@ -40,11 +40,11 @@ export async function vetCandidacy(candidacyId: string) {
   revalidatePath("/admin/candidacies");
 }
 
-/** Open the next FIFO ballot on a seat (steward act). */
-export async function openBallot(seatId: string) {
+/** Open the admission ballot for a vetted candidacy (steward act). */
+export async function openBallot(candidacyId: string) {
   const actor = await assertAdmin();
-  const ballot = await openNextBallotForSeat(seatId, actor.email!);
-  if (!ballot) throw new Error("No queued candidacy, or a ballot is already open for this seat.");
+  const ballot = await openBallotForCandidacy(candidacyId, actor.email!);
+  if (!ballot) throw new Error("Candidacy is not vetted, or a ballot is already open for it.");
   revalidatePath("/admin/candidacies");
   revalidatePath("/account/ballots");
 }
@@ -56,22 +56,22 @@ export async function openBallot(seatId: string) {
  */
 export async function designateSeed(candidacyId: string, rationale: string) {
   const actor = await assertAdmin();
-  const seated = await seatedVoters();
-  if (seated.length >= SEED_COHORT_MAX) {
+  const seated = await seatedCount();
+  if (seated >= SEED_COHORT_MAX) {
     throw new Error(
       `The seed cohort is complete (${SEED_COHORT_MAX}) — admissions now require a ⅔ peer vote.`,
     );
   }
+  if (seated >= COUNCIL_SEAT_CAP) throw new Error(`The ${COUNCIL_SEAT_CAP}-seat cap is reached.`);
   if (!rationale.trim()) throw new Error("A published rationale is required for a seed designation.");
 
   const c = await db.candidacy.findUnique({
     where: { id: candidacyId },
-    include: { member: true, seat: true },
+    include: { member: true },
   });
   if (!c || !["signed", "queued"].includes(c.status)) {
     throw new Error("Candidacy must be signed (and vetted) before designation.");
   }
-  if (c.seat.seatedMemberId) throw new Error("The seat is already taken.");
 
   const seatedAt = new Date();
   await db.$transaction(async (tx) => {
@@ -79,32 +79,33 @@ export async function designateSeed(candidacyId: string, rationale: string) {
       where: { id: c.id },
       data: { status: "accepted", vettedAt: c.vettedAt ?? seatedAt, completedAt: c.completedAt ?? seatedAt },
     });
-    await tx.seatCell.update({
-      where: { id: c.seatId },
-      data: { seatedMemberId: c.memberId, seatedAt },
-    });
     await tx.membership.upsert({
       where: { memberId: c.memberId },
-      update: { track: "founding_member", status: "active", admission: "seed", seatedAt },
+      update: {
+        track: "founding_member",
+        status: "active",
+        admission: "seed",
+        sector: c.sector,
+        region: c.region,
+        seatedAt,
+      },
       create: {
         memberId: c.memberId,
         track: "founding_member",
         status: "active",
         admission: "seed",
+        sector: c.sector,
+        region: c.region,
         seatedAt,
       },
-    });
-    await tx.candidacy.updateMany({
-      where: { seatId: c.seatId, id: { not: c.id }, status: { in: ["applied", "signed", "queued"] } },
-      data: { status: "lapsed" },
     });
     await addRecord(
       {
         type: "seed_designation",
-        title: `Seed designation — ${c.member.legalName} seated as ${seatLabel(c.seat.sector, c.seat.region)} (${seated.length + 1}/${SEED_COHORT_MAX})`,
+        title: `Seed designation — ${c.member.legalName} seated as ${seatLabel(c.sector, c.region)} (${seated + 1}/${SEED_COHORT_MAX})`,
         body: rationale.trim(),
-        refType: "seat",
-        refId: c.seatId,
+        refType: "member",
+        refId: c.memberId,
       },
       tx,
     );

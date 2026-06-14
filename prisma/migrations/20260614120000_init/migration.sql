@@ -35,7 +35,7 @@ CREATE TYPE "BallotOutcome" AS ENUM ('accepted', 'refused');
 CREATE TYPE "VoteChoice" AS ENUM ('accept', 'refuse');
 
 -- CreateEnum
-CREATE TYPE "Sector" AS ENUM ('financial_services', 'workforce', 'communications', 'industrial_iot', 'energy_sustainability', 'logistics_supply_chain', 'ai_agentic_identity', 'ai_agentic_commerce', 'idv_kyc', 'markets_commodities', 'legal', 'crypto_validators', 'academic_research', 'standards_liaison', 'public_sector');
+CREATE TYPE "Sector" AS ENUM ('financial_services', 'workforce', 'communications', 'industrial_iot', 'energy_sustainability', 'logistics_supply_chain', 'ai_agentic', 'idv_kyc', 'legal', 'crypto_validators', 'academic_research', 'standards_bodies', 'public_sector');
 
 -- CreateEnum
 CREATE TYPE "Region" AS ENUM ('americas', 'emea', 'apac', 'latam', 'africa');
@@ -140,6 +140,8 @@ CREATE TABLE "Membership" (
     "track" "MembershipTrack" NOT NULL,
     "status" "MembershipStatus" NOT NULL DEFAULT 'pending',
     "listed" BOOLEAN NOT NULL DEFAULT false,
+    "sector" "Sector",
+    "region" "Region",
     "admission" "AdmissionKind",
     "seatedAt" TIMESTAMP(3),
     "ratifiedAt" TIMESTAMP(3),
@@ -178,23 +180,11 @@ CREATE TABLE "MemberAccess" (
 );
 
 -- CreateTable
-CREATE TABLE "SeatCell" (
-    "id" TEXT NOT NULL,
-    "sector" "Sector" NOT NULL,
-    "region" "Region" NOT NULL,
-    "seatedMemberId" TEXT,
-    "seatedAt" TIMESTAMP(3),
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "SeatCell_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
 CREATE TABLE "Candidacy" (
     "id" TEXT NOT NULL,
     "memberId" TEXT NOT NULL,
-    "seatId" TEXT NOT NULL,
+    "sector" "Sector" NOT NULL,
+    "region" "Region" NOT NULL,
     "status" "CandidacyStatus" NOT NULL DEFAULT 'applied',
     "signatureId" TEXT,
     "vettedAt" TIMESTAMP(3),
@@ -455,13 +445,7 @@ CREATE INDEX "MemberAccess_email_idx" ON "MemberAccess"("email");
 CREATE UNIQUE INDEX "MemberAccess_memberId_email_key" ON "MemberAccess"("memberId", "email");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "SeatCell_seatedMemberId_key" ON "SeatCell"("seatedMemberId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "SeatCell_sector_region_key" ON "SeatCell"("sector", "region");
-
--- CreateIndex
-CREATE INDEX "Candidacy_seatId_status_idx" ON "Candidacy"("seatId", "status");
+CREATE INDEX "Candidacy_status_idx" ON "Candidacy"("status");
 
 -- CreateIndex
 CREATE INDEX "Candidacy_memberId_idx" ON "Candidacy"("memberId");
@@ -542,13 +526,7 @@ ALTER TABLE "UserMember" ADD CONSTRAINT "UserMember_memberId_fkey" FOREIGN KEY (
 ALTER TABLE "MemberAccess" ADD CONSTRAINT "MemberAccess_memberId_fkey" FOREIGN KEY ("memberId") REFERENCES "Member"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "SeatCell" ADD CONSTRAINT "SeatCell_seatedMemberId_fkey" FOREIGN KEY ("seatedMemberId") REFERENCES "Member"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "Candidacy" ADD CONSTRAINT "Candidacy_memberId_fkey" FOREIGN KEY ("memberId") REFERENCES "Member"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Candidacy" ADD CONSTRAINT "Candidacy_seatId_fkey" FOREIGN KEY ("seatId") REFERENCES "SeatCell"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Ballot" ADD CONSTRAINT "Ballot_candidacyId_fkey" FOREIGN KEY ("candidacyId") REFERENCES "Candidacy"("id") ON DELETE CASCADE ON UPDATE CASCADE;

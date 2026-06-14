@@ -3,7 +3,7 @@ import Link from "next/link";
 import { getActiveAgreement } from "@/app/lib/agreement";
 import { currentUser } from "@/app/lib/authz";
 import { db } from "@/app/lib/db";
-import { seatLabel } from "@/app/lib/seats";
+import { SECTORS, REGIONS, SECTOR_LABELS, REGION_LABELS, loadSeatSummary } from "@/app/lib/seats";
 import ApplyForm from "./ApplyForm";
 
 export const metadata: Metadata = { title: "Apply for a Founding Council Seat" };
@@ -11,17 +11,17 @@ export const metadata: Metadata = { title: "Apply for a Founding Council Seat" }
 export default async function ApplyPage({
   searchParams,
 }: {
-  searchParams: Promise<{ seat?: string }>;
+  searchParams: Promise<{ sector?: string }>;
 }) {
-  const { seat: seatId } = await searchParams;
+  const { sector } = await searchParams;
   const agreement = await getActiveAgreement();
+  const summary = await loadSeatSummary();
+  const full = summary.remaining <= 0;
 
-  const seat = seatId
-    ? await db.seatCell.findUnique({ where: { id: seatId } })
-    : null;
-  const seatOpen = !!seat && !seat.seatedMemberId;
+  const prefillSector =
+    sector && (SECTORS as string[]).includes(sector) ? sector : undefined;
 
-  // Seat-switch / successor candidacy: prefill the org the user manages.
+  // Re-application / successor candidacy: prefill the org the user manages.
   const user = await currentUser();
   const link = user
     ? await db.userMember.findFirst({
@@ -38,6 +38,9 @@ export default async function ApplyPage({
       }
     : null;
 
+  const sectorOptions = SECTORS.map((s) => ({ value: s, label: SECTOR_LABELS[s] }));
+  const regionOptions = REGIONS.map((r) => ({ value: r, label: REGION_LABELS[r] }));
+
   return (
     <>
       {/* Hero */}
@@ -49,9 +52,10 @@ export default async function ApplyPage({
           </h1>
           <div className="accent-line mt-6" />
           <p className="mt-8 text-lg text-muted max-w-2xl leading-relaxed">
-            Membership is free. Select an open seat, e-sign the Candidate
-            Agreement, and your candidacy enters vetting; admission is decided
-            by a ⅔ vote of the seated members, one ballot per candidate.
+            Membership is free. Pick the sector and region that fit your
+            organization, e-sign the Candidate Agreement, and your candidacy
+            enters vetting; admission is decided by a ⅔ vote of the seated
+            members. {summary.seated} of {summary.cap} seats are filled.
           </p>
         </div>
       </section>
@@ -64,26 +68,25 @@ export default async function ApplyPage({
               Candidacies aren&rsquo;t open yet — no Candidate Agreement is
               configured.
             </p>
-          ) : !seat ? (
-            <p className="text-muted">
-              Choose an open seat from the{" "}
-              <Link href="/members" className="underline">
-                seat matrix
-              </Link>{" "}
-              to start a candidacy.
-            </p>
-          ) : !seatOpen ? (
-            <p className="text-muted">
-              This seat has been taken. Choose another open seat from the{" "}
-              <Link href="/members" className="underline">
-                seat matrix
-              </Link>
-              .
-            </p>
+          ) : full ? (
+            <div className="card max-w-2xl">
+              <h3>All {summary.cap} seats are filled</h3>
+              <p className="text-sm text-muted leading-relaxed">
+                The Founding Council has reached its cap. You can still register
+                interest as a successor candidate via the{" "}
+                <Link href="/contact" className="text-indigo hover:underline">
+                  contact form
+                </Link>{" "}
+                (inquiry type <em>Council membership</em>); a seat may reopen on
+                term non-renewal or departure.
+              </p>
+            </div>
           ) : (
             <ApplyForm
               agreementVersion={agreement.version}
-              seat={{ id: seat.id, label: seatLabel(seat.sector, seat.region) }}
+              sectors={sectorOptions}
+              regions={regionOptions}
+              prefillSector={prefillSector}
               prefill={prefill}
             />
           )}

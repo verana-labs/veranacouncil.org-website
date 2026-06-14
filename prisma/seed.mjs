@@ -58,40 +58,8 @@ try {
 } catch (e) {
   console.warn(`Could not seed Candidate Agreement from ${agreementFile}:`, e.message);
 }
-
-
-// Seed the seat matrix (sector × region) from defs.md. A row exists only for
-// cells that are open; "n/a" cells have no row. Idempotent (upsert) — never
-// deletes cells (closing/opening a cell is a Council decision, done in admin).
-const MATRIX = {
-  financial_services: ["americas"],
-  workforce: ["americas", "emea", "apac"],
-  communications: ["americas"],
-  industrial_iot: ["emea", "apac"],
-  energy_sustainability: ["americas", "emea"],
-  logistics_supply_chain: ["americas", "emea", "apac", "latam"],
-  ai_agentic_identity: ["americas"],
-  ai_agentic_commerce: ["americas"],
-  idv_kyc: ["americas", "emea", "apac", "latam"],
-  markets_commodities: ["americas"],
-  legal: ["americas", "emea"],
-  crypto_validators: ["americas", "emea"],
-  academic_research: ["americas", "emea", "apac", "latam", "africa"],
-  standards_liaison: ["americas", "emea"],
-  public_sector: ["americas", "emea", "apac", "latam", "africa"],
-};
-
-let cells = 0;
-for (const [sector, regions] of Object.entries(MATRIX)) {
-  for (const region of regions) {
-    await db.seatCell.upsert({
-      where: { sector_region: { sector, region } },
-      update: {},
-      create: { sector, region },
-    });
-    cells += 1;
-  }
-}
-console.log(`Seeded ${cells} seat-matrix cells.`);
+// No seat rows to seed: seats are sectors (a fixed enum) with a 25-member cap,
+// not pre-created sector × region cells. The diversity spread is computed from
+// seated memberships at read time.
 
 await db.$disconnect();

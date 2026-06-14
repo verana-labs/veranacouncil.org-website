@@ -121,7 +121,6 @@ model Member {
   userLinks        UserMember[]
   signatureRecords SignatureRecord[]
   candidacies      Candidacy[]
-  seat             SeatCell? // the seat this member holds (Founding Members)
   ballotVotes      BallotVote[] // admission votes this member (as a seated voter) cast
 
   createdAt DateTime @default(now())
@@ -136,6 +135,11 @@ model Membership {
   track  MembershipTrack
   status MembershipStatus @default(pending)
   listed Boolean          @default(false) // admin-curated: shown on the public /members page
+
+  // Seat classification (set on seating; the diversity spread is computed from
+  // these). Region is a soft balancing guardrail, not a fixed slot.
+  sector Sector?
+  region Region?
 
   // How the member was admitted (provisional mechanism, pre-mainnet)
   admission   AdmissionKind?
@@ -192,43 +196,28 @@ model MemberAccess {
 // itself a Council decision.
 // ─────────────────────────────────────────────────────────────────────────────
 
-model SeatCell {
-  id     String @id @default(cuid())
-  sector Sector
-  region Region
-
-  seatedMemberId String?   @unique
-  seatedMember   Member?   @relation(fields: [seatedMemberId], references: [id])
-  seatedAt       DateTime?
-
-  candidacies Candidacy[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([sector, region])
-}
-
-// A candidacy for a specific open seat. FIFO per seat: ballots run one at a
-// time in order of completedAt (agreement signed + vetting passed).
+// A candidacy under a chosen sector (+ declared region). Seats are not a fixed
+// sector × region grid: the candidate picks the sector that fits, region is a
+// soft balancing dimension, and admissions stop at the 25-seat cap.
 model Candidacy {
   id       String @id @default(cuid())
   memberId String
   member   Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
-  seatId   String
-  seat     SeatCell @relation(fields: [seatId], references: [id])
+
+  sector Sector
+  region Region
 
   status      CandidacyStatus @default(applied)
   signatureId String? // SignatureRecord of the e-signed candidate agreement
   vettedAt    DateTime? // Membership & Seats Committee (steward pre-incorporation)
-  completedAt DateTime? // signed + vetted → joins the seat's FIFO queue
+  completedAt DateTime? // signed + vetted → eligible for a ballot
 
   ballot Ballot?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([seatId, status])
+  @@index([status])
   @@index([memberId])
 }
 
@@ -560,13 +549,13 @@ enum ValidatorStatus {
 }
 
 enum CandidacyStatus {
-  applied // seat picked, agreement not yet signed
+  applied // sector chosen, agreement not yet signed
   signed // agreement e-signed, vetting underway
-  queued // signed + vetted; in the seat's FIFO queue
+  queued // signed + vetted; eligible for a ballot
   ballot_open
   accepted
   refused
-  lapsed // another candidate took the seat
+  lapsed // reserved: cap reached / superseded
   withdrawn
 }
 
@@ -586,20 +575,18 @@ enum VoteChoice {
 }
 
 enum Sector {
-  financial_services
+  financial_services // Financial services & markets
   workforce
   communications
   industrial_iot
   energy_sustainability
   logistics_supply_chain
-  ai_agentic_identity
-  ai_agentic_commerce
+  ai_agentic
   idv_kyc
-  markets_commodities
   legal
   crypto_validators
   academic_research
-  standards_liaison
+  standards_bodies
   public_sector
 }
 

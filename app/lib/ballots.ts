@@ -61,7 +61,9 @@ export async function openNextBallotForSeat(seatId: string, actorEmail: string) 
     await addRecord(
       {
         type: "ballot_opened",
-        title: `Admission ballot opened — ${next.member.legalName} for ${seatLabel(next.seat.sector, next.seat.region)}`,
+        // Anonymous: show that a seat is under vote, never the candidate's name.
+        // The organization is named publicly only once accepted/seated.
+        title: `Admission ballot open — ${seatLabel(next.seat.sector, next.seat.region)}`,
         refType: "ballot",
         refId: b.id,
       },
@@ -162,7 +164,9 @@ export async function settleBallot(ballotId: string) {
       await addRecord(
         {
           type: "ballot_result",
-          title: `Admission ballot result — ${candidacy.member.legalName} refused (${accepts}/${ballot.electorate} accept, threshold ${threshold})`,
+          // Anonymous: a refused candidate is never named publicly. Only the
+          // seat and the (de-identified) tally are shown.
+          title: `Admission ballot closed — ${seatLabel(seat.sector, seat.region)}: candidate not admitted (${accepts}/${ballot.electorate} accept, threshold ${threshold})`,
           refType: "ballot",
           refId: ballot.id,
         },

@@ -43,9 +43,9 @@ this exactly; it is the spine of the whole site:
   constitutional layer every EGF must respect), the **ECS-EGF** (the four
   Essential Credential Schemas), and the **Template EGF** (a scaffold for sector
   ecosystems).
-- **One-member-one-vote**, seat-diversity rule (one voice per sector × region),
-  **⅔ supermajority** for any protocol-governance change, fixed validator terms
-  with formal renewal.
+- **One-member-one-vote**, seat-diversity rule (broad spread across sectors and
+  regions, capped at **25** Founding Member seats), **⅔ supermajority** for any
+  protocol-governance change, fixed validator terms with formal renewal.
 - **Membership is free** — no dues, no capital contribution, either track; the
   statutes exclude personal financial liability of members (Art. 75a ZGB).
   Funded by 2060 OÜ (stewardship) before network launch, then by a
@@ -94,13 +94,16 @@ ecosystem growth are the Foundation's domain (→ `veranafoundation.org`).
   grants (→ Foundation), nothing that is a build tutorial (→ verana.io / docs),
   nothing commercial (→ hologram.zone / 2060.io).
 - **The record is generated, not written**: `/news` is the automatic output of
-  actions taken in the console (candidacies, votes, seatings, minutes). No
-  marketing blog.
+  actions taken in the console (admission ballots, seatings, minutes). No
+  marketing blog. An organization is named publicly only once accepted/seated
+  (and admin-listed); applications aren't published, and a ballot in progress
+  shows by sector/region without the candidate's name.
 - **Show the constitution**: the signature visual element is the **live seat
-  matrix** (sector × region; `[open]` · `candidate pending` · `seated`) — the
-  diversity rule made visible, doubling as the recruitment surface (an `[open]`
-  cell is an invitation). The Foundation's signature is community activity; the
-  Council's is governance structure.
+  board** — *seats filled of 25* plus the spread across sectors and regions, an
+  anonymous, inviting recruitment surface (an open seat is an invitation). It is
+  **not** a sector × region grid (that earlier design read as complex and
+  off-putting). The Foundation's signature is community activity; the Council's
+  is governance structure.
 
 ## 2. Brand & voice
 
@@ -121,15 +124,15 @@ accessibility baseline.
 - **Neutrals:** background `#FAFAF8`, ink `#111111`, muted `#5B5B5B`, rule `#E8E6E0`.
 - **Type** — **all-Inter** (headings and body; no display face — the absence of
   Space Grotesk is itself the signal vs. the Foundation). **Mono: IBM Plex
-  Mono**, used sparingly — seat-matrix states, schema names, dates of record.
+  Mono**, used sparingly — seat-board figures, schema names, dates of record.
 - **Layout** — formal, generous whitespace, predominantly **one-column
   institutional prose blocks** and tables; no card mosaics, no contributor
-  avatars, no activity feeds. The seat matrix and the four-schema table are the
+  avatars, no activity feeds. The seat board and the four-schema table are the
   only dense visual structures.
 - **Imagery & motion** — minimal to none: no stock photos, no illustration
   system, no scroll animations. Structure (tables, rules, numbering) *is* the
   aesthetic.
-- **Signature element it owns** — the **live seat matrix** (see §1) and the
+- **Signature element it owns** — the **live seat board** (see §1) and the
   numbered public record.
 
 **Voice:** institutional, present-tense, declarative. The Council "authors,
@@ -170,9 +173,8 @@ The one-screen statement. Sections in order:
 - **What the Council is** — 4 short cards: **Non-profit Swiss Verein** ·
   **One member, one vote** · **Authors & operates the frameworks** ·
   **Sole securer of the network (every member runs a validator)**.
-- **The seat matrix** *(signature element — see §1)* — the live sector × region
-  grid with cell states; each `[open]` cell links to `/join` with the seat
-  pre-selected.
+- **The seat board** *(signature element — see §1)* — *seats filled of 25* plus
+  the sector and region spread; a link to `/join` to start a candidacy.
 - **Latest record** — the 3 most recent `/news` entries (auto-generated).
 - **Provisional-governance note** — one line: pre-mainnet admissions are decided
   through this site's provisional voting mechanism; at mainnet launch all
@@ -202,10 +204,10 @@ Who the Council is and how it runs.
   parameters — on-chain via validator nodes after mainnet; provisional
   mechanism before). The statutes make the association recognize on-chain
   outcomes.
-- **How we operate** — bullets: one-member-one-vote; seat-diversity rule (one
-  voice per sector × region); ⅔ supermajority for any protocol-governance
-  change; fixed validator terms with formal renewal; membership is free, with
-  member liability excluded by statute.
+- **How we operate** — bullets: one-member-one-vote; seat-diversity rule (broad
+  spread across sectors and regions, capped at 25 members); ⅔ supermajority for
+  any protocol-governance change; fixed validator terms with formal renewal;
+  membership is free, with member liability excluded by statute.
 - **Funding** — one short paragraph: free membership; costs covered by 2060 OÜ
   (steward) before network launch; after launch the network funds its own
   governance via a protocol-defined on-chain allocation. The Council does not
@@ -251,16 +253,16 @@ A single summary page. **No normative text on-site** — every item links to
 
 ### 4.4 Members `/members`
 
-- **The seat matrix** — the full live grid (same component as Home), with a
-  legend for the three states: `[open]` (accepting candidacies — a seat stays
-  open until someone is seated) · `candidate pending` (one or more candidacies
-  in the queue; still open to new candidacies) · `seated`.
-- **How seats work** — one paragraph: one voice per sector × region; one ballot
-  per candidate, never head-to-head; FIFO queue per seat; the Council can vote
-  to open new cells. Fixed validator terms with formal renewal.
+- **The seat board** — the full version (same component as Home): *seats filled
+  of 25*, the sector spread, and the region spread. Anonymous — no org names.
+- **How seats work** — one paragraph: a candidate applies under one sector and
+  declares a region; admission by ⅔ of seated members, one ballot per candidate,
+  never head-to-head; up to 25 seats; the Membership & Seats Committee keeps a
+  broad sector/region spread (region is a soft guardrail, not a fixed quota).
+  Fixed validator terms with formal renewal.
 - **Members & Observers** — the directory: seated Founding Members and
-  Public-Sector Observers, with org name, sector × region, and date seated
-  (logo grid; placeholders pre-incorporation).
+  Public-Sector Observers, with org name, sector + region, and date seated
+  (logo grid; placeholders pre-incorporation). Listing is admin-curated.
 - **Become a Member** — link to `/join`.
 
 ### 4.5 News `/news`
@@ -276,7 +278,7 @@ the underlying artifact (gov-repo commit, minutes file). No editorial posts.
 
 ## 5. Persistent CTA — Join `/join`
 
-The candidacy page. Reachable from the nav button, the matrix cells, and the
+The candidacy page. Reachable from the nav button, the seat board, and the
 closing banner.
 
 - **Intro** — one short paragraph: two tracks; **membership is free** (no dues,
@@ -298,17 +300,17 @@ closing banner.
     membership.
 - **How admission works** *(Founding Member track — short numbered list, public
   and honest)*:
-  1. **Apply** — sign in (passwordless: Google, GitHub, or email code), select
-     an open seat from the matrix, e-sign the candidate agreement for that seat.
+  1. **Apply** — sign in (passwordless: Google, GitHub, or email code), pick the
+     sector and region that fit the organization, e-sign the candidate agreement.
   2. **Vetting** — the Membership & Seats Committee (the steward,
      pre-incorporation) runs due diligence. No Foundation membership or any
      other third-party status is required.
   3. **Ballot** — one vote per candidate, accept / refuse, **⅔ supermajority of
-     seated members**, in an async **14-day window**. Ballots for the same seat
-     run one at a time, in order of completed candidacy.
-  4. **Seated** — the seat flips to `seated` on the public record; refused or
-     lapsed candidates may switch to another open seat (re-sign only) or stand
-     by as successor.
+     seated members**, in an async **14-day window**. Admissions stop at the
+     **25-seat cap**.
+  4. **Seated** — the organization is named on the public record only once
+     accepted/seated; a refused candidate may re-apply under another
+     sector/region.
   - One transparency line on bootstrap: the first 3 members (2060 plus the
     first 2 vetted candidates) are designated by the steward with published
     rationale; from candidate #4 onward every admission goes through the peer
@@ -332,12 +334,12 @@ calendar-synced meetings, published minutes. Council-specific surfaces:
 
 ### 6.1 Candidacy & seat (Founding Member track)
 
-- Apply: pick an open seat (sector × region) → e-sign the candidate agreement
+- Apply: pick a **sector** + **region** → e-sign the candidate agreement
   (to be drafted; replaces the abandoned Initial-Council-Member-MoU v1) →
-  status `candidate pending`, queue position visible to the candidate.
-- Track status: vetting → ballot open (deadline visible) → result. Lapsed/refused:
-  one-click switch to another open seat (re-sign only) or successor standby.
-- After seating: seat record — sector × region, date seated, validator term and
+  status `signed`, then vetting.
+- Track status: vetting → ballot open (deadline visible) → result. Refused:
+  one-click re-apply under another sector/region.
+- After seating: seat record — sector + region, date seated, validator term and
   renewal date (term mechanics activate at mainnet), and **testnet validator
   status** — seated members are expected to bring a testnet node online during
   the formation period as the readiness step for the genesis validator set.
@@ -432,10 +434,10 @@ personal data of representatives is not.
 
 | Path | Nav | Purpose |
 | --- | --- | --- |
-| `/` | — | Hero · what the Council is · live seat matrix · latest record · provisional-governance note · Apply CTA |
+| `/` | — | Hero · what the Council is · live seat board · latest record · provisional-governance note · Apply CTA |
 | `/about` | About | Mission · organs · two governance layers · how we operate · funding · status · what it is not |
 | `/governance` | Governance | Network GF · ECS-EGF (+ schema table, ECS-participant forward note) · Template EGF · bylaws & CoC · disputes — all linking to the gov repo |
-| `/members` | Members | Seat matrix + legend · how seats work · member/observer directory |
+| `/members` | Members | Seat board (filled/cap + sector & region spread) · how seats work · member/observer directory |
 | `/news` | News | The generated public record |
 | `/join` | **Apply** (button) | Two tracks · how admission works · apply (signed-in candidacy flow) |
 | `/account` | Sign in | Council console: candidacy & seat · org access lists · meetings · admission ballots (provisional) · ECS EOI |

@@ -29,25 +29,27 @@ export default async function AccountPage() {
   const links = user ? await effectiveMemberships(user.id) : [];
   const memberIds = links.map((l) => l.memberId);
 
-  // Candidacies + seats of the orgs this user belongs to.
+  // Candidacies + seated memberships of the orgs this user belongs to.
   const candidacies = memberIds.length
     ? await db.candidacy.findMany({
         where: { memberId: { in: memberIds } },
-        include: { seat: true, ballot: true, member: { select: { legalName: true } } },
+        include: { ballot: true, member: { select: { legalName: true } } },
         orderBy: { createdAt: "desc" },
       })
     : [];
   const seats = memberIds.length
-    ? await db.seatCell.findMany({
-        where: { seatedMemberId: { in: memberIds } },
-        include: { seatedMember: { include: { membership: true } } },
+    ? await db.membership.findMany({
+        where: {
+          memberId: { in: memberIds },
+          track: "founding_member",
+          status: "active",
+        },
+        include: { member: { select: { legalName: true } } },
       })
     : [];
 
-  // Voting member? (org seated + active founding membership + this user listed)
-  const isVoter = seats.some(
-    (s) => s.seatedMember?.membership?.status === "active",
-  );
+  // Voting member? (seated founding membership)
+  const isVoter = seats.length > 0;
   const openBallots = isVoter
     ? await db.ballot.count({ where: { status: "open" } })
     : 0;
@@ -129,47 +131,45 @@ export default async function AccountPage() {
                 <h2 className="display text-3xl">Your Council seat</h2>
                 <div className="accent-line mt-4 mb-8" />
                 <div className="grid sm:grid-cols-2 gap-6 max-w-4xl">
-                  {seats.map((s) => {
-                    const m = s.seatedMember!;
-                    return (
-                      <div key={s.id} className="card">
-                        <h3>{m.legalName}</h3>
-                        <dl className="text-sm text-muted grid gap-1 mt-2">
-                          <div>
-                            <dt className="inline font-medium text-ink">Seat: </dt>
-                            <dd className="inline font-mono">{seatLabel(s.sector, s.region)}</dd>
-                          </div>
-                          <div>
-                            <dt className="inline font-medium text-ink">Seated: </dt>
-                            <dd className="inline">
-                              {s.seatedAt?.toISOString().slice(0, 10) ?? "—"}
-                            </dd>
-                          </div>
-                          <div>
-                            <dt className="inline font-medium text-ink">
-                              Testnet validator:{" "}
-                            </dt>
-                            <dd className="inline">
-                              {VALIDATOR_LABEL[m.membership?.testnetValidator ?? "none"]}
-                              {" "}
-                              <span className="text-xs">
-                                (expected during the formation period — the
-                                readiness step for the genesis validator set)
-                              </span>
-                            </dd>
-                          </div>
-                          <div>
-                            <dt className="inline font-medium text-ink">Validator term: </dt>
-                            <dd className="inline">
-                              {m.membership?.termStart
-                                ? `${m.membership.termStart.toISOString().slice(0, 10)} → ${m.membership.termEnd?.toISOString().slice(0, 10) ?? "…"}`
-                                : "activates at mainnet"}
-                            </dd>
-                          </div>
-                        </dl>
-                      </div>
-                    );
-                  })}
+                  {seats.map((m) => (
+                    <div key={m.id} className="card">
+                      <h3>{m.member.legalName}</h3>
+                      <dl className="text-sm text-muted grid gap-1 mt-2">
+                        <div>
+                          <dt className="inline font-medium text-ink">Seat: </dt>
+                          <dd className="inline font-mono">
+                            {m.sector && m.region ? seatLabel(m.sector, m.region) : "—"}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt className="inline font-medium text-ink">Seated: </dt>
+                          <dd className="inline">
+                            {m.seatedAt?.toISOString().slice(0, 10) ?? "—"}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt className="inline font-medium text-ink">
+                            Testnet validator:{" "}
+                          </dt>
+                          <dd className="inline">
+                            {VALIDATOR_LABEL[m.testnetValidator ?? "none"]}{" "}
+                            <span className="text-xs">
+                              (expected during the formation period — the
+                              readiness step for the genesis validator set)
+                            </span>
+                          </dd>
+                        </div>
+                        <div>
+                          <dt className="inline font-medium text-ink">Validator term: </dt>
+                          <dd className="inline">
+                            {m.termStart
+                              ? `${m.termStart.toISOString().slice(0, 10)} → ${m.termEnd?.toISOString().slice(0, 10) ?? "…"}`
+                              : "activates at mainnet"}
+                          </dd>
+                        </div>
+                      </dl>
+                    </div>
+                  ))}
                 </div>
               </div>
             </section>
@@ -187,7 +187,7 @@ export default async function AccountPage() {
                     <div key={c.id} className="card">
                       <h3>{c.member.legalName}</h3>
                       <p className="text-sm font-mono mt-1">
-                        {seatLabel(c.seat.sector, c.seat.region)}
+                        {seatLabel(c.sector, c.region)}
                       </p>
                       <p className="text-sm text-muted mt-2">
                         {CANDIDACY_LABEL[c.status] ?? c.status}
@@ -197,8 +197,8 @@ export default async function AccountPage() {
                       </p>
                       {(c.status === "lapsed" || c.status === "refused") && (
                         <p className="text-sm mt-2">
-                          <Link href="/members" className="text-indigo hover:underline">
-                            Switch to another open seat →
+                          <Link href="/apply" className="text-indigo hover:underline">
+                            Re-apply →
                           </Link>
                         </p>
                       )}

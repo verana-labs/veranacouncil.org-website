@@ -13,6 +13,7 @@ import { loadActiveAgreement, type ActiveAgreement } from "@/app/lib/agreement-v
 import { sendEmail, escapeHtml } from "@/app/lib/email";
 import { emailLayout } from "@/app/lib/email-layout";
 import { seatLabel } from "@/app/lib/seats";
+import { Sector, Region } from "@prisma/client";
 
 const SITE_URL = process.env.AUTH_URL ?? "https://veranacouncil.org";
 
@@ -85,7 +86,8 @@ async function notifyAdminsIntegrityFailure(active: ActiveAgreement) {
  * its integrity check (the signing step would block anyway).
  */
 export async function previewAgreement(input: {
-  seatId: string;
+  sector?: string;
+  region?: string;
   legalName?: string;
   entityType?: string;
   jurisdiction?: string;
@@ -98,8 +100,10 @@ export async function previewAgreement(input: {
   if (!active.intact) {
     return { error: "The Candidate Agreement is temporarily unavailable. Please try again later." };
   }
-  const seat = await db.seatCell.findUnique({ where: { id: input.seatId } });
-  if (!seat) return { error: "Unknown seat." };
+  const sector = input.sector as Sector | undefined;
+  const region = input.region as Region | undefined;
+  if (!sector || !(sector in Sector)) return { error: "Choose a sector." };
+  if (!region || !(region in Region)) return { error: "Choose a region." };
   const user = await currentUser();
   const ctx = toAgreementContext({
     legalName: input.legalName,
@@ -109,8 +113,8 @@ export async function previewAgreement(input: {
     signerName: input.signerName,
     signerTitle: input.signerTitle,
     email: user?.email,
-    sector: seat.sector,
-    region: seat.region,
+    sector,
+    region,
     effectiveDate: new Date(),
   });
   try {
@@ -122,7 +126,8 @@ export async function previewAgreement(input: {
 }
 
 const candidacySchema = z.object({
-  seatId: z.string().min(1),
+  sector: z.nativeEnum(Sector),
+  region: z.nativeEnum(Region),
   legalName: z.string().trim().min(1, "Required"),
   entityType: z.string().trim().optional(),
   jurisdiction: z.string().trim().min(1, "Select the country"),
@@ -135,8 +140,8 @@ const candidacySchema = z.object({
 
 /**
  * Open a candidacy: create (or reuse) the Member org, e-sign the Candidate
- * Agreement for the selected open seat, and put the candidacy into vetting.
- * Free — there is no payment step (Council membership is free).
+ * Agreement under the chosen sector + region, and put the candidacy into
+ * vetting. Free — there is no payment step (Council membership is free).
  */
 export async function applyCandidacy(
   _prev: ApplyState,
@@ -145,9 +150,9 @@ export async function applyCandidacy(
   const user = await currentUser();
   if (!user?.email || !user.id) {
     // Fallback for a session that expired mid-form (the page is normally
-    // auth-gated). Preserve the seat so sign-in returns to the right candidacy.
-    const seatId = String(formData.get("seatId") ?? "");
-    const target = seatId ? `/apply?seat=${seatId}` : "/apply";
+    // auth-gated). Preserve the sector so sign-in returns to the right form.
+    const sector = String(formData.get("sector") ?? "");
+    const target = sector ? `/apply?sector=${sector}` : "/apply";
     redirect(`/login?callbackUrl=${encodeURIComponent(target)}`);
   }
 
@@ -159,7 +164,8 @@ export async function applyCandidacy(
   }
 
   const parsed = candidacySchema.safeParse({
-    seatId: formData.get("seatId"),
+    sector: formData.get("sector"),
+    region: formData.get("region"),
     legalName: formData.get("legalName"),
     entityType: formData.get("entityType") || undefined,
     jurisdiction: formData.get("jurisdiction"),
@@ -175,13 +181,7 @@ export async function applyCandidacy(
   const d = parsed.data;
   const signedAt = new Date();
 
-  const seat = await db.seatCell.findUnique({ where: { id: d.seatId } });
-  if (!seat) return { error: "Unknown seat." };
-  if (seat.seatedMemberId) {
-    return { error: "This seat has been taken. Choose another open seat." };
-  }
-
-  // Reuse the org the user already manages (seat switch / successor candidacy);
+  // Reuse the org the user already manages (re-application / successor candidacy);
   // otherwise create it. One live candidacy per org at a time.
   const existingLink = await db.userMember.findFirst({
     where: { userId: user.id, role: "manager" },
@@ -233,12 +233,18 @@ export async function applyCandidacy(
       },
     });
     const candidacy = await tx.candidacy.create({
-      data: { memberId: member.id, seatId: seat.id, status: "signed", signatureId: sig.id },
+      data: {
+        memberId: member.id,
+        sector: d.sector,
+        region: d.region,
+        status: "signed",
+        signatureId: sig.id,
+      },
     });
     // Applying is private: no public record entry. The org's public footprint
-    // (directory, matrix name, record) appears only once an admin lists it in
-    // /admin/members. The steward is notified by email + sees it in
-    // /admin/candidacies; the seat shows an anonymous "candidate pending".
+    // (directory, record) appears only once an admin lists it in /admin/members.
+    // The steward is notified by email + sees it in /admin/candidacies; the
+    // seat board shows only an anonymous "under review" count.
     return { memberId: member.id, signatureRecordId: sig.id, candidacyId: candidacy.id };
   });
 
@@ -252,8 +258,8 @@ export async function applyCandidacy(
     signerName: d.signerName,
     signerTitle: d.signerTitle,
     email: user.email,
-    sector: seat.sector,
-    region: seat.region,
+    sector: d.sector,
+    region: d.region,
     effectiveDate: signedAt,
   });
   let pdf: Buffer | undefined;
@@ -271,7 +277,7 @@ export async function applyCandidacy(
   await emailExecutedCopy({
     to: user.email!,
     memberName: d.legalName,
-    seat: seatLabel(seat.sector, seat.region),
+    seat: seatLabel(d.sector, d.region),
     signerName: d.signerName,
     signedAt,
     agreementVersion: active.version,
@@ -292,7 +298,7 @@ export async function applyCandidacy(
         html: emailLayout({
           heading: "New Council candidacy",
           bodyHtml: `<p style="margin:0 0 12px;">${escapeHtml(d.legalName)} signed the
-          Candidate Agreement for <strong>${escapeHtml(seatLabel(seat.sector, seat.region))}</strong>
+          Candidate Agreement for <strong>${escapeHtml(seatLabel(d.sector, d.region))}</strong>
           and is awaiting vetting.</p>`,
           button: { label: "Open candidacies", href: `${SITE_URL}/admin/candidacies` },
         }),

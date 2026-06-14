@@ -4,8 +4,8 @@ import { notFound } from "next/navigation";
 import { db } from "@/app/lib/db";
 import { currentUser, isAdmin } from "@/app/lib/authz";
 import { PageHero, Section } from "@/app/components/PageHero";
-import { seatLabel } from "@/app/lib/seats";
-import { seatedVoters } from "@/app/lib/ballots";
+import { seatLabel, COUNCIL_SEAT_CAP } from "@/app/lib/seats";
+import { seatedCount as countSeated } from "@/app/lib/ballots";
 import CandidacyRow from "./CandidacyRow";
 
 export const metadata: Metadata = { title: "Candidacies · Admin" };
@@ -18,13 +18,12 @@ export default async function AdminCandidaciesPage() {
     where: { status: { in: ["applied", "signed", "queued", "ballot_open"] } },
     include: {
       member: { select: { id: true, legalName: true, primaryEmail: true } },
-      seat: true,
       ballot: true,
     },
     orderBy: { createdAt: "asc" },
   });
-  const seatedCount = (await seatedVoters()).length;
-  const seedSlotsLeft = Math.max(0, 3 - seatedCount);
+  const seated = await countSeated();
+  const seedSlotsLeft = Math.max(0, 3 - seated);
 
   return (
     <>
@@ -32,8 +31,9 @@ export default async function AdminCandidaciesPage() {
       <Section bordered={false}>
         <p className="text-sm text-muted max-w-2xl">
           The candidacy pipeline: vetting (Membership &amp; Seats Committee — the
-          steward pre-incorporation) → FIFO queue per seat → admission ballot
-          (⅔ of {seatedCount} seated member{seatedCount === 1 ? "" : "s"}).
+          steward pre-incorporation) → admission ballot (⅔ of {seated} seated
+          member{seated === 1 ? "" : "s"}). {seated} of {COUNCIL_SEAT_CAP} seats
+          filled.
           {seedSlotsLeft > 0 && (
             <>
               {" "}
@@ -58,8 +58,7 @@ export default async function AdminCandidaciesPage() {
                   memberName: c.member.legalName,
                   memberId: c.member.id,
                   memberEmail: c.member.primaryEmail,
-                  seatId: c.seatId,
-                  seat: seatLabel(c.seat.sector, c.seat.region),
+                  seat: seatLabel(c.sector, c.region),
                   completedAt: c.completedAt?.toISOString() ?? null,
                   ballotCloses: c.ballot?.closesAt.toISOString() ?? null,
                 }}

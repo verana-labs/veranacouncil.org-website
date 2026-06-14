@@ -9,10 +9,7 @@ export async function votableMemberIds(userId: string, email: string) {
   const links = await db.userMember.findMany({
     where: {
       userId,
-      member: {
-        membership: { track: "founding_member", status: "active" },
-        seat: { isNot: null },
-      },
+      member: { membership: { track: "founding_member", status: "active" } },
     },
     include: { member: { include: { access: { where: { status: "active" } } } } },
   });

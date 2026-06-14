@@ -5,15 +5,21 @@ import { useActionState } from "react";
 import CountrySelect from "@/app/components/CountrySelect";
 import { applyCandidacy, previewAgreement, type ApplyState } from "./actions";
 
+type Option = { value: string; label: string };
+
 export default function ApplyForm({
   agreementVersion,
-  seat,
+  sectors,
+  regions,
+  prefillSector,
   prefill,
 }: {
   agreementVersion: string;
-  /** The open seat this candidacy targets. */
-  seat: { id: string; label: string };
-  /** Org details when the user already manages an organization (seat switch). */
+  sectors: Option[];
+  regions: Option[];
+  /** Sector pre-selected from ?sector= on the link. */
+  prefillSector?: string;
+  /** Org details when the user already manages an organization. */
   prefill?: {
     legalName: string;
     entityType: string | null;
@@ -57,6 +63,8 @@ export default function ApplyForm({
 
   function step1Error(fd: FormData): string | null {
     const has = (k: string) => !!(fd.get(k) as string)?.trim();
+    if (!has("sector")) return "Choose the sector that fits your organization.";
+    if (!has("region")) return "Choose your region.";
     if (!has("legalName")) return "Enter the organization's legal name.";
     if (!has("jurisdiction")) return "Select the country.";
     if (!has("signerName")) return "Enter the signatory's name.";
@@ -76,7 +84,8 @@ export default function ApplyForm({
     const get = (k: string) => (fd.get(k) as string) || undefined;
     startPreview(async () => {
       const res = await previewAgreement({
-        seatId: seat.id,
+        sector: get("sector"),
+        region: get("region"),
         legalName: get("legalName"),
         entityType: get("entityType"),
         jurisdiction: get("jurisdiction"),
@@ -95,21 +104,42 @@ export default function ApplyForm({
 
   return (
     <form ref={formRef} action={formAction} className="grid gap-8 max-w-2xl">
-      <input type="hidden" name="seatId" value={seat.id} />
-
-      {/* ── Step 1: your organization ────────────────────────────────── */}
+      {/* ── Step 1: seat + organization ──────────────────────────────── */}
       <div className={step === 1 ? "grid gap-8" : "hidden"}>
-        <div className="card">
-          <p className="tag mb-2">Candidacy for the open seat</p>
-          <p className="display text-xl text-ink font-mono">{seat.label}</p>
-          <p className="text-sm text-muted mt-3 leading-relaxed">
-            One candidacy per organization. Membership is free — no dues, no
-            capital contribution. Admission is decided by a ⅔ vote of the
-            seated members, one ballot per candidate.
-          </p>
-        </div>
-
         <fieldset className="grid gap-1">
+          <SectionHeading tag="Your seat" title="Where does your organization fit?" />
+          <p className="text-sm text-muted mb-4">
+            Pick the one sector that best fits you and your region. Membership is
+            free; admission is decided by a ⅔ vote of the seated members, one
+            ballot per candidate.
+          </p>
+          <Labeled label="Sector" required>
+            <select name="sector" required defaultValue={prefillSector ?? ""}>
+              <option value="" disabled>
+                Choose a sector…
+              </option>
+              {sectors.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
+          </Labeled>
+          <Labeled label="Region" required>
+            <select name="region" required defaultValue="">
+              <option value="" disabled>
+                Choose a region…
+              </option>
+              {regions.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
+          </Labeled>
+        </fieldset>
+
+        <fieldset className="grid gap-1 border-t border-rule pt-8">
           <SectionHeading tag="Your organization" title="Tell us who is applying" />
           <Field
             label="Organization legal name"
@@ -161,9 +191,8 @@ export default function ApplyForm({
             title="Review your agreement"
           />
           <p className="text-sm text-muted">
-            Review the personalised agreement below, for the seat{" "}
-            <strong className="text-ink">{seat.label}</strong>. A PDF copy will
-            be emailed to you and is available any time from your account.
+            Review the personalised agreement below. A PDF copy will be emailed
+            to you and is available any time from your account.
           </p>
           <div
             className="agreement-prose max-h-[28rem] overflow-y-auto rounded border border-rule bg-surface p-5"
@@ -174,22 +203,14 @@ export default function ApplyForm({
         <fieldset className="grid gap-3 border-t border-rule pt-6">
           <SectionHeading tag="Sign" title="Open the candidacy" />
           <label className="flex items-start gap-2 text-sm">
-            <input
-              type="checkbox"
-              name="logoDisplayConsent"
-              className="mt-1"
-            />
+            <input type="checkbox" name="logoDisplayConsent" className="mt-1" />
             <span>
               The logo may be displayed on veranacouncil.org once the
               organization is seated and listed.
             </span>
           </label>
           <label className="flex items-start gap-2 text-sm">
-            <input
-              type="checkbox"
-              name="socialAnnouncementConsent"
-              className="mt-1"
-            />
+            <input type="checkbox" name="socialAnnouncementConsent" className="mt-1" />
             <span>
               The Council may announce the seating of this organization on its
               social channels.
@@ -206,8 +227,7 @@ export default function ApplyForm({
             />
             <span ref={acceptRef}>
               I am authorized to sign for this organization and I accept the
-              Candidate Agreement shown above for the seat{" "}
-              <strong>{seat.label}</strong>. <Req />
+              Candidate Agreement shown above. <Req />
             </span>
           </label>
 
@@ -265,7 +285,6 @@ function LogoField({
 }) {
   const [preview, setPreview] = useState<string | null>(null);
 
-  // Object URLs hold the file in memory — release the old one on replace/unmount.
   useEffect(() => {
     return () => {
       if (preview) URL.revokeObjectURL(preview);
@@ -293,7 +312,6 @@ function LogoField({
       </div>
       {preview && (
         <div className="flex items-center gap-3">
-          {/* Blob URL preview of the user's own pick — next/image can't help here. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={preview}
@@ -305,6 +323,7 @@ function LogoField({
           </p>
         </div>
       )}
+      {hasLogo && null}
     </>
   );
 }

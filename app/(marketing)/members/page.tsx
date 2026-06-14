@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { db } from "@/app/lib/db";
 import { seatLabel } from "@/app/lib/seats";
-import SeatMatrix from "@/app/components/SeatMatrix";
+import SeatBoard from "@/app/components/SeatBoard";
 
 export const metadata: Metadata = { title: "Members" };
 
@@ -12,7 +12,7 @@ export default async function MembersPage() {
   // Admin-curated (`listed`) active members & observers.
   const members = await db.member.findMany({
     where: { membership: { status: "active", listed: true } },
-    include: { membership: true, seat: true },
+    include: { membership: true },
     orderBy: { createdAt: "asc" },
   });
   const founding = members.filter((m) => m.membership?.track === "founding_member");
@@ -25,23 +25,23 @@ export default async function MembersPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <p className="tag mb-4">Members</p>
           <h1 className="display text-4xl sm:text-5xl leading-tight max-w-3xl">
-            Members &amp; the seat matrix
+            Members &amp; seats
           </h1>
           <div className="accent-line mt-6" />
           <p className="mt-8 text-lg text-muted max-w-2xl leading-relaxed">
-            One voice per sector × region. A seat stays open until someone is
-            seated; an open cell is an invitation.
+            A capped, diverse council — broad spread across sectors and regions.
+            An open seat is an invitation.
           </p>
         </div>
       </section>
 
-      {/* The matrix */}
+      {/* The seat board */}
       <section className="border-b border-rule">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <p className="tag mb-3">Seats</p>
-          <h2 className="display text-3xl">The live seat matrix</h2>
+          <h2 className="display text-3xl">The seat board</h2>
           <div className="accent-line mt-4 mb-8" />
-          <SeatMatrix />
+          <SeatBoard />
         </div>
       </section>
 
@@ -52,11 +52,11 @@ export default async function MembersPage() {
           <h2 className="display text-3xl">One ballot per candidate</h2>
           <div className="accent-line mt-4 mb-6" />
           <p className="max-w-3xl text-sm leading-relaxed">
-            Candidacies for the same seat are balloted one at a time, in order
-            of completed candidacy — accept or refuse, by a ⅔ supermajority of
-            seated members, never head-to-head. A seat stays open to new
-            candidacies while one is pending. The Council can vote to open a
-            new matrix cell for a strong second candidate. Validator terms are
+            A candidate applies under one sector and declares its region.
+            Admission is decided by a ⅔ supermajority of seated members —
+            accept or refuse, one ballot per candidate, never head-to-head.
+            Up to 25 Founding Member seats; the Membership &amp; Seats Committee
+            keeps a broad spread across sectors and regions. Validator terms are
             fixed, with formal renewal.
           </p>
         </div>
@@ -90,9 +90,9 @@ export default async function MembersPage() {
                         )}
                         <h3>{m.legalName}</h3>
                       </div>
-                      {m.seat && (
+                      {m.membership?.sector && m.membership?.region && (
                         <p className="text-sm font-mono mt-1">
-                          {seatLabel(m.seat.sector, m.seat.region)}
+                          {seatLabel(m.membership.sector, m.membership.region)}
                         </p>
                       )}
                       <p className="text-xs text-muted mt-1">
@@ -131,7 +131,7 @@ export default async function MembersPage() {
           <div className="card p-10 text-center">
             <h2 className="display text-2xl">Become a Member</h2>
             <p className="text-muted mt-3 max-w-xl mx-auto text-sm">
-              Membership is free. Pick an open seat from the matrix and apply.
+              Membership is free. Pick your sector and region, and apply.
             </p>
             <div className="mt-6">
               <Link href="/join" className="btn btn-primary">

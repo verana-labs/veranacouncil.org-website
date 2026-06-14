@@ -20,7 +20,7 @@ export default async function BallotsPage() {
     take: 50,
     include: {
       votes: true,
-      candidacy: { include: { member: { select: { legalName: true, id: true } }, seat: true } },
+      candidacy: { include: { member: { select: { legalName: true, id: true } } } },
     },
   });
 
@@ -69,7 +69,7 @@ export default async function BallotsPage() {
                 </div>
                 <h3 className="mt-2">{b.candidacy.member.legalName}</h3>
                 <p className="text-sm font-mono">
-                  {seatLabel(b.candidacy.seat.sector, b.candidacy.seat.region)}
+                  {seatLabel(b.candidacy.sector, b.candidacy.region)}
                 </p>
                 <p className="text-sm text-muted mt-1">
                   {open

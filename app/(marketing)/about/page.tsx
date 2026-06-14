@@ -72,7 +72,7 @@ export default function AboutPage() {
               <h3>Committees</h3>
               <p className="text-sm text-muted leading-relaxed">
                 Created by statute as needed — e.g. Membership &amp; Seats
-                (vets candidates, manages the matrix) and Technical / Validator
+                (vets candidates, keeps the sector/region balance) and Technical / Validator
                 (readiness, terms, renewals).
               </p>
             </div>
@@ -129,7 +129,7 @@ export default function AboutPage() {
           <div className="accent-line mt-4 mb-6" />
           <ul className="grid gap-3 max-w-3xl text-sm leading-relaxed list-disc pl-5">
             <li>One member, one vote.</li>
-            <li>Seat-diversity rule: one voice per sector × region.</li>
+            <li>Seat-diversity rule: broad spread across sectors and regions, capped at 25 members.</li>
             <li>⅔ supermajority for any protocol-governance change.</li>
             <li>Fixed validator terms, with formal renewal.</li>
             <li>

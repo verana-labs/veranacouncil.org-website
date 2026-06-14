@@ -82,7 +82,7 @@ export default function PrivacyPage() {
           <li>
             <strong>Candidate details.</strong> The organization&rsquo;s legal
             name, entity type, country, registered address, optional logo, and
-            the seat (sector × region) applied for.
+            the sector and region applied for.
           </li>
           <li>
             <strong>Signature record.</strong> When you e-sign the Candidate

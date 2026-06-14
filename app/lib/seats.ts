@@ -2,27 +2,27 @@ import { Sector, Region } from "@prisma/client";
 import { db } from "@/app/lib/db";
 
 /**
- * The seat matrix (sector × region) — the Council's signature element.
- * A SeatCell row exists only where a seat is open or seated; absent cells are
- * "n/a". `candidate pending` is derived from queued/balloting candidacies.
- * Source of truth for the initial grid: defs.md (verana-strategy/2026).
+ * Council seats — sectors with a fixed cap and a soft regional balance (defs.md).
+ * Not a sector × region grid: a candidate applies under one sector + declares a
+ * region; the Membership & Seats Committee keeps a broad spread; admissions stop
+ * at COUNCIL_SEAT_CAP.
  */
 
+export const COUNCIL_SEAT_CAP = Number(process.env.COUNCIL_SEAT_CAP ?? 25);
+
 export const SECTOR_LABELS: Record<Sector, string> = {
-  financial_services: "Financial services",
+  financial_services: "Financial services & markets",
   workforce: "Workforce / employment",
   communications: "Communications",
   industrial_iot: "Industrial / IoT",
   energy_sustainability: "Energy / Sustainability",
   logistics_supply_chain: "Logistics / Supply-chain",
-  ai_agentic_identity: "AI / Agentic (Identity)",
-  ai_agentic_commerce: "AI / Agentic (Commerce)",
+  ai_agentic: "AI / Agentic",
   idv_kyc: "IDV / KYC orchestration",
-  markets_commodities: "Markets / commodities",
   legal: "Legal",
-  crypto_validators: "Crypto Network Validators",
+  crypto_validators: "Crypto network validators",
   academic_research: "Academic / research",
-  standards_liaison: "Standards-body liaison",
+  standards_bodies: "Standards bodies",
   public_sector: "Public-sector / sovereign issuers",
 };
 
@@ -37,42 +37,63 @@ export const REGION_LABELS: Record<Region, string> = {
 export const SECTORS = Object.keys(SECTOR_LABELS) as Sector[];
 export const REGIONS = Object.keys(REGION_LABELS) as Region[];
 
-export type CellState = "open" | "pending" | "seated";
-
-export type MatrixCell = {
-  id: string;
-  sector: Sector;
-  region: Region;
-  state: CellState;
-  seatedMemberName: string | null;
-  pendingCount: number;
-};
-
-/** All cells with their derived public state. */
-export async function loadMatrix(): Promise<MatrixCell[]> {
-  const cells = await db.seatCell.findMany({
-    include: {
-      seatedMember: { select: { legalName: true, membership: { select: { listed: true } } } },
-      candidacies: {
-        where: { status: { in: ["queued", "ballot_open"] } },
-        select: { id: true },
-      },
-    },
-  });
-  return cells.map((c) => ({
-    id: c.id,
-    sector: c.sector,
-    region: c.region,
-    state: c.seatedMemberId ? "seated" : c.candidacies.length > 0 ? "pending" : "open",
-    // Name shown only once seated and admin-listed (logo/name consent flow).
-    seatedMemberName:
-      c.seatedMemberId && c.seatedMember?.membership?.listed
-        ? c.seatedMember.legalName
-        : null,
-    pendingCount: c.candidacies.length,
-  }));
+export function sectorLabel(s: Sector): string {
+  return SECTOR_LABELS[s];
+}
+export function regionLabel(r: Region): string {
+  return REGION_LABELS[r];
 }
 
+/** "Financial services & markets — EMEA", used in agreements, the record, etc. */
 export function seatLabel(sector: Sector, region: Region): string {
   return `${SECTOR_LABELS[sector]} — ${REGION_LABELS[region]}`;
+}
+
+export type SeatSummary = {
+  cap: number;
+  seated: number;
+  remaining: number;
+  pending: number; // candidacies in vetting/queue/ballot (anonymous count)
+  bySector: { sector: Sector; label: string; seated: number }[];
+  byRegion: { region: Region; label: string; seated: number }[];
+};
+
+/**
+ * The public, anonymous seat picture: how many of the cap are filled, plus the
+ * spread across sectors and regions. Never names organizations (that is gated
+ * by the admin `listed` flag on the directory).
+ */
+export async function loadSeatSummary(): Promise<SeatSummary> {
+  const seatedMemberships = await db.membership.findMany({
+    where: { track: "founding_member", status: "active" },
+    select: { sector: true, region: true },
+  });
+  const pending = await db.candidacy.count({
+    where: { status: { in: ["signed", "queued", "ballot_open"] } },
+  });
+
+  const seated = seatedMemberships.length;
+  const sectorCount = new Map<Sector, number>();
+  const regionCount = new Map<Region, number>();
+  for (const m of seatedMemberships) {
+    if (m.sector) sectorCount.set(m.sector, (sectorCount.get(m.sector) ?? 0) + 1);
+    if (m.region) regionCount.set(m.region, (regionCount.get(m.region) ?? 0) + 1);
+  }
+
+  return {
+    cap: COUNCIL_SEAT_CAP,
+    seated,
+    remaining: Math.max(0, COUNCIL_SEAT_CAP - seated),
+    pending,
+    bySector: SECTORS.map((sector) => ({
+      sector,
+      label: SECTOR_LABELS[sector],
+      seated: sectorCount.get(sector) ?? 0,
+    })),
+    byRegion: REGIONS.map((region) => ({
+      region,
+      label: REGION_LABELS[region],
+      seated: regionCount.get(region) ?? 0,
+    })),
+  };
 }

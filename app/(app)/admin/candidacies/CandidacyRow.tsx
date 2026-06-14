@@ -10,7 +10,6 @@ export type AdminCandidacy = {
   memberName: string;
   memberId: string;
   memberEmail: string;
-  seatId: string;
   seat: string;
   completedAt: string | null;
   ballotCloses: string | null;
@@ -72,7 +71,7 @@ export default function CandidacyRow({
             type="button"
             disabled={pending}
             onClick={() =>
-              window.confirm(`Mark vetting passed for ${c.memberName}? The candidacy joins the seat's queue.`) &&
+              window.confirm(`Mark vetting passed for ${c.memberName}? The candidacy becomes eligible for a ballot.`) &&
               run(() => vetCandidacy(c.id))
             }
             className="btn btn-primary text-sm"
@@ -86,8 +85,8 @@ export default function CandidacyRow({
             disabled={pending}
             onClick={() =>
               window.confirm(
-                `Open the admission ballot for the next queued candidacy on ${c.seat}? The window and electorate snapshot start now.`,
-              ) && run(() => openBallot(c.seatId))
+                `Open the admission ballot for ${c.memberName} (${c.seat})? The window and electorate snapshot start now.`,
+              ) && run(() => openBallot(c.id))
             }
             className="btn btn-primary text-sm"
           >

@@ -12,7 +12,6 @@ import { persistSignedAgreement } from "@/app/lib/signed-agreement";
 import { loadActiveAgreement, type ActiveAgreement } from "@/app/lib/agreement-versions";
 import { sendEmail, escapeHtml } from "@/app/lib/email";
 import { emailLayout } from "@/app/lib/email-layout";
-import { addRecord } from "@/app/lib/record";
 import { seatLabel } from "@/app/lib/seats";
 
 const SITE_URL = process.env.AUTH_URL ?? "https://veranacouncil.org";
@@ -230,15 +229,10 @@ export async function applyCandidacy(
     const candidacy = await tx.candidacy.create({
       data: { memberId: member.id, seatId: seat.id, status: "signed", signatureId: sig.id },
     });
-    await addRecord(
-      {
-        type: "candidacy_opened",
-        title: `Candidacy opened — ${d.legalName} for ${seatLabel(seat.sector, seat.region)}`,
-        refType: "candidacy",
-        refId: candidacy.id,
-      },
-      tx,
-    );
+    // Applying is private: no public record entry. The org's public footprint
+    // (directory, matrix name, record) appears only once an admin lists it in
+    // /admin/members. The steward is notified by email + sees it in
+    // /admin/candidacies; the seat shows an anonymous "candidate pending".
     return { memberId: member.id, signatureRecordId: sig.id, candidacyId: candidacy.id };
   });
 

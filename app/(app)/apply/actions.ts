@@ -143,7 +143,13 @@ export async function applyCandidacy(
   formData: FormData,
 ): Promise<ApplyState> {
   const user = await currentUser();
-  if (!user?.email || !user.id) redirect("/login?callbackUrl=/apply");
+  if (!user?.email || !user.id) {
+    // Fallback for a session that expired mid-form (the page is normally
+    // auth-gated). Preserve the seat so sign-in returns to the right candidacy.
+    const seatId = String(formData.get("seatId") ?? "");
+    const target = seatId ? `/apply?seat=${seatId}` : "/apply";
+    redirect(`/login?callbackUrl=${encodeURIComponent(target)}`);
+  }
 
   const active = await loadActiveAgreement();
   if (!active) return { error: "No active Candidate Agreement is configured." };

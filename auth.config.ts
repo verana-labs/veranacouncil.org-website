@@ -65,8 +65,14 @@ export default {
     },
     authorized({ auth, request }) {
       const { pathname } = request.nextUrl;
+      // /apply is gated too, so candidacy applicants sign in *before* filling
+      // the form — middleware redirects to /login with the full URL (incl.
+      // ?seat=) as callbackUrl, so the seat survives the round-trip and no
+      // form data is entered (and lost) while logged out.
       const isProtected =
-        pathname.startsWith("/account") || pathname.startsWith("/admin");
+        pathname.startsWith("/account") ||
+        pathname.startsWith("/admin") ||
+        pathname.startsWith("/apply");
       if (!isProtected) return true;
       // Coarse "is logged in?" gate; fine-grained role checks run server-side
       // in the (app) layouts/pages, which can hit the DB.

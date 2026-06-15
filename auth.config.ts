@@ -39,7 +39,7 @@ export default {
           const res = await fetch("https://api.github.com/user/emails", {
             headers: {
               Authorization: `Bearer ${account.access_token}`,
-              "User-Agent": "veranafoundation.org",
+              "User-Agent": "veranacouncil.org",
               Accept: "application/vnd.github+json",
             },
           });

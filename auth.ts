@@ -34,7 +34,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             async sendVerificationRequest({ identifier, token }) {
               await sendEmail({
                 to: identifier,
-                subject: `${token} is your Verana Foundation sign-in code`,
+                subject: `${token} is your Verana Council sign-in code`,
                 html: emailLayout({
                   heading: "Your sign-in code",
                   bodyHtml: `

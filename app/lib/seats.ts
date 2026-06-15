@@ -11,19 +11,23 @@ import { db } from "@/app/lib/db";
 export const COUNCIL_SEAT_CAP = Number(process.env.COUNCIL_SEAT_CAP ?? 25);
 
 export const SECTOR_LABELS: Record<Sector, string> = {
-  financial_services: "Financial services & markets",
-  workforce: "Workforce / employment",
-  communications: "Communications",
-  industrial_iot: "Industrial / IoT",
-  energy_sustainability: "Energy / Sustainability",
-  logistics_supply_chain: "Logistics / Supply-chain",
-  ai_agentic: "AI / Agentic",
-  idv_kyc: "IDV / KYC orchestration",
-  legal: "Legal",
-  crypto_validators: "Crypto network validators",
-  academic_research: "Academic / research",
+  // 11 GICS sectors
+  energy: "Energy",
+  materials: "Materials",
+  industrials: "Industrials",
+  consumer_discretionary: "Consumer Discretionary",
+  consumer_staples: "Consumer Staples",
+  health_care: "Health Care",
+  financials: "Financials",
+  information_technology: "Information Technology",
+  communication_services: "Communication Services",
+  utilities: "Utilities",
+  real_estate: "Real Estate",
+  // + Education, Nonprofit, and the trust-layer stakeholder types
+  education: "Education",
+  nonprofit: "Nonprofit / NGO",
+  public_sector: "Public sector / government",
   standards_bodies: "Standards bodies",
-  public_sector: "Public-sector / sovereign issuers",
 };
 
 export const REGION_LABELS: Record<Region, string> = {

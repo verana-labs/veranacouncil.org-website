@@ -574,20 +574,25 @@ enum VoteChoice {
   refuse
 }
 
+// Recognized taxonomy: the 11 GICS sectors + Education + Nonprofit + the two
+// trust-layer stakeholder types GICS can't express (Public sector, Standards
+// bodies). GICS names used as a neutral standard, not a GICS licence.
 enum Sector {
-  financial_services // Financial services & markets
-  workforce
-  communications
-  industrial_iot
-  energy_sustainability
-  logistics_supply_chain
-  ai_agentic
-  idv_kyc
-  legal
-  crypto_validators
-  academic_research
-  standards_bodies
+  energy
+  materials
+  industrials
+  consumer_discretionary
+  consumer_staples
+  health_care
+  financials
+  information_technology
+  communication_services
+  utilities
+  real_estate
+  education
+  nonprofit
   public_sector
+  standards_bodies
 }
 
 enum Region {

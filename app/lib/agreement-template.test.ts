@@ -5,7 +5,7 @@ import { resolveTemplate, AgreementContext } from "./agreement-template";
 import { markdownToPdf, renderAgreementPdf } from "./agreement-pdf";
 
 const TEMPLATE = readFileSync(
-  path.join(process.cwd(), "legal", "candidate-agreement-v1.md"),
+  path.join(process.cwd(), "legal", "membership-agreement-v1.md"),
   "utf8",
 );
 

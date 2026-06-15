@@ -16,7 +16,7 @@ export function agreementKey(memberId: string): string {
  *
  * Persistence (volume + DB) is best-effort: a broken storage mount must not
  * cost the member their signed copy — the rendered bytes are still returned so
- * the executed-agreement email attaches them. `persisted: false` means the
+ * the signing flow attaches them. `persisted: false` means the
  * /account download will 404 until the copy is re-persisted.
  */
 export async function persistSignedAgreement(opts: {

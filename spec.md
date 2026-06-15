@@ -2,7 +2,7 @@
 
 **Status:** Full rebuild of `verana-labs/veranacouncil.org-website`. Supersedes the
 repo's previous `spec.md` and `sitemap-simpler.md`, and abandons the
-`Initial-Council-Member-MoU-v1` (the candidate agreement will be redrafted).
+`Initial-Council-Member-MoU-v1` (the binding Council Membership Agreement will be drafted).
 **Source of truth for all entity facts: the Verana Council section of
 [`defs.md`](../defs.md).** Where this spec and defs.md disagree, defs.md wins.
 
@@ -301,16 +301,20 @@ closing banner.
 - **How admission works** *(Founding Member track — short numbered list, public
   and honest)*:
   1. **Apply** — sign in (passwordless: Google, GitHub, or email code), pick the
-     sector and region that fit the organization, e-sign the candidate agreement.
+     sector and region that fit the organization, and submit a **non-binding
+     expression of interest** (no document signed — any authorized rep can do
+     this without legal review). The binding Council Membership Agreement comes
+     later (step 4).
   2. **Vetting** — the Membership & Seats Committee (the steward,
      pre-incorporation) runs due diligence. No Foundation membership or any
      other third-party status is required.
   3. **Ballot** — one vote per candidate, accept / refuse, **⅔ supermajority of
      seated members**, in an async **14-day window**. Admissions stop at the
      **25-seat cap**.
-  4. **Seated** — the organization is named on the public record only once
-     accepted/seated; a refused candidate may re-apply under another
-     sector/region.
+  4. **Seated & bound** — the organization is named on the public record only
+     once accepted/seated; then the binding **Council Membership Agreement** is
+     executed from the console (legal-reviewed, authorized signatory). A refused
+     candidate may re-apply under another sector/region.
   - One transparency line on bootstrap: the first 3 members (2060 plus the
     first 2 vetted candidates) are designated by the steward with published
     rationale; from candidate #4 onward every admission goes through the peer
@@ -334,11 +338,15 @@ calendar-synced meetings, published minutes. Council-specific surfaces:
 
 ### 6.1 Candidacy & seat (Founding Member track)
 
-- Apply: pick a **sector** + **region** → e-sign the candidate agreement
-  (to be drafted; replaces the abandoned Initial-Council-Member-MoU v1) →
-  status `signed`, then vetting.
+- Apply: pick a **sector** + **region** → submit a **non-binding expression of
+  interest** (no document signed; a representation that the submitter is
+  authorized) → awaiting vetting.
 - Track status: vetting → ballot open (deadline visible) → result. Refused:
   one-click re-apply under another sector/region.
+- After seating: execute the binding **Council Membership Agreement** from the
+  console — reviewed by the org's legal team, e-signed by an authorized
+  signatory (the agreement is to be drafted; replaces the abandoned
+  Initial-Council-Member-MoU v1).
 - After seating: seat record — sector + region, date seated, validator term and
   renewal date (term mechanics activate at mainnet), and **testnet validator
   status** — seated members are expected to bring a testnet node online during

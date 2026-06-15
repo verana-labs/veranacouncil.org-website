@@ -35,10 +35,10 @@ for (const email of emails) {
 
 console.log(`Seeded ${emails.length} admin allowlist entr${emails.length === 1 ? "y" : "ies"}.`);
 
-// Activate a Candidate Agreement version file from legal/ (admins can switch
+// Activate a Membership Agreement version file from legal/ (admins can switch
 // versions in /admin/settings). Pins the file's sha384 on first activation;
 // never re-pins a changed file (that would defeat the integrity guarantee).
-const agreementFile = process.env.AGREEMENT_FILENAME ?? "candidate-agreement-v1.md";
+const agreementFile = process.env.AGREEMENT_FILENAME ?? "membership-agreement-v1.md";
 try {
   const content = readFileSync(path.join(process.cwd(), "legal", agreementFile), "utf8");
   const hash = "sha384-" + crypto.createHash("sha384").update(content, "utf8").digest("base64");
@@ -53,10 +53,10 @@ try {
       update: { active: true },
       create: { filename: agreementFile, version, hash, active: true },
     });
-    console.log(`Activated Candidate Agreement ${version} (${agreementFile}).`);
+    console.log(`Activated Membership Agreement ${version} (${agreementFile}).`);
   }
 } catch (e) {
-  console.warn(`Could not seed Candidate Agreement from ${agreementFile}:`, e.message);
+  console.warn(`Could not seed Membership Agreement from ${agreementFile}:`, e.message);
 }
 // No seat rows to seed: seats are sectors (a fixed enum) with a 25-member cap,
 // not pre-created sector × region cells. The diversity spread is computed from

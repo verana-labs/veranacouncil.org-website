@@ -7,7 +7,7 @@ import { activateVersion } from "@/app/lib/agreement-versions";
 
 export type SettingsState = { error?: string; ok?: boolean };
 
-/** Make the chosen legal/ version file the active Candidate Agreement. */
+/** Make the chosen legal/ version file the active Membership Agreement. */
 export async function activateAgreementVersion(
   _prev: SettingsState,
   formData: FormData,

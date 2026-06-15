@@ -33,10 +33,10 @@ export default async function SettingsPage() {
       <PageHero
         back={{ href: "/admin", label: "Admin" }}
         title="Settings"
-        lead="The active Candidate Agreement shown to applicants, and the version catalog."
+        lead="The active Membership Agreement shown to applicants, and the version catalog."
       />
       <Section bordered={false}>
-      <h2 className="display text-xl">Candidate Agreement</h2>
+      <h2 className="display text-xl">Membership Agreement</h2>
       <p className="text-muted text-sm">
         Versions live as Markdown files in <code>legal/</code>. Each new version is a
         new file; never edit a published one. The active version is shown to

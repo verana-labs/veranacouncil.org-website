@@ -5,7 +5,7 @@ import { markdownToHtml, renderAgreementHtml, renderTemplateHtml } from "./agree
 import { AgreementContext } from "./agreement-template";
 
 const TEMPLATE = readFileSync(
-  path.join(process.cwd(), "legal", "candidate-agreement-v1.md"),
+  path.join(process.cwd(), "legal", "membership-agreement-v1.md"),
   "utf8",
 );
 

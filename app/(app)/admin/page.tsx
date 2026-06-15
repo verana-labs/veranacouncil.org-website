@@ -56,7 +56,7 @@ const FEATURES: {
   {
     href: "/admin/settings",
     label: "Settings",
-    description: "Candidate Agreement versions, integrity, and activation.",
+    description: "Membership Agreement versions, integrity, and activation.",
     icon: faGear,
   },
   {

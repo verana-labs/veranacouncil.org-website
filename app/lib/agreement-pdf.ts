@@ -4,7 +4,7 @@ import { AgreementContext, resolveTemplate } from "@/app/lib/agreement-template"
 export type { AgreementContext } from "@/app/lib/agreement-template";
 
 /**
- * Renders the personalised Candidate Agreement markdown to a PDF using pdf-lib
+ * Renders the personalised Membership Agreement markdown to a PDF using pdf-lib
  * and the standard Helvetica fonts — no headless browser, no font files to ship,
  * so it runs unchanged on the node:22-alpine standalone runtime.
  *

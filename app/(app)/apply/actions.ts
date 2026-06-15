@@ -86,22 +86,29 @@ export async function applyCandidacy(
   }
   const d = parsed.data;
 
-  // Reuse the org the user already manages (re-application / successor
-  // candidacy); otherwise create it. One live candidacy per org at a time.
-  const existingLink = await db.userMember.findFirst({
-    where: { userId: user.id, role: "manager" },
+  // Consider every organization this user belongs to (manager OR
+  // representative), not just one they manage: a person who already
+  // represents a seated member — or an org with a candidacy in flight —
+  // cannot start a separate candidacy for a new seat.
+  const links = await db.userMember.findMany({
+    where: { userId: user.id },
     include: { member: { include: { candidacies: true, membership: true } } },
   });
-  const existing = existingLink?.member ?? null;
-  if (existing?.membership?.status === "active") {
-    return { error: "Your organization is already a Council member." };
+  if (links.some((l) => l.member.membership?.status === "active")) {
+    return { error: "Your organization is already a Council member, so you can't apply for another seat." };
   }
-  const live = existing?.candidacies.some((c) =>
-    ["applied", "signed", "queued", "ballot_open"].includes(c.status),
-  );
-  if (live) {
+  if (
+    links.some((l) =>
+      l.member.candidacies.some((c) =>
+        ["applied", "signed", "queued", "ballot_open"].includes(c.status),
+      ),
+    )
+  ) {
     return { error: "Your organization already has a candidacy in progress." };
   }
+  // Reuse the org the user manages for a re-application (e.g. after a refusal),
+  // so we update it rather than creating a duplicate; otherwise create one.
+  const existing = links.find((l) => l.role === "manager")?.member ?? null;
 
   const memberId = await db.$transaction(async (tx) => {
     const memberData = {

@@ -6,7 +6,14 @@ import { loadSeatSummary } from "@/app/lib/seats";
  * across sectors and regions. Anonymous by design (no org names); an inviting,
  * legible recruitment surface, not a sector × region grid.
  */
-export default async function SeatBoard({ compact = false }: { compact?: boolean }) {
+export default async function SeatBoard({
+  compact = false,
+  cta = true,
+}: {
+  compact?: boolean;
+  /** Render the "Apply for a seat" button (suppress where the page has its own). */
+  cta?: boolean;
+}) {
   const s = await loadSeatSummary();
   const pct = s.cap > 0 ? Math.round((s.seated / s.cap) * 100) : 0;
 
@@ -28,10 +35,14 @@ export default async function SeatBoard({ compact = false }: { compact?: boolean
               {s.pending} under review
             </span>
           )}
-          <Link href="/join" className="text-indigo hover:underline">
-            apply for a seat →
-          </Link>
         </p>
+        {cta && (
+          <div className="mt-4">
+            <Link href="/apply" className="btn btn-primary text-sm">
+              Apply for a seat →
+            </Link>
+          </div>
+        )}
       </div>
 
       {!compact && (

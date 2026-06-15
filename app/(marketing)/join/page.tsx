@@ -124,14 +124,16 @@ export default function JoinPage() {
           <p className="tag mb-3">Open seats</p>
           <h2 className="display text-3xl">Seats at a glance</h2>
           <div className="accent-line mt-4 mb-8" />
-          <SeatBoard compact />
-          <p className="text-sm text-muted mt-4">
-            <Link href="/apply" className="text-indigo hover:underline">
+          <SeatBoard compact cta={false} />
+          <div className="mt-6">
+            <Link href="/apply" className="btn btn-primary">
               Start a candidacy →
-            </Link>{" "}
-            — pick your sector and region in the form. Pre-incorporation
-            submissions are confidential.
-          </p>
+            </Link>
+            <p className="text-sm text-muted mt-3">
+              Pick your sector and region in the form. Pre-incorporation
+              submissions are confidential.
+            </p>
+          </div>
         </div>
       </section>
 

@@ -10,7 +10,7 @@ type Me = { user: MeUser | null; actions: MeAction[]; isMember: boolean };
 
 const NAV_LINKS = [
   { href: "/about", label: "About" },
-  { href: "/governance", label: "Governance" },
+  { href: "/council-bodies", label: "Governance" },
   { href: "/members", label: "Members" },
   { href: "/news", label: "News" },
 ];

@@ -27,7 +27,7 @@ export default async function HomePage() {
             <Link href="/join" className="btn btn-primary">
               Apply for a Founding Council Seat
             </Link>
-            <Link href="/governance" className="btn btn-secondary">
+            <Link href="/council-bodies" className="btn btn-secondary">
               Read the frameworks
             </Link>
           </div>

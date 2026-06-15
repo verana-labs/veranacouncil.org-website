@@ -9,24 +9,52 @@ import {
 import WorkingGroupCards from "@/app/components/WorkingGroupCards";
 
 export const metadata: Metadata = {
-  title: "Council Bodies",
+  title: "Governance",
   description:
-    "The Verana Council's bodies and committees — the General Assembly, Membership & Seats, Technical / Validator. Participation requires Council membership (Founding Member or Observer).",
+    "The Verana Council's governance frameworks (Network GF, ECS-EGF, Template EGF) and its bodies & committees. Council Members and Observers join a body to take part in its meetings.",
 };
 
-// Per-user content (join state, membership notice) makes this page dynamic.
+// Per-user content (body join state, membership notice) makes this page dynamic.
 export const dynamic = "force-dynamic";
 
-export default async function WorkingGroupsPage() {
+const GOV_REPO = "https://github.com/verana-labs/verana-council-gov";
+const SCHEMAS = "https://verana-labs.github.io/verifiable-trust-spec/schemas/v4";
+
+const ECS_ROWS = [
+  {
+    schema: "Service",
+    identifies: "Verifiable Services (incl. AI agents)",
+    mode: "ECOSYSTEM_VALIDATION_PROCESS",
+    file: "service.json",
+  },
+  {
+    schema: "Organization",
+    identifies: "Legal entities controlling services",
+    mode: "GRANTOR_VALIDATION_PROCESS",
+    file: "org.json",
+  },
+  {
+    schema: "Persona",
+    identifies: "Individuals controlling services",
+    mode: "GRANTOR_VALIDATION_PROCESS",
+    file: "persona.json",
+  },
+  {
+    schema: "UserAgent",
+    identifies: "End-user wallets and applications",
+    mode: "OPEN",
+    file: "ua.json",
+  },
+];
+
+export default async function GovernancePage() {
   const user = await currentUser();
-  const [workingGroups, classes] = await Promise.all([
+  const [bodies, classes] = await Promise.all([
     listWorkingGroupsWithAccess(user?.id ?? null),
-    user?.id
-      ? userActiveClasses(user.id)
-      : Promise.resolve(new Set<WgClass>()),
+    user?.id ? userActiveClasses(user.id) : Promise.resolve(new Set<WgClass>()),
   ]);
   // Signed-out visitors and signed-in users without an active membership get
-  // the "membership required" explainer; members don't need it.
+  // the "membership required" explainer; members/observers don't need it.
   const showMembershipNotice = !user || classes.size === 0;
 
   return (
@@ -34,28 +62,167 @@ export default async function WorkingGroupsPage() {
       {/* Hero */}
       <section className="border-b border-rule">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <p className="tag mb-4">Council Bodies</p>
+          <p className="tag mb-4">Governance</p>
           <h1 className="display text-4xl sm:text-5xl leading-tight max-w-3xl">
-            Where the work happens
+            How the Council governs
           </h1>
           <div className="accent-line mt-6" />
           <p className="mt-8 text-lg text-muted max-w-2xl leading-relaxed">
-            The council bodies author the specifications, build and maintain the
-            open-source software, and shape the open trust layer. Join the ones
-            your membership grants — across every organization you belong to —
-            and the meetings land straight in your calendar.
+            The Council authors and operates the governance frameworks of the
+            Verana network, and runs the bodies that do the work. Normative text
+            lives in the public governance repository — this page summarizes and
+            links.
           </p>
         </div>
       </section>
 
-      {/* Membership-required notice — only for visitors who can't join yet */}
-      {showMembershipNotice && (
-        <section className="border-b border-rule reveal">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div className="card border-l-[3px]" style={{ borderLeftColor: "var(--color-indigo)" }}>
-              <h2 className="display text-xl">
-                Council-body participation requires membership
-              </h2>
+      {/* Network GF */}
+      <section className="border-b border-rule">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <p className="tag mb-3">Network GF</p>
+          <h2 className="display text-3xl">The constitutional layer</h2>
+          <div className="accent-line mt-4 mb-6" />
+          <p className="max-w-3xl text-sm leading-relaxed">
+            The Network Governance Framework is the constitutional layer that
+            every Ecosystem Governance Framework (EGF) on Verana must respect.
+          </p>
+          <p className="text-sm mt-4">
+            <a href={GOV_REPO} rel="noopener" className="text-indigo hover:underline">
+              Read the Network GF ↗
+            </a>
+          </p>
+        </div>
+      </section>
+
+      {/* ECS-EGF */}
+      <section className="border-b border-rule">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <p className="tag mb-3">ECS-EGF</p>
+          <h2 className="display text-3xl">The Essential Credential Schemas</h2>
+          <div className="accent-line mt-4 mb-6" />
+          <p className="max-w-3xl text-sm leading-relaxed mb-8">
+            The Council&rsquo;s own ecosystem framework, covering the four
+            Essential Credential Schemas that make the trust layer work.
+          </p>
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse text-sm min-w-[640px] max-w-4xl">
+              <thead>
+                <tr className="text-left text-muted">
+                  <th className="p-2">Schema</th>
+                  <th className="p-2">Identifies</th>
+                  <th className="p-2">Permission mode</th>
+                  <th className="p-2">Definition</th>
+                </tr>
+              </thead>
+              <tbody>
+                {ECS_ROWS.map((r) => (
+                  <tr key={r.schema} className="border-t border-rule">
+                    <td className="p-2 font-mono">{r.schema}</td>
+                    <td className="p-2">{r.identifies}</td>
+                    <td className="p-2 font-mono text-xs">{r.mode}</td>
+                    <td className="p-2">
+                      <a
+                        href={`${SCHEMAS}/${r.file}`}
+                        rel="noopener"
+                        className="text-indigo hover:underline font-mono text-xs"
+                      >
+                        {r.file} ↗
+                      </a>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      {/* ECS participants — forward note + waitlist */}
+      <section className="border-b border-rule">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <p className="tag mb-3">ECS Ecosystem Participants</p>
+          <h2 className="display text-3xl">A separate process — opening with the ECS-EGF</h2>
+          <div className="accent-line mt-4 mb-6" />
+          <p className="max-w-3xl text-sm leading-relaxed">
+            ECS Ecosystem Participants are required for running Verifiable
+            Services on Verana. Their selection is governed by the ECS-EGF, so
+            recruitment opens as soon as the Council delivers the framework
+            (target Q4 2026), with initial participants permissioned in time
+            for mainnet. Until then, the Council collects non-binding
+            expressions of interest.
+          </p>
+          <p className="text-sm mt-4">
+            <Link href="/ecs-interest" className="text-indigo hover:underline">
+              Express interest →
+            </Link>
+          </p>
+        </div>
+      </section>
+
+      {/* Template EGF */}
+      <section className="border-b border-rule">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <p className="tag mb-3">Template EGF</p>
+          <h2 className="display text-3xl">A scaffold, not a gate</h2>
+          <div className="accent-line mt-4 mb-6" />
+          <p className="max-w-3xl text-sm leading-relaxed">
+            A template for ecosystems authoring their own sector EGF. The
+            Council provides the scaffold; it is not a sector-EGF authority.
+          </p>
+          <p className="text-sm mt-4">
+            <a href={GOV_REPO} rel="noopener" className="text-indigo hover:underline">
+              Read the Template EGF ↗
+            </a>
+          </p>
+        </div>
+      </section>
+
+      {/* Bylaws & disputes */}
+      <section className="border-b border-rule">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <p className="tag mb-3">Association documents</p>
+          <h2 className="display text-3xl">Bylaws, conduct &amp; disputes</h2>
+          <div className="accent-line mt-4 mb-6" />
+          <ul className="grid gap-3 max-w-3xl text-sm leading-relaxed list-disc pl-5">
+            <li>
+              <a href={GOV_REPO} rel="noopener" className="text-indigo hover:underline">
+                Bylaws ↗
+              </a>{" "}
+              — the Verein&rsquo;s statutes and operating rules.
+            </li>
+            <li>
+              <a href={GOV_REPO} rel="noopener" className="text-indigo hover:underline">
+                Code of Conduct ↗
+              </a>{" "}
+              — applies to all members, observers, and representatives.
+            </li>
+          </ul>
+          <p className="max-w-3xl text-sm leading-relaxed text-muted mt-6">
+            Risk management &amp; disputes: graduated sanctions, a public
+            record of decisions, and appeal to the General Assembly.
+          </p>
+        </div>
+      </section>
+
+      {/* Council Bodies */}
+      <section className="border-b border-rule reveal">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <p className="tag mb-3">Council Bodies</p>
+          <h2 className="display text-3xl">The bodies &amp; committees</h2>
+          <div className="accent-line mt-4 mb-6" />
+          <p className="max-w-3xl text-sm leading-relaxed mb-8">
+            The General Assembly and committees that author and operate the
+            frameworks. Any Council Member or Observer can join a body — across
+            every organization you belong to — and its meetings land straight in
+            your calendar.
+          </p>
+
+          {showMembershipNotice && (
+            <div
+              className="card border-l-[3px] mb-8"
+              style={{ borderLeftColor: "var(--color-indigo)" }}
+            >
+              <h3>Participation requires membership</h3>
               <p className="text-sm text-muted leading-relaxed">
                 Council bodies are open to any{" "}
                 <strong className="text-ink">Council Member</strong> or{" "}
@@ -66,74 +233,14 @@ export default async function WorkingGroupsPage() {
                 </Link>
               </p>
             </div>
-          </div>
-        </section>
-      )}
+          )}
 
-      {/* Working-group board */}
-      <section className="border-b border-rule reveal">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <WorkingGroupCards groups={workingGroups} />
+          <WorkingGroupCards groups={bodies} />
           <p className="text-xs text-muted mt-4">
-            Each group's page shows its leads, meeting schedule and published
-            minutes; members join and are invited to the meetings in their own
-            calendar.
+            Each body&rsquo;s page shows its leads, meeting schedule and
+            published minutes; members and observers join and are invited to the
+            meetings in their own calendar.
           </p>
-        </div>
-      </section>
-
-      {/* Ways to contribute */}
-      <section className="border-b border-rule reveal">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="card">
-              <span className="badge">no membership needed</span>
-              <h3>Use the open-source software</h3>
-              <p className="text-sm text-muted leading-relaxed">
-                Public repos, issue trackers, and releases. Apache 2.0
-                (AGPL-3.0 for the Verifiable Public Registry); copyright held by
-                contributors.
-              </p>
-              <a
-                href="https://github.com/verana-labs"
-                rel="noopener"
-                className="text-sm text-indigo hover:underline mt-auto self-end"
-              >
-                github.com/verana-labs ↗
-              </a>
-            </div>
-            <div className="card">
-              <span className="badge">no membership needed</span>
-              <h3>Implement the specifications</h3>
-              <p className="text-sm text-muted leading-relaxed">
-                Build to Verifiable Trust and VPR. Both specs are published for
-                implementers.
-              </p>
-              <a
-                href="https://verana-labs.github.io/verifiable-trust-spec/"
-                rel="noopener"
-                className="text-sm text-indigo hover:underline mt-auto self-end"
-              >
-                Read the specs ↗
-              </a>
-            </div>
-            <div className="card">
-              <span className="badge badge-indigo">members</span>
-              <h3>Join to take part</h3>
-              <p className="text-sm text-muted leading-relaxed">
-                Council bodies are open to any{" "}
-                <strong className="text-ink">Council Member</strong> or{" "}
-                <strong className="text-ink">Observer</strong>. Membership is
-                free.
-              </p>
-              <Link
-                href="/join"
-                className="text-sm text-indigo hover:underline mt-auto self-end"
-              >
-                Apply for a Council seat →
-              </Link>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -143,8 +250,7 @@ export default async function WorkingGroupsPage() {
           <div className="card">
             <h3>Building an app or agent on Verana?</h3>
             <p className="text-sm text-muted leading-relaxed">
-              The Foundation stewards the standards; the builder docs live
-              elsewhere. Start at{" "}
+              Governance lives here; the builder docs live elsewhere. Start at{" "}
               <a href="https://verana.io" rel="noopener" className="text-indigo hover:underline">
                 verana.io
               </a>{" "}

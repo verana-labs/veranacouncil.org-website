@@ -19,14 +19,25 @@ export default async function ApplyPage({
   const prefillSector =
     sector && (SECTORS as string[]).includes(sector) ? sector : undefined;
 
-  // Re-application / successor candidacy: prefill the org the user manages.
+  // A person who already belongs to a seated member — or to an org with a
+  // candidacy in flight (any role) — can't start a separate candidacy.
   const user = await currentUser();
-  const link = user
-    ? await db.userMember.findFirst({
-        where: { userId: user.id, role: "manager" },
-        include: { member: true },
+  const links = user
+    ? await db.userMember.findMany({
+        where: { userId: user.id },
+        include: { member: { include: { membership: true, candidacies: true } } },
       })
-    : null;
+    : [];
+  const alreadyMember = links.find((l) => l.member.membership?.status === "active");
+  const inFlight = links.find((l) =>
+    l.member.candidacies.some((c) =>
+      ["applied", "signed", "queued", "ballot_open"].includes(c.status),
+    ),
+  );
+  const blocked = alreadyMember ?? inFlight ?? null;
+
+  // Re-application (e.g. after a refusal): prefill the org the user manages.
+  const link = links.find((l) => l.role === "manager") ?? null;
   const prefill = link
     ? {
         legalName: link.member.legalName,
@@ -63,7 +74,27 @@ export default async function ApplyPage({
       {/* Candidacy */}
       <section>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          {full ? (
+          {blocked ? (
+            <div className="card max-w-2xl">
+              <h3>
+                {alreadyMember
+                  ? "Your organization already holds a seat"
+                  : "Your organization already has a candidacy"}
+              </h3>
+              <p className="text-sm text-muted leading-relaxed">
+                You belong to{" "}
+                <strong className="text-ink">{blocked.member.legalName}</strong>
+                {alreadyMember
+                  ? ", a seated Council member — an organization holds a single seat, so there's no separate seat to apply for."
+                  : ", whose candidacy is under review — one candidacy per organization at a time."}{" "}
+                See it in your{" "}
+                <Link href="/account" className="text-indigo hover:underline">
+                  account
+                </Link>
+                .
+              </p>
+            </div>
+          ) : full ? (
             <div className="card max-w-2xl">
               <h3>All {summary.cap} seats are filled</h3>
               <p className="text-sm text-muted leading-relaxed">

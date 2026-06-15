@@ -277,6 +277,7 @@ export default async function AccountPage() {
                     country={l.member.jurisdiction}
                     entityType={l.member.entityType}
                     address={l.member.registeredAddress}
+                    website={l.member.website}
                     logoUrl={
                       l.member.logoUri
                         ? `/logo/${l.memberId}?v=${l.member.updatedAt.getTime()}`
@@ -290,6 +291,7 @@ export default async function AccountPage() {
                       return {
                         memberId: l.memberId,
                         canEditAddress: isManager,
+                        canEditWebsite: isManager,
                         canEditLogo: isManager,
                         manageHref: isManager ? `/account/org/${l.memberId}/access` : null,
                         // Managers may leave only if another manager remains;

@@ -106,6 +106,7 @@ model Member {
   entityType        String?
   jurisdiction      String?
   registeredAddress String?
+  website           String? // public website; makes the /members card clickable
   noticeEmail       String? // formal notices
   logoUri           String? // storage key of the uploaded logo (logos/{id}.{ext})
 

@@ -178,6 +178,65 @@ export async function updateOrgAddress(memberId: string, address: string) {
 }
 
 /**
+ * Update an organization's public website (managers only). Normalizes a
+ * bare host to https:// and validates the URL; returns a user-safe error
+ * (instead of throwing) so the card can show it inline. The website makes
+ * the organization's card on /members clickable.
+ */
+export async function updateOrgWebsite(
+  memberId: string,
+  website: string,
+): Promise<{ error?: string }> {
+  const user = await currentUser();
+  if (!user?.id || !user.email) return { error: "Not signed in." };
+
+  const link = await db.userMember.findUnique({
+    where: { userId_memberId: { userId: user.id, memberId } },
+  });
+  if (link?.role !== "manager") {
+    return { error: "Only a manager can update the organization's website." };
+  }
+  const member = await db.member.findUnique({ where: { id: memberId } });
+  if (!member || member.type !== "organization") return { error: "Not found." };
+
+  let normalized: string | null = null;
+  const raw = website.trim().slice(0, 300);
+  if (raw) {
+    const withScheme = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
+    try {
+      const u = new URL(withScheme);
+      if (u.protocol !== "http:" && u.protocol !== "https:") throw new Error();
+      if (!u.hostname.includes(".")) throw new Error();
+      normalized = u.toString();
+    } catch {
+      return { error: "Enter a valid website URL (e.g. https://example.org)." };
+    }
+  }
+
+  await db.$transaction([
+    db.member.update({
+      where: { id: memberId },
+      data: { website: normalized },
+    }),
+    db.adminAction.create({
+      data: {
+        actorUserId: user.id,
+        actorEmail: user.email,
+        action: "member.update_website",
+        targetType: "Member",
+        targetId: memberId,
+        before: { website: member.website },
+        after: { website: normalized },
+      },
+    }),
+  ]);
+
+  revalidatePath("/account");
+  revalidatePath("/members");
+  return {};
+}
+
+/**
  * Upload/replace an organization's logo (managers only) with the explicit
  * display consent gathered at upload. Returns a user-safe error message
  * instead of throwing, so the card can show it inline.

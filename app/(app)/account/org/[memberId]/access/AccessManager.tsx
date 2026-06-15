@@ -61,8 +61,8 @@ export default function AccessManager({
       <section>
         <h2 className="display text-xl">Admins</h2>
         <p className="text-sm text-muted">
-          Can manage billing and this access list, and participate in working
-          groups.
+          Manage this access list and the organization&rsquo;s candidacy and
+          membership, plus everything a representative can do.
         </p>
         <EntryTable
           memberId={memberId}
@@ -77,7 +77,8 @@ export default function AccessManager({
       <section>
         <h2 className="display text-xl">Representatives</h2>
         <p className="text-sm text-muted">
-          Participate in working groups on the organization&rsquo;s behalf.
+          Access the console, follow candidacy and seat status, and download the
+          organization&rsquo;s documents. They do not manage the access list.
         </p>
         <EntryTable
           memberId={memberId}

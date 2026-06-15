@@ -190,40 +190,37 @@ export default async function AccountPage() {
             </section>
           )}
 
-          {/* Membership Agreement (binding) — managers of seated orgs */}
-          {seats.some(
-            (m) => links.find((l) => l.memberId === m.memberId)?.role === "manager",
-          ) && (
+          {/* Membership Agreement (binding) — seated orgs. Managers sign;
+              representatives see status and can download once signed. */}
+          {seats.length > 0 && (
             <section className="border-b border-rule">
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
                 <p className="tag mb-3">Membership Agreement</p>
                 <h2 className="display text-3xl">The binding agreement</h2>
                 <div className="accent-line mt-4 mb-8" />
                 <div className="grid sm:grid-cols-2 gap-6 max-w-4xl">
-                  {seats
-                    .filter(
-                      (m) =>
-                        links.find((l) => l.memberId === m.memberId)?.role === "manager",
-                    )
-                    .map((m) => {
-                      const sig = signatureFor(m.memberId);
-                      return (
-                        <MembershipAgreementCard
-                          key={m.memberId}
-                          memberId={m.memberId}
-                          memberName={m.member.legalName}
-                          agreementVersion={activeAgreement?.version ?? null}
-                          signed={
-                            sig
-                              ? {
-                                  version: sig.agreementVersion,
-                                  at: sig.signedAt.toISOString().slice(0, 10),
-                                }
-                              : null
-                          }
-                        />
-                      );
-                    })}
+                  {seats.map((m) => {
+                    const sig = signatureFor(m.memberId);
+                    const canSign =
+                      links.find((l) => l.memberId === m.memberId)?.role === "manager";
+                    return (
+                      <MembershipAgreementCard
+                        key={m.memberId}
+                        memberId={m.memberId}
+                        memberName={m.member.legalName}
+                        canSign={canSign}
+                        agreementVersion={activeAgreement?.version ?? null}
+                        signed={
+                          sig
+                            ? {
+                                version: sig.agreementVersion,
+                                at: sig.signedAt.toISOString().slice(0, 10),
+                              }
+                            : null
+                        }
+                      />
+                    );
+                  })}
                 </div>
               </div>
             </section>
@@ -278,6 +275,7 @@ export default async function AccountPage() {
                     status={l.member.membership?.status}
                     role={l.role}
                     country={l.member.jurisdiction}
+                    entityType={l.member.entityType}
                     address={l.member.registeredAddress}
                     logoUrl={
                       l.member.logoUri
@@ -285,13 +283,6 @@ export default async function AccountPage() {
                         : null
                     }
                     logoConsent={l.member.logoDisplayConsent}
-                    agreementHref={
-                      // Only managers (incl. the signer) may download the
-                      // signed agreement — not representatives.
-                      l.role === "manager"
-                        ? `/account/agreement/${l.memberId}`
-                        : null
-                    }
                     menu={(() => {
                       const isManager = l.role === "manager";
                       const mgr = countOf(l.memberId, "manager");

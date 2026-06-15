@@ -83,7 +83,9 @@ export default function JoinPage() {
             <li>
               <strong>Apply</strong> — sign in (Google, GitHub, or an email
               code), pick the sector and region that fit your organization, and
-              e-sign the Candidate Agreement.
+              submit a <strong>non-binding expression of interest</strong>. No
+              document is signed; any authorized representative can do this
+              without legal review.
             </li>
             <li>
               <strong>Vetting</strong> — the Membership &amp; Seats Committee
@@ -96,9 +98,12 @@ export default function JoinPage() {
               14-day window. Admissions stop at the 25-seat cap.
             </li>
             <li>
-              <strong>Seated</strong> — your organization is named on the
-              public record only once accepted/seated. A refused candidate may
-              re-apply under another sector/region.
+              <strong>Seated &amp; bound</strong> — once accepted, your
+              organization is named on the public record, and the binding
+              <strong> Council Membership Agreement</strong> is executed from
+              your account — reviewed by your legal team, signed by an
+              authorized signatory. A refused candidate may re-apply under
+              another sector/region.
             </li>
           </ol>
           <p className="max-w-3xl text-sm text-muted leading-relaxed mt-6">

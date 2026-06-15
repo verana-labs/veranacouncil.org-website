@@ -1,5 +1,5 @@
 /**
- * Personalises a Candidate Agreement template (a file in legal/) for a specific
+ * Personalises a Membership Agreement template (a file in legal/) for a specific
  * signer. Council candidates are always organizations; the template is driven by
  * the org's details and the seat (sector × region) the candidacy targets.
  * The template content is supplied by the caller (the active version is

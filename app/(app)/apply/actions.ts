@@ -5,11 +5,6 @@ import { redirect } from "next/navigation";
 import { db } from "@/app/lib/db";
 import { currentUser } from "@/app/lib/authz";
 import { saveMemberLogo } from "@/app/lib/logo";
-import { sendExecutedAgreementEmail } from "@/app/lib/executed-agreement";
-import { toAgreementContext } from "@/app/lib/agreement-context";
-import { renderAgreementHtml } from "@/app/lib/agreement-html";
-import { persistSignedAgreement } from "@/app/lib/signed-agreement";
-import { loadActiveAgreement, type ActiveAgreement } from "@/app/lib/agreement-versions";
 import { sendEmail, escapeHtml } from "@/app/lib/email";
 import { emailLayout } from "@/app/lib/email-layout";
 import { seatLabel } from "@/app/lib/seats";
@@ -18,15 +13,6 @@ import { Sector, Region } from "@prisma/client";
 const SITE_URL = process.env.AUTH_URL ?? "https://veranacouncil.org";
 
 export type ApplyState = { error?: string };
-
-/** Best-effort: never block a successful candidacy on email delivery. */
-async function emailExecutedCopy(d: Parameters<typeof sendExecutedAgreementEmail>[0]) {
-  try {
-    await sendExecutedAgreementEmail(d);
-  } catch (e) {
-    console.error("[apply] executed-agreement email failed", e);
-  }
-}
 
 /** Best-effort: store an optional org logo from the candidacy form. */
 async function maybeSaveLogo(
@@ -49,99 +35,26 @@ async function maybeSaveLogo(
   }
 }
 
-/** Alert the admin allowlist that the active agreement file failed its hash check. */
-async function notifyAdminsIntegrityFailure(active: ActiveAgreement) {
-  try {
-    const admins = await db.adminAllowlistEntry.findMany({ select: { email: true } });
-    const to = admins.map((a) => a.email).join(",");
-    if (!to) return;
-    await sendEmail({
-      to,
-      subject: "⚠ Candidate Agreement integrity check failed — signing blocked",
-      html: emailLayout({
-        heading: "Agreement integrity check failed",
-        bodyHtml: `
-        <p style="margin:0 0 12px;">The active Candidate Agreement file no longer
-        matches the hash it was published with, so new signatures are blocked
-        until it is resolved.</p>
-        <ul style="margin:0 0 12px;padding-left:18px;">
-          <li>Version: ${escapeHtml(active.version)}</li>
-          <li>File: ${escapeHtml(active.filename)}</li>
-          <li>Expected: ${escapeHtml(active.pinnedHash)}</li>
-          <li>Found: ${escapeHtml(active.currentHash ?? "(file missing)")}</li>
-        </ul>
-        <p style="margin:0;">Restore the original file, or publish a new version
-        in Settings.</p>`,
-        button: { label: "Open Settings", href: `${SITE_URL}/admin/settings` },
-      }),
-    });
-  } catch (e) {
-    console.error("[apply] admin integrity alert failed", e);
-  }
-}
-
-/**
- * Render the personalised agreement to HTML for the wizard's review step, from
- * the data entered so far + the active version. Blocks if the active file failed
- * its integrity check (the signing step would block anyway).
- */
-export async function previewAgreement(input: {
-  sector?: string;
-  region?: string;
-  legalName?: string;
-  entityType?: string;
-  jurisdiction?: string;
-  registeredAddress?: string;
-  signerName?: string;
-  signerTitle?: string;
-}): Promise<{ html?: string; error?: string }> {
-  const active = await loadActiveAgreement();
-  if (!active) return { error: "No active Candidate Agreement is configured." };
-  if (!active.intact) {
-    return { error: "The Candidate Agreement is temporarily unavailable. Please try again later." };
-  }
-  const sector = input.sector as Sector | undefined;
-  const region = input.region as Region | undefined;
-  if (!sector || !(sector in Sector)) return { error: "Choose a sector." };
-  if (!region || !(region in Region)) return { error: "Choose a region." };
-  const user = await currentUser();
-  const ctx = toAgreementContext({
-    legalName: input.legalName,
-    entityType: input.entityType,
-    jurisdiction: input.jurisdiction,
-    registeredAddress: input.registeredAddress,
-    signerName: input.signerName,
-    signerTitle: input.signerTitle,
-    email: user?.email,
-    sector,
-    region,
-    effectiveDate: new Date(),
-  });
-  try {
-    return { html: renderAgreementHtml(ctx, active.content) };
-  } catch (e) {
-    console.error("[apply] preview render failed", e);
-    return { error: "Could not render the agreement preview." };
-  }
-}
-
-const candidacySchema = z.object({
+const eoiSchema = z.object({
   sector: z.nativeEnum(Sector),
   region: z.nativeEnum(Region),
   legalName: z.string().trim().min(1, "Required"),
   entityType: z.string().trim().optional(),
   jurisdiction: z.string().trim().min(1, "Select the country"),
   registeredAddress: z.string().trim().optional(),
-  signerName: z.string().trim().min(1, "Required"),
-  signerTitle: z.string().trim().optional(),
+  contactName: z.string().trim().min(1, "Required"),
+  contactRole: z.string().trim().optional(),
   socialAnnouncementConsent: z.boolean(),
-  accept: z.literal(true),
+  // The representation: binds the individual submitter, not the organization.
+  represent: z.literal(true),
 });
 
 /**
- * Open a candidacy: create (or reuse) the Member org, e-sign the Candidate
- * Agreement under the chosen sector + region, and put the candidacy into
- * vetting. Free — there is no payment step (Council membership is free).
+ * Open a candidacy as a **non-binding Expression of Interest**. No document is
+ * signed and the organization is not bound — any authorized representative can
+ * postulate without legal review. The single binding instrument (the Council
+ * Membership Agreement) is executed later, at acceptance/seating and
+ * incorporation, as its own console step. Free — no payment.
  */
 export async function applyCandidacy(
   _prev: ApplyState,
@@ -156,33 +69,25 @@ export async function applyCandidacy(
     redirect(`/login?callbackUrl=${encodeURIComponent(target)}`);
   }
 
-  const active = await loadActiveAgreement();
-  if (!active) return { error: "No active Candidate Agreement is configured." };
-  if (!active.intact) {
-    await notifyAdminsIntegrityFailure(active);
-    return { error: "The Candidate Agreement is temporarily unavailable. Please try again later." };
-  }
-
-  const parsed = candidacySchema.safeParse({
+  const parsed = eoiSchema.safeParse({
     sector: formData.get("sector"),
     region: formData.get("region"),
     legalName: formData.get("legalName"),
     entityType: formData.get("entityType") || undefined,
     jurisdiction: formData.get("jurisdiction"),
     registeredAddress: formData.get("registeredAddress") || undefined,
-    signerName: formData.get("signerName"),
-    signerTitle: formData.get("signerTitle") || undefined,
+    contactName: formData.get("contactName"),
+    contactRole: formData.get("contactRole") || undefined,
     socialAnnouncementConsent: formData.get("socialAnnouncementConsent") === "on",
-    accept: formData.get("accept") === "on",
+    represent: formData.get("represent") === "on",
   });
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Please check the form." };
   }
   const d = parsed.data;
-  const signedAt = new Date();
 
-  // Reuse the org the user already manages (re-application / successor candidacy);
-  // otherwise create it. One live candidacy per org at a time.
+  // Reuse the org the user already manages (re-application / successor
+  // candidacy); otherwise create it. One live candidacy per org at a time.
   const existingLink = await db.userMember.findFirst({
     where: { userId: user.id, role: "manager" },
     include: { member: { include: { candidacies: true, membership: true } } },
@@ -198,7 +103,7 @@ export async function applyCandidacy(
     return { error: "Your organization already has a candidacy in progress." };
   }
 
-  const { memberId, signatureRecordId, candidacyId } = await db.$transaction(async (tx) => {
+  const memberId = await db.$transaction(async (tx) => {
     const memberData = {
       legalName: d.legalName,
       entityType: d.entityType ?? null,
@@ -213,7 +118,13 @@ export async function applyCandidacy(
           data: {
             ...memberData,
             access: {
-              create: { email: user.email!, role: "manager", status: "active", votingRep: true, addedByUserId: user.id },
+              create: {
+                email: user.email!,
+                role: "manager",
+                status: "active",
+                votingRep: true,
+                addedByUserId: user.id,
+              },
             },
           },
         });
@@ -222,70 +133,38 @@ export async function applyCandidacy(
         data: { userId: user.id!, memberId: member.id, role: "manager" },
       });
     }
-    const sig = await tx.signatureRecord.create({
-      data: {
-        memberId: member.id,
-        signerName: d.signerName,
-        signerTitle: d.signerTitle ?? null,
-        emailVerified: true,
-        agreementVersion: active.version,
-        agreementUrl: active.filename, // the version file that was signed
-      },
+    // `signed` here means "EOI submitted, awaiting vetting" — there is no
+    // signature. Applying is private: no public record entry; the org's public
+    // footprint appears only once seated and admin-listed.
+    await tx.candidacy.create({
+      data: { memberId: member.id, sector: d.sector, region: d.region, status: "signed" },
     });
-    const candidacy = await tx.candidacy.create({
-      data: {
-        memberId: member.id,
-        sector: d.sector,
-        region: d.region,
-        status: "signed",
-        signatureId: sig.id,
-      },
-    });
-    // Applying is private: no public record entry. The org's public footprint
-    // (directory, record) appears only once an admin lists it in /admin/members.
-    // The steward is notified by email + sees it in /admin/candidacies; the
-    // seat board shows only an anonymous "under review" count.
-    return { memberId: member.id, signatureRecordId: sig.id, candidacyId: candidacy.id };
+    return member.id;
   });
 
   await maybeSaveLogo(formData, memberId, { userId: user.id, email: user.email! });
 
-  const ctx = toAgreementContext({
-    legalName: d.legalName,
-    entityType: d.entityType,
-    jurisdiction: d.jurisdiction,
-    registeredAddress: d.registeredAddress,
-    signerName: d.signerName,
-    signerTitle: d.signerTitle,
-    email: user.email,
-    sector: d.sector,
-    region: d.region,
-    effectiveDate: signedAt,
-  });
-  let pdf: Buffer | undefined;
-  let documentHash: string | undefined;
+  // Confirm to the submitter (best-effort).
   try {
-    ({ pdf, hash: documentHash } = await persistSignedAgreement({
-      memberId,
-      signatureRecordId,
-      ctx,
-      template: active.content,
-    }));
+    await sendEmail({
+      to: user.email!,
+      subject: "Your Verana Council expression of interest",
+      html: emailLayout({
+        heading: "Expression of interest received",
+        bodyHtml: `<p style="margin:0 0 12px;">Thank you — we've recorded
+        <strong>${escapeHtml(d.legalName)}</strong>'s expression of interest in a
+        Founding Council seat (<strong>${escapeHtml(seatLabel(d.sector, d.region))}</strong>).</p>
+        <p style="margin:0 0 12px;">This is non-binding. The Membership &amp; Seats
+        Committee will review it; if it proceeds to an admission ballot and your
+        organization is accepted, the binding Council Membership Agreement is
+        executed later — with time for your legal team to review. You can follow
+        the status from your account.</p>`,
+        button: { label: "Go to your account", href: `${SITE_URL}/account` },
+      }),
+    });
   } catch (e) {
-    console.error("[apply] persist signed agreement failed", e);
+    console.error("[apply] confirmation email failed", e);
   }
-  await emailExecutedCopy({
-    to: user.email!,
-    memberName: d.legalName,
-    seat: seatLabel(d.sector, d.region),
-    signerName: d.signerName,
-    signedAt,
-    agreementVersion: active.version,
-    agreementSource: active.filename,
-    versionHash: active.pinnedHash,
-    documentHash: documentHash ?? null,
-    agreementPdf: pdf,
-  });
 
   // Tell the steward a candidacy is awaiting vetting.
   try {
@@ -294,11 +173,12 @@ export async function applyCandidacy(
     if (to) {
       await sendEmail({
         to,
-        subject: `Candidacy awaiting vetting — ${d.legalName}`,
+        subject: `Expression of interest — ${d.legalName}`,
         html: emailLayout({
           heading: "New Council candidacy",
-          bodyHtml: `<p style="margin:0 0 12px;">${escapeHtml(d.legalName)} signed the
-          Candidate Agreement for <strong>${escapeHtml(seatLabel(d.sector, d.region))}</strong>
+          bodyHtml: `<p style="margin:0 0 12px;">${escapeHtml(d.legalName)} expressed
+          interest in <strong>${escapeHtml(seatLabel(d.sector, d.region))}</strong>
+          (submitted by ${escapeHtml(d.contactName)}${d.contactRole ? ", " + escapeHtml(d.contactRole) : ""})
           and is awaiting vetting.</p>`,
           button: { label: "Open candidacies", href: `${SITE_URL}/admin/candidacies` },
         }),
@@ -308,6 +188,5 @@ export async function applyCandidacy(
     console.error("[apply] admin notification failed", e);
   }
 
-  void candidacyId;
   redirect("/account");
 }

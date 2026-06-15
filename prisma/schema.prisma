@@ -301,7 +301,7 @@ model EcsInterest {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Candidate Agreement (admin-configurable PDF) + e-signature record
+// Membership Agreement (admin-configurable PDF) + e-signature record
 // ─────────────────────────────────────────────────────────────────────────────
 
 // Catalog of agreement template versions. One row per version file in legal/.

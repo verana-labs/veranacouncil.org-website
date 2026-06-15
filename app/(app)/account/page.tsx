@@ -3,13 +3,15 @@ import Link from "next/link";
 import { currentUser, effectiveMemberships } from "@/app/lib/authz";
 import { db } from "@/app/lib/db";
 import { seatLabel } from "@/app/lib/seats";
+import { getActiveAgreement } from "@/app/lib/agreement";
 import MembershipCard from "@/app/components/MembershipCard";
+import MembershipAgreementCard from "@/app/components/MembershipAgreementCard";
 
 export const metadata: Metadata = { title: "Your account" };
 
 const CANDIDACY_LABEL: Record<string, string> = {
-  applied: "Applied — agreement not yet signed",
-  signed: "Signed — vetting underway",
+  applied: "Submitted — awaiting vetting",
+  signed: "Submitted — vetting underway",
   queued: "Queued — awaiting an admission ballot",
   ballot_open: "Admission ballot open",
   accepted: "Accepted — seated",
@@ -53,6 +55,19 @@ export default async function AccountPage() {
   const openBallots = isVoter
     ? await db.ballot.count({ where: { status: "open" } })
     : 0;
+
+  // Membership Agreement (binding, post-seating): active version + which seated
+  // orgs have already executed it (a signature record exists).
+  const seatedIds = seats.map((m) => m.memberId);
+  const activeAgreement = seatedIds.length ? await getActiveAgreement() : null;
+  const signatures = seatedIds.length
+    ? await db.signatureRecord.findMany({
+        where: { memberId: { in: seatedIds } },
+        orderBy: { signedAt: "desc" },
+      })
+    : [];
+  const signatureFor = (memberId: string) =>
+    signatures.find((s) => s.memberId === memberId) ?? null;
 
   // Active manager / representative counts per org, to decide which menu actions
   // are offered (the actions re-check server-side before mutating).
@@ -170,6 +185,45 @@ export default async function AccountPage() {
                       </dl>
                     </div>
                   ))}
+                </div>
+              </div>
+            </section>
+          )}
+
+          {/* Membership Agreement (binding) — managers of seated orgs */}
+          {seats.some(
+            (m) => links.find((l) => l.memberId === m.memberId)?.role === "manager",
+          ) && (
+            <section className="border-b border-rule">
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+                <p className="tag mb-3">Membership Agreement</p>
+                <h2 className="display text-3xl">The binding agreement</h2>
+                <div className="accent-line mt-4 mb-8" />
+                <div className="grid sm:grid-cols-2 gap-6 max-w-4xl">
+                  {seats
+                    .filter(
+                      (m) =>
+                        links.find((l) => l.memberId === m.memberId)?.role === "manager",
+                    )
+                    .map((m) => {
+                      const sig = signatureFor(m.memberId);
+                      return (
+                        <MembershipAgreementCard
+                          key={m.memberId}
+                          memberId={m.memberId}
+                          memberName={m.member.legalName}
+                          agreementVersion={activeAgreement?.version ?? null}
+                          signed={
+                            sig
+                              ? {
+                                  version: sig.agreementVersion,
+                                  at: sig.signedAt.toISOString().slice(0, 10),
+                                }
+                              : null
+                          }
+                        />
+                      );
+                    })}
                 </div>
               </div>
             </section>

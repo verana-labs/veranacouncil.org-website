@@ -77,20 +77,22 @@ export default function PrivacyPage() {
           6(1)(b)) — operating your account.
         </p>
 
-        <h3>Candidacies and e-signatures</h3>
+        <h3>Candidacies, membership agreements, and e-signatures</h3>
         <ul>
           <li>
-            <strong>Candidate details.</strong> The organization&rsquo;s legal
-            name, entity type, country, registered address, optional logo, and
-            the sector and region applied for.
+            <strong>Candidacy (expression of interest).</strong> The
+            organization&rsquo;s legal name, entity type, country, registered
+            address, optional logo, the sector and region applied for, and the
+            contact&rsquo;s name and role. No agreement is signed at this stage.
           </li>
           <li>
-            <strong>Signature record.</strong> When you e-sign the Candidate
-            Agreement we record the signer&rsquo;s name and title, timestamp,
-            agreement version and document hash, and the{" "}
-            <strong>IP address and browser user-agent</strong> at signing — kept
-            as evidence that the agreement was validly executed — plus the
-            personalised signed PDF.
+            <strong>Signature record (Membership Agreement).</strong> Only if
+            your organization is admitted and an authorized signatory executes
+            the binding Council Membership Agreement, we record the
+            signer&rsquo;s name and title, timestamp, agreement version and
+            document hash, and the <strong>IP address and browser user-agent</strong>{" "}
+            at signing — kept as evidence that the agreement was validly
+            executed — plus the personalised signed PDF.
           </li>
           <li>
             <strong>Organization access lists.</strong> Org managers may add
@@ -100,9 +102,10 @@ export default function PrivacyPage() {
           </li>
         </ul>
         <p>
-          <strong>Legal basis.</strong> Performance of the Candidate Agreement
-          (Art. 6(1)(b)) and our legitimate interest in evidencing contracts
-          (Art. 6(1)(f)).
+          <strong>Legal basis.</strong> Our legitimate interest in assessing
+          candidacies (Art. 6(1)(f)); and, for the Membership Agreement,
+          performance of that agreement (Art. 6(1)(b)) plus our legitimate
+          interest in evidencing contracts (Art. 6(1)(f)).
         </p>
 
         <h3>Admission ballots and the public record</h3>
@@ -145,7 +148,8 @@ export default function PrivacyPage() {
         <h3>Transactional email</h3>
         <p>
           We send operational email tied to your candidacy or membership:
-          sign-in codes, executed-agreement copies, vetting and ballot
+          sign-in codes, candidacy and membership-agreement confirmations,
+          vetting and ballot
           notifications, and access notifications. These are part of operating
           the service, not marketing; we send no newsletters without separate
           consent.

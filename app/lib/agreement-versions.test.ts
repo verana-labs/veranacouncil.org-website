@@ -12,19 +12,19 @@ describe("sha384", () => {
 
 describe("versionLabel", () => {
   it("extracts a vN label from the filename", () => {
-    expect(versionLabel("candidate-agreement-v1.md")).toBe("v1");
-    expect(versionLabel("candidate-agreement-v2.3.md")).toBe("v2.3");
+    expect(versionLabel("membership-agreement-v1.md")).toBe("v1");
+    expect(versionLabel("membership-agreement-v2.3.md")).toBe("v2.3");
     expect(versionLabel("plain.md")).toBe("plain");
   });
 });
 
 describe("listVersionFiles / readVersionFile", () => {
   it("lists the bundled v1 file", async () => {
-    expect(await listVersionFiles()).toContain("candidate-agreement-v1.md");
+    expect(await listVersionFiles()).toContain("membership-agreement-v1.md");
   });
 
   it("reads a known version file", async () => {
-    expect(await readVersionFile("candidate-agreement-v1.md")).toContain("CANDIDATE AGREEMENT");
+    expect(await readVersionFile("membership-agreement-v1.md")).toContain("MEMBERSHIP AGREEMENT");
   });
 
   it("rejects path traversal and non-markdown names", async () => {

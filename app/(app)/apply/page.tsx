@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getActiveAgreement } from "@/app/lib/agreement";
 import { currentUser } from "@/app/lib/authz";
 import { db } from "@/app/lib/db";
 import { SECTORS, REGIONS, SECTOR_LABELS, REGION_LABELS, loadSeatSummary } from "@/app/lib/seats";
@@ -14,7 +13,6 @@ export default async function ApplyPage({
   searchParams: Promise<{ sector?: string }>;
 }) {
   const { sector } = await searchParams;
-  const agreement = await getActiveAgreement();
   const summary = await loadSeatSummary();
   const full = summary.remaining <= 0;
 
@@ -53,9 +51,11 @@ export default async function ApplyPage({
           <div className="accent-line mt-6" />
           <p className="mt-8 text-lg text-muted max-w-2xl leading-relaxed">
             Membership is free. Pick the sector and region that fit your
-            organization, e-sign the Candidate Agreement, and your candidacy
-            enters vetting; admission is decided by a ⅔ vote of the seated
-            members. {summary.seated} of {summary.cap} seats are filled.
+            organization and submit a <strong>non-binding expression of
+            interest</strong> — no document to sign, nothing for legal to clear.
+            Admission is decided by a ⅔ vote of the seated members.
+            {" "}
+            {summary.seated} of {summary.cap} seats are filled.
           </p>
         </div>
       </section>
@@ -63,12 +63,7 @@ export default async function ApplyPage({
       {/* Candidacy */}
       <section>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          {!agreement ? (
-            <p className="text-muted">
-              Candidacies aren&rsquo;t open yet — no Candidate Agreement is
-              configured.
-            </p>
-          ) : full ? (
+          {full ? (
             <div className="card max-w-2xl">
               <h3>All {summary.cap} seats are filled</h3>
               <p className="text-sm text-muted leading-relaxed">
@@ -83,10 +78,10 @@ export default async function ApplyPage({
             </div>
           ) : (
             <ApplyForm
-              agreementVersion={agreement.version}
               sectors={sectorOptions}
               regions={regionOptions}
               prefillSector={prefillSector}
+              prefillContactName={user?.name ?? undefined}
               prefill={prefill}
             />
           )}

@@ -4,7 +4,7 @@ import crypto from "node:crypto";
 import { db } from "@/app/lib/db";
 
 /**
- * Candidate Agreement version management. The legal/ directory is the source of
+ * Membership Agreement version management. The legal/ directory is the source of
  * truth: one Markdown template file per version, added (never edited) for each
  * new version. The DB (AgreementDocument) is a catalog that pins each filename to
  * the sha384 it had when first activated, so a version can never silently change.

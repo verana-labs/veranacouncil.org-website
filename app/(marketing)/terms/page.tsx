@@ -33,15 +33,17 @@ export default function TermsPage() {
           site you accept these terms.
         </p>
 
-        <h2>Relationship to the Candidate Agreement and statutes</h2>
+        <h2>Candidacy is non-binding; membership is governed separately</h2>
         <p>
-          These terms govern your use of the website and its account features.{" "}
-          <strong>Candidacy and membership themselves</strong> — rights,
-          obligations, validator duties — are governed by the{" "}
-          <strong>Candidate Agreement</strong> you e-sign during application
-          and, upon admission and incorporation, by the Verein&rsquo;s statutes
-          and the Council Membership Agreement. If these terms conflict with
-          those instruments, those instruments prevail for membership matters.
+          These terms govern your use of the website and its account features.
+          Submitting a candidacy is a <strong>non-binding expression of
+          interest</strong> — no document is signed and your organization is not
+          committed. <strong>Membership itself</strong> — rights, obligations,
+          validator duties — is governed only by the binding{" "}
+          <strong>Council Membership Agreement</strong>, executed from your
+          account upon admission and incorporation, together with the
+          Verein&rsquo;s statutes. If these terms conflict with those
+          instruments, those instruments prevail for membership matters.
           Membership is free: no dues or capital contributions are collected on
           or off this site.
         </p>
@@ -60,14 +62,17 @@ export default function TermsPage() {
           unauthorized access to the service.
         </p>
 
-        <h2>Application, e-signature, and records</h2>
+        <h2>Candidacy submission, and signing the Membership Agreement</h2>
         <p>
-          Submitting the candidacy and typing your name constitutes an{" "}
-          <strong>electronic signature</strong> of the Candidate Agreement,
-          which you accept as binding to the extent stated in it. We retain the
-          executed agreement, a certificate of execution, and technical
-          evidence of signing (see the <a href="/privacy">privacy policy</a>);
-          copies are available from your account.
+          At candidacy you submit a non-binding expression of interest with a
+          representation that you are authorized to submit it and that the
+          information is accurate — no agreement is signed. <strong>Only later,
+          if your organization is admitted</strong>, an authorized signatory
+          executes the binding Council Membership Agreement from your account by
+          typing their name (an <strong>electronic signature</strong>); we then
+          retain the executed agreement and technical evidence of signing (see
+          the <a href="/privacy">privacy policy</a>), available from your
+          account.
         </p>
 
         <h2>Admission ballots and the public record</h2>

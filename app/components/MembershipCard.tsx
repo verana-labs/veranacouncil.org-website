@@ -192,12 +192,14 @@ export default function MembershipCard({
                     className="block w-full px-3 py-2 text-left hover:bg-rule/40 text-red-600"
                     onClick={() =>
                       act(
-                        "Cancel this membership? This ends it and can't be undone here.",
+                        track
+                          ? "Cancel this membership? This ends it and can't be undone here."
+                          : "Withdraw this candidacy? It will no longer be under review.",
                         () => cancelMembership(menu!.memberId),
                       )
                     }
                   >
-                    Cancel membership
+                    {track ? "Cancel membership" : "Cancel candidacy"}
                   </button>
                 )}
                 {menu!.canEditAddress && (

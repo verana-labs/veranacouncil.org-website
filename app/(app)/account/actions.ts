@@ -93,6 +93,28 @@ export async function cancelMembership(memberId: string) {
       where: { memberId, status: { not: "ended" } },
       data: { status: "ended" },
     });
+    // Withdraw any in-flight candidacy so it stops counting as "under review"
+    // on the public seat board. (A candidate has no membership yet — this is
+    // what "cancel candidacy" actually does.)
+    const live = await tx.candidacy.findMany({
+      where: {
+        memberId,
+        status: { in: ["applied", "signed", "queued", "ballot_open"] },
+      },
+      select: { id: true },
+    });
+    if (live.length) {
+      const ids = live.map((c) => c.id);
+      // Close any open ballot first, so settlement never seats a withdrawn org.
+      await tx.ballot.updateMany({
+        where: { candidacyId: { in: ids }, status: "open" },
+        data: { status: "closed", outcome: "refused", closedAt: new Date() },
+      });
+      await tx.candidacy.updateMany({
+        where: { id: { in: ids } },
+        data: { status: "withdrawn" },
+      });
+    }
     await tx.userMember.deleteMany({ where: { userId: user.id, memberId } });
     await tx.memberAccess.updateMany({
       where: { memberId, email },
@@ -109,6 +131,9 @@ export async function cancelMembership(memberId: string) {
       },
     });
   });
+
+  revalidatePath("/");
+  revalidatePath("/members");
 
   revalidatePath("/account");
 }

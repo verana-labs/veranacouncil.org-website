@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
-import { vetCandidacy, openBallot, designateSeed } from "./actions";
+import { vetCandidacy, openBallot, designateSeed, withdrawCandidacy } from "./actions";
 
 export type AdminCandidacy = {
   id: string;
@@ -103,6 +103,18 @@ export default function CandidacyRow({
             Seed designation…
           </button>
         )}
+        <button
+          type="button"
+          disabled={pending}
+          onClick={() =>
+            window.confirm(
+              `Withdraw ${c.memberName}'s candidacy? It is removed from the seat board and the pipeline. Use this for abandoned or erroneous candidacies.`,
+            ) && run(() => withdrawCandidacy(c.id))
+          }
+          className="text-sm text-red-600 hover:underline ml-auto self-center"
+        >
+          Withdraw
+        </button>
       </div>
 
       {seedOpen && (

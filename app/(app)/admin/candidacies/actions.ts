@@ -40,6 +40,44 @@ export async function vetCandidacy(candidacyId: string) {
   revalidatePath("/admin/candidacies");
 }
 
+/**
+ * Withdraw a candidacy (steward act) — for abandoned (e.g. cancelled by the
+ * org) or erroneous candidacies. Clears it from the seat board and pipeline;
+ * closes any open ballot. Not a public-record event.
+ */
+export async function withdrawCandidacy(candidacyId: string) {
+  const actor = await assertAdmin();
+  const c = await db.candidacy.findUnique({
+    where: { id: candidacyId },
+    include: { ballot: true },
+  });
+  if (!c) throw new Error("Candidacy not found.");
+  if (!["applied", "signed", "queued", "ballot_open"].includes(c.status)) {
+    throw new Error("This candidacy is not live.");
+  }
+  await db.$transaction(async (tx) => {
+    if (c.ballot && c.ballot.status === "open") {
+      await tx.ballot.update({
+        where: { id: c.ballot.id },
+        data: { status: "closed", outcome: "refused", closedAt: new Date() },
+      });
+    }
+    await tx.candidacy.update({ where: { id: c.id }, data: { status: "withdrawn" } });
+    await tx.adminAction.create({
+      data: {
+        actorUserId: actor.id,
+        actorEmail: actor.email!,
+        action: "candidacy.withdraw",
+        targetType: "Candidacy",
+        targetId: c.id,
+      },
+    });
+  });
+  revalidatePath("/admin/candidacies");
+  revalidatePath("/");
+  revalidatePath("/members");
+}
+
 /** Open the admission ballot for a vetted candidacy (steward act). */
 export async function openBallot(candidacyId: string) {
   const actor = await assertAdmin();

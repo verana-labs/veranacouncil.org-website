@@ -32,7 +32,7 @@ export default function Footer() {
                   <Link href="/about">About</Link>
                 </li>
                 <li>
-                  <Link href="/governance">Governance</Link>
+                  <Link href="/council-bodies">Governance</Link>
                 </li>
                 <li>
                   <Link href="/members">Members</Link>

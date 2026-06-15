@@ -43,7 +43,7 @@ export default async function SeatBoard({ compact = false }: { compact?: boolean
               {s.bySector.map((row) => (
                 <li key={row.sector} className="flex items-center justify-between gap-3">
                   <span>{row.label}</span>
-                  <StatusBadge seated={row.seated} />
+                  <StatusBadge seated={row.seated} open={s.remaining > 0} />
                 </li>
               ))}
             </ul>
@@ -56,7 +56,7 @@ export default async function SeatBoard({ compact = false }: { compact?: boolean
               {s.byRegion.map((row) => (
                 <li key={row.region} className="flex items-center justify-between gap-3">
                   <span>{row.label}</span>
-                  <StatusBadge seated={row.seated} />
+                  <StatusBadge seated={row.seated} open={s.remaining > 0} />
                 </li>
               ))}
             </ul>
@@ -71,11 +71,16 @@ export default async function SeatBoard({ compact = false }: { compact?: boolean
   );
 }
 
-/** Green "open" when empty; indigo "N seated" when filled. */
-function StatusBadge({ seated }: { seated: number }) {
-  return seated > 0 ? (
-    <span className="badge badge-indigo">{seated} seated</span>
-  ) : (
-    <span className="badge badge-green">open</span>
+/**
+ * Always show the green "open" badge while seats remain (no per-sector cap),
+ * plus an indigo "N seated" badge when the sector/region already has members.
+ */
+function StatusBadge({ seated, open }: { seated: number; open: boolean }) {
+  return (
+    <span className="flex items-center justify-end gap-1.5 flex-wrap">
+      {seated > 0 && <span className="badge badge-indigo">{seated} seated</span>}
+      {open && <span className="badge badge-green">open</span>}
+      {!open && seated === 0 && <span className="text-muted">—</span>}
+    </span>
   );
 }

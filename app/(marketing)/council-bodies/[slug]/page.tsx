@@ -73,9 +73,7 @@ export default async function WorkingGroupPage({
           <p className="tag mb-4">Council body</p>
           <div className="flex flex-wrap items-center gap-4">
             <h1 className="display text-4xl sm:text-5xl leading-tight">{wg.name}</h1>
-            <span className={`badge ${wg.requiredClass === "associate" ? "badge-purple" : ""}`}>
-              {wg.requiredClass === "associate" ? "Associate only" : "Associate or Contributor"}
-            </span>
+            <span className="badge">Council Member or Observer</span>
           </div>
           <div className="accent-line mt-6" />
           {wg.description && (

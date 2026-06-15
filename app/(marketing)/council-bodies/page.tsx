@@ -52,22 +52,18 @@ export default async function WorkingGroupsPage() {
       {showMembershipNotice && (
         <section className="border-b border-rule reveal">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div className="card border-l-[3px]" style={{ borderLeftColor: "var(--color-purple)" }}>
+            <div className="card border-l-[3px]" style={{ borderLeftColor: "var(--color-indigo)" }}>
               <h2 className="display text-xl">
-                Working-group participation requires membership
+                Council-body participation requires membership
               </h2>
               <p className="text-sm text-muted leading-relaxed">
-                Joining a body requires Council membership. Most are open
-                to <strong className="text-ink">Associate</strong> or{" "}
-                <strong className="text-ink">Contributor</strong> members; the{" "}
-                <strong className="text-ink">Business Cases WG</strong> requires{" "}
-                <strong className="text-ink">Associate</strong> membership.{" "}
+                Council bodies are open to any{" "}
+                <strong className="text-ink">Council Member</strong> or{" "}
+                <strong className="text-ink">Observer</strong> — a Council
+                account is all that&rsquo;s required.{" "}
                 <Link href="/join" className="text-indigo hover:underline">
-                  Compare &amp; join →
-                </Link>{" "}
-                Anyone may still use, fork, read, and file issues against the public
-                open-source code and specifications; working-group participation and
-                formal contributions are members-only.
+                  Apply for a seat →
+                </Link>
               </p>
             </div>
           </div>
@@ -123,11 +119,12 @@ export default async function WorkingGroupsPage() {
             </div>
             <div className="card">
               <span className="badge badge-indigo">members</span>
-              <h3>Join to contribute</h3>
+              <h3>Join to take part</h3>
               <p className="text-sm text-muted leading-relaxed">
-                Participate in a council body and submit formal contributions.
-                Recurring technical work joins as a{" "}
-                <strong className="text-ink">Contributor Member</strong> (free).
+                Council bodies are open to any{" "}
+                <strong className="text-ink">Council Member</strong> or{" "}
+                <strong className="text-ink">Observer</strong>. Membership is
+                free.
               </p>
               <Link
                 href="/join"

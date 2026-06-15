@@ -63,13 +63,8 @@ export default function WorkingGroupsAdmin({ groups }: { groups: AdminWg[] }) {
             </label>
             <input id="wg-link" name="link" type="url" required placeholder="https://… (external space)" />
           </div>
-          <div className="form-field">
-            <label htmlFor="wg-class">Required membership</label>
-            <select id="wg-class" name="requiredClass" defaultValue="any">
-              <option value="any">Any active membership</option>
-              <option value="associate">Active Associate only</option>
-            </select>
-          </div>
+          {/* No "required membership" choice: every council body is open to
+              any Council member or Observer (a site account is required). */}
           <div className="grid sm:grid-cols-2 gap-x-5">
             <div className="form-field">
               <label htmlFor="wg-state">State</label>

@@ -4,7 +4,7 @@ import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { db } from "@/app/lib/db";
 import { currentUser, isAdmin } from "@/app/lib/authz";
-import { slugify } from "@/app/lib/working-groups";
+import { slugify } from "@/app/lib/council-bodies";
 import { deleteScheduleEvent } from "@/app/lib/google-calendar";
 
 /** A slug from the name, suffixed on collision. Slugs are stable after create
@@ -27,7 +27,7 @@ async function assertAdmin() {
 
 /** Re-render the admin list and the ISR home board after any change. */
 function revalidate() {
-  revalidatePath("/admin/working-groups");
+  revalidatePath("/admin/council-bodies");
   revalidatePath("/"); // home page board (showOnHome) is ISR
 }
 

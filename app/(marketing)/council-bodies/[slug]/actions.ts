@@ -11,7 +11,7 @@ import {
   personName,
   syncScheduleToGoogle,
   userActiveClasses,
-} from "@/app/lib/working-groups";
+} from "@/app/lib/council-bodies";
 import {
   cancelOccurrence,
   deleteScheduleEvent,
@@ -57,8 +57,8 @@ async function audit(
 
 async function revalidateWg(wgId: string) {
   const wg = await db.workingGroup.findUnique({ where: { id: wgId } });
-  if (wg) revalidatePath(`/working-groups/${wg.slug}`);
-  revalidatePath("/working-groups");
+  if (wg) revalidatePath(`/council-bodies/${wg.slug}`);
+  revalidatePath("/council-bodies");
 }
 
 /** Push the attendee list / schedule to Google; never blocks the user action. */
@@ -149,7 +149,7 @@ export async function removeLead(
   // ADR-0003 invariant: a WG with leads never drops to zero.
   const count = await db.wgLead.count({ where: { wgId } });
   if (count <= 1) {
-    return { error: "A working group must keep at least one lead." };
+    return { error: "A council body must keep at least one lead." };
   }
   await db.wgLead.delete({ where: { wgId_userId: { wgId, userId } } });
   await audit(user, "wg.lead.remove", wgId, { userId });
@@ -328,7 +328,7 @@ export async function startSession(wgId: string, occurredAtIso: string) {
     create: { wgId, occurredAt, recordedById: user.id },
     update: {},
   });
-  redirect(`/working-groups/${wg.slug}/sessions/${session.id}`);
+  redirect(`/council-bodies/${wg.slug}/sessions/${session.id}`);
 }
 
 const saveSessionSchema = z.object({

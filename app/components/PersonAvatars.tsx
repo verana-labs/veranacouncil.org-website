@@ -1,6 +1,6 @@
 // Overlapping avatar row (the GitHub-contributor look from the home page) for
 // WG leads and participants: photo when the provider gave one, initials chip
-// otherwise. Pure presentational; data shape matches lib/working-groups WgPerson.
+// otherwise. Pure presentational; data shape matches lib/council-bodies WgPerson.
 
 export type Person = { userId: string; name: string; image: string | null };
 

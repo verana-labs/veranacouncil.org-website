@@ -8,7 +8,7 @@ import {
   addLead,
   removeLead,
   type ActionState,
-} from "@/app/(marketing)/working-groups/[slug]/actions";
+} from "@/app/(marketing)/council-bodies/[slug]/actions";
 import PersonAvatars from "@/app/components/PersonAvatars";
 
 export type AdminLead = {
@@ -199,7 +199,7 @@ export default function WorkingGroupAdminCard({ wg }: { wg: AdminWg }) {
               </span>
               <button
                 type="button"
-                aria-label="Working group actions"
+                aria-label="Council body actions"
                 aria-haspopup="menu"
                 aria-expanded={menuOpen}
                 onClick={() => setMenuOpen((o) => !o)}
@@ -252,8 +252,8 @@ export default function WorkingGroupAdminCard({ wg }: { wg: AdminWg }) {
           <dl className="mt-3 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
             <dt className="text-muted">Page</dt>
             <dd className="truncate">
-              <a href={`/working-groups/${wg.slug}`} className="text-indigo hover:underline">
-                /working-groups/{wg.slug}
+              <a href={`/council-bodies/${wg.slug}`} className="text-indigo hover:underline">
+                /council-bodies/{wg.slug}
               </a>
             </dd>
             <dt className="text-muted">External link</dt>

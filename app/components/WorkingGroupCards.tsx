@@ -1,9 +1,9 @@
 import Link from "next/link";
-import type { WorkingGroupCard } from "@/app/lib/working-groups";
+import type { WorkingGroupCard } from "@/app/lib/council-bodies";
 import PersonAvatars from "@/app/components/PersonAvatars";
 import LocalTime from "@/app/components/LocalTime";
 
-// The working-group tile design for the /working-groups board. Every tile
+// The working-group tile design for the /council-bodies board. Every tile
 // links to the group's page; what you can do there (join, meeting link)
 // depends on your memberships.
 export default function WorkingGroupCards({
@@ -12,7 +12,7 @@ export default function WorkingGroupCards({
   groups: WorkingGroupCard[];
 }) {
   if (groups.length === 0) {
-    return <p className="text-sm text-muted">No working groups yet.</p>;
+    return <p className="text-sm text-muted">No council bodies yet.</p>;
   }
 
   return (
@@ -25,7 +25,7 @@ export default function WorkingGroupCards({
         return (
           <Link
             key={wg.id}
-            href={`/working-groups/${wg.slug}`}
+            href={`/council-bodies/${wg.slug}`}
             className="wg-tile block hover:no-underline"
           >
             <div className="flex items-center justify-between gap-4">

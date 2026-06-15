@@ -168,7 +168,7 @@ export async function syncScheduleToGoogle(
   const base = process.env.AUTH_URL ?? "https://veranacouncil.org";
   const input = {
     summary: `Verana — ${wg.name}`,
-    description: `${wg.description ?? ""}\n\nWorking group page: ${base}/working-groups/${wg.slug}`.trim(),
+    description: `${wg.description ?? ""}\n\nCouncil body page: ${base}/council-bodies/${wg.slug}`.trim(),
     startsAt: schedule.startsAt,
     durationMin: schedule.durationMin,
     timezone: schedule.timezone,
@@ -223,7 +223,7 @@ export function upcomingOccurrences(
 }
 
 /**
- * Working groups featured on the public home page (admin-flagged). Resilient:
+ * Council bodies featured on the public home page (admin-flagged). Resilient:
  * the home is ISR-prerendered (incl. at build where there's no DB), so a DB
  * failure degrades to an empty board rather than breaking the build.
  */
@@ -253,7 +253,7 @@ export type WorkingGroupCard = {
 };
 
 /**
- * All working groups (always the full list), with per-user clickability:
+ * All council bodies (always the full list), with per-user clickability:
  * `accessible` is true only for a signed-in user whose memberships satisfy the
  * group's requiredClass. Pass null for a signed-out visitor.
  */

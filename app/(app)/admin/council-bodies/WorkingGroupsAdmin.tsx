@@ -43,13 +43,13 @@ export default function WorkingGroupsAdmin({ groups }: { groups: AdminWg[] }) {
   return (
     <div className="grid gap-10">
       <section>
-        <h2 className="display text-xl">Add a working group</h2>
+        <h2 className="display text-xl">Add a council body</h2>
         <form action={createAction} className="space-y-1 max-w-xl mt-3">
           <div className="form-field">
             <label htmlFor="wg-name">
               Name <span className="req">*</span>
             </label>
-            <input id="wg-name" name="name" required placeholder="Working group name" />
+            <input id="wg-name" name="name" required placeholder="Council body name" />
           </div>
           <div className="form-field">
             <label htmlFor="wg-description">
@@ -96,7 +96,7 @@ export default function WorkingGroupsAdmin({ groups }: { groups: AdminWg[] }) {
 
       <section>
         <div className="flex items-center justify-between gap-4">
-          <h2 className="display text-xl">Working groups</h2>
+          <h2 className="display text-xl">Council Bodies</h2>
           <label className="flex items-center gap-2 text-sm">
             <input
               type="checkbox"
@@ -109,7 +109,7 @@ export default function WorkingGroupsAdmin({ groups }: { groups: AdminWg[] }) {
 
         {visible.length === 0 ? (
           <p className="text-sm text-muted mt-3">
-            {groups.length === 0 ? "None yet." : "No enabled working groups."}
+            {groups.length === 0 ? "None yet." : "No enabled council bodies."}
           </p>
         ) : (
           <div className="mt-4 space-y-4">

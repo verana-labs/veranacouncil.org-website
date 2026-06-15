@@ -63,7 +63,7 @@ export type CrmResult = {
 const TOPIC_LABELS: Record<string, string> = {
   "membership-associate": "Membership — Associate",
   "membership-contributor": "Membership — Contributor",
-  "working-group": "Working group participation",
+  "working-group": "Council body participation",
   grant: "Grant / ecosystem",
   partnership: "Partnership / integration",
   press: "Press or analyst",

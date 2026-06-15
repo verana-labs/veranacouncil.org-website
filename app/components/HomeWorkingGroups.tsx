@@ -13,7 +13,7 @@ type HomeWg = {
   leads: Person[];
 };
 
-// The home "Working groups" board, fetched client-side so it always reflects the
+// The home "Council bodies" board, fetched client-side so it always reflects the
 // DB even though the home page is ISR-cached (see /api/home-working-groups).
 export default function HomeWorkingGroups() {
   const [groups, setGroups] = useState<HomeWg[] | null>(null);
@@ -27,7 +27,7 @@ export default function HomeWorkingGroups() {
 
   if (groups !== null && groups.length === 0) {
     return (
-      <p className="text-sm text-muted">Working groups will be announced soon.</p>
+      <p className="text-sm text-muted">Council bodies will be announced soon.</p>
     );
   }
 
@@ -36,7 +36,7 @@ export default function HomeWorkingGroups() {
       {(groups ?? []).map((wg) => (
         <Link
           key={wg.id}
-          href={`/working-groups/${wg.slug}`}
+          href={`/council-bodies/${wg.slug}`}
           className="wg-tile block hover:no-underline"
         >
           <div className="flex items-center justify-between gap-3">

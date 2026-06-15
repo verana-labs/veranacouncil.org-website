@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { db } from "@/app/lib/db";
 import { currentUser, isAdmin } from "@/app/lib/authz";
-import { isWgLead, personName } from "@/app/lib/working-groups";
+import { isWgLead, personName } from "@/app/lib/council-bodies";
 import { minutesConfigured, minutesUrl } from "@/app/lib/minutes";
 import SessionEditor from "./SessionEditor";
 
@@ -57,7 +57,7 @@ export default async function SessionPage({
       <section className="border-b border-rule">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <p className="tag mb-4">
-            <a href={`/working-groups/${slug}`} className="hover:underline">
+            <a href={`/council-bodies/${slug}`} className="hover:underline">
               {session.wg.name}
             </a>
           </p>

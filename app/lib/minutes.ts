@@ -1,6 +1,6 @@
 /**
  * Publishing WG meeting minutes to the public GitHub minutes repository
- * (ADR-0003): `MINUTES_REPO` (e.g. "verana-labs/working-groups"), path
+ * (ADR-0003): `MINUTES_REPO` (e.g. "verana-labs/verana-council-gov"), path
  * `<wg-slug>/minutes/YYYY-MM-DD.md`. The DB keeps the working copy and renders
  * the history pages; the commit is the immutable, citable public record.
  *

@@ -147,7 +147,7 @@ export default function SessionEditor({
               startTransition(async () => {
                 const res = await deleteSession(sessionId);
                 if (res.error) setResult(res);
-                else router.push(`/working-groups/${slug}`);
+                else router.push(`/council-bodies/${slug}`);
               });
             }}
           >

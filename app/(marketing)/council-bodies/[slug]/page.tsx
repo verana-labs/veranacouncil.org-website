@@ -10,7 +10,7 @@ import {
   wgLeads,
   wgParticipants,
   type WgClass,
-} from "@/app/lib/working-groups";
+} from "@/app/lib/council-bodies";
 import { describeRrule } from "@/app/lib/recurrence";
 import { minutesUrl } from "@/app/lib/minutes";
 import { calendarConfigured } from "@/app/lib/google-calendar";
@@ -28,7 +28,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const wg = await getWgBySlug((await params).slug);
-  return { title: wg ? `${wg.name} · Working groups` : "Working group" };
+  return { title: wg ? `${wg.name} · Council Bodies` : "Council body" };
 }
 
 function fmtOccurrence(d: Date, tz: string): string {
@@ -70,7 +70,7 @@ export default async function WorkingGroupPage({
       {/* Hero — same full-bleed, rule-separated pattern as the marketing pages */}
       <section className="border-b border-rule">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <p className="tag mb-4">Working group</p>
+          <p className="tag mb-4">Council body</p>
           <div className="flex flex-wrap items-center gap-4">
             <h1 className="display text-4xl sm:text-5xl leading-tight">{wg.name}</h1>
             <span className={`badge ${wg.requiredClass === "associate" ? "badge-purple" : ""}`}>
@@ -185,7 +185,7 @@ export default async function WorkingGroupPage({
                     {fmtOccurrence(s.occurredAt, wg.schedule?.timezone ?? "UTC")}
                     <span className="badge badge-amber ml-3">Draft</span>
                   </span>
-                  <a href={`/working-groups/${wg.slug}/sessions/${s.id}`} className="btn text-sm">
+                  <a href={`/council-bodies/${wg.slug}/sessions/${s.id}`} className="btn text-sm">
                     Open
                   </a>
                 </div>
@@ -223,7 +223,7 @@ export default async function WorkingGroupPage({
                       {(joined || lead) && (
                         <p className="mt-2">
                           <a
-                            href={`/working-groups/${wg.slug}/sessions/${s.id}`}
+                            href={`/council-bodies/${wg.slug}/sessions/${s.id}`}
                             className="text-indigo hover:underline"
                           >
                             Edit &amp; republish

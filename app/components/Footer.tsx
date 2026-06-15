@@ -24,7 +24,7 @@ export default function Footer() {
     <>
       <footer className="site-footer">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-sm">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-8 text-sm">
             <div>
               <h3>Council</h3>
               <ul className="space-y-2">
@@ -40,6 +40,14 @@ export default function Footer() {
                 <li>
                   <Link href="/news">News</Link>
                 </li>
+                <li>
+                  <a
+                    href="https://github.com/verana-labs/verana-council-gov"
+                    rel="noopener"
+                  >
+                    Documents ↗
+                  </a>
+                </li>
               </ul>
             </div>
             <div>
@@ -53,35 +61,6 @@ export default function Footer() {
                 </li>
                 <li>
                   <Link href="/contact">Contact</Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h3>Governance documents</h3>
-              <ul className="space-y-2">
-                <li>
-                  <a
-                    href="https://github.com/verana-labs/verana-council-gov"
-                    rel="noopener"
-                  >
-                    verana-council-gov ↗
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="https://verana-labs.github.io/verifiable-trust-spec/"
-                    rel="noopener"
-                  >
-                    Verifiable Trust spec ↗
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="https://verana-labs.github.io/verifiable-trust-vpr-spec/"
-                    rel="noopener"
-                  >
-                    VPR spec ↗
-                  </a>
                 </li>
               </ul>
             </div>

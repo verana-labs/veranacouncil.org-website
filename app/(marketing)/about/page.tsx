@@ -208,11 +208,11 @@ export default function AboutPage() {
             growth are the Foundation&rsquo;s domain. The Council and the
             Foundation are fully separate.
           </p>
-          <p className="text-sm mt-6">
-            <Link href="/join" className="text-indigo hover:underline">
+          <div className="mt-6">
+            <Link href="/join" className="btn btn-primary">
               Apply for a Founding Council Seat →
             </Link>
-          </p>
+          </div>
         </div>
       </section>
     </>

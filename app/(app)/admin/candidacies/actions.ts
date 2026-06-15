@@ -126,6 +126,8 @@ export async function designateSeed(candidacyId: string, rationale: string) {
         sector: c.sector,
         region: c.region,
         seatedAt,
+        // Seating publishes the member; auto-list it (Unlist available in admin).
+        listed: true,
       },
       create: {
         memberId: c.memberId,
@@ -135,6 +137,7 @@ export async function designateSeed(candidacyId: string, rationale: string) {
         sector: c.sector,
         region: c.region,
         seatedAt,
+        listed: true,
       },
     });
     await addRecord(
@@ -175,8 +178,8 @@ export async function makeObserver(memberId: string) {
   await db.$transaction(async (tx) => {
     await tx.membership.upsert({
       where: { memberId },
-      update: { track: "observer", status: "active", admission: "board" },
-      create: { memberId, track: "observer", status: "active", admission: "board" },
+      update: { track: "observer", status: "active", admission: "board", listed: true },
+      create: { memberId, track: "observer", status: "active", admission: "board", listed: true },
     });
     await addRecord(
       {

@@ -132,6 +132,9 @@ export async function settleBallot(ballotId: string) {
           sector: candidacy.sector,
           region: candidacy.region,
           seatedAt,
+          // Seating publishes the member to the record + directory; auto-list
+          // it (admins can Unlist from /admin/members if needed).
+          listed: true,
         },
         create: {
           memberId: candidacy.memberId,
@@ -141,6 +144,7 @@ export async function settleBallot(ballotId: string) {
           sector: candidacy.sector,
           region: candidacy.region,
           seatedAt,
+          listed: true,
         },
       });
       await addRecord(

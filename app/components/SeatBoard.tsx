@@ -21,10 +21,13 @@ export default async function SeatBoard({ compact = false }: { compact?: boolean
         <div className="mt-3 h-2 w-full max-w-md rounded-full bg-rule overflow-hidden">
           <div className="h-full bg-indigo" style={{ width: `${pct}%` }} />
         </div>
-        <p className="text-sm text-muted mt-2">
-          {s.remaining} open
-          {s.pending > 0 && ` · ${s.pending} candidacy(ies) under review`}
-          {" · "}
+        <p className="text-sm mt-2 flex flex-wrap items-center gap-2">
+          <span className="badge badge-green">{s.remaining} open</span>
+          {s.pending > 0 && (
+            <span className="badge badge-amber">
+              {s.pending} under review
+            </span>
+          )}
           <Link href="/join" className="text-indigo hover:underline">
             apply for a seat →
           </Link>
@@ -40,9 +43,7 @@ export default async function SeatBoard({ compact = false }: { compact?: boolean
               {s.bySector.map((row) => (
                 <li key={row.sector} className="flex items-center justify-between gap-3">
                   <span>{row.label}</span>
-                  <span className="font-mono text-muted">
-                    {row.seated > 0 ? `${row.seated} seated` : "open"}
-                  </span>
+                  <StatusBadge seated={row.seated} />
                 </li>
               ))}
             </ul>
@@ -55,9 +56,7 @@ export default async function SeatBoard({ compact = false }: { compact?: boolean
               {s.byRegion.map((row) => (
                 <li key={row.region} className="flex items-center justify-between gap-3">
                   <span>{row.label}</span>
-                  <span className="font-mono text-muted">
-                    {row.seated > 0 ? `${row.seated} seated` : "—"}
-                  </span>
+                  <StatusBadge seated={row.seated} />
                 </li>
               ))}
             </ul>
@@ -69,5 +68,14 @@ export default async function SeatBoard({ compact = false }: { compact?: boolean
         </div>
       )}
     </div>
+  );
+}
+
+/** Green "open" when empty; indigo "N seated" when filled. */
+function StatusBadge({ seated }: { seated: number }) {
+  return seated > 0 ? (
+    <span className="badge badge-indigo">{seated} seated</span>
+  ) : (
+    <span className="badge badge-green">open</span>
   );
 }

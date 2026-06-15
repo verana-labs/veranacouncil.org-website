@@ -2,11 +2,11 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { db } from "@/app/lib/db";
 import { currentUser, isAdmin } from "@/app/lib/authz";
-import { personName } from "@/app/lib/working-groups";
+import { personName } from "@/app/lib/council-bodies";
 import { PageHero, Section } from "@/app/components/PageHero";
 import WorkingGroupsAdmin from "./WorkingGroupsAdmin";
 
-export const metadata: Metadata = { title: "Working groups · Admin" };
+export const metadata: Metadata = { title: "Council Bodies · Admin" };
 
 export default async function AdminWorkingGroupsPage() {
   const user = await currentUser();
@@ -26,7 +26,7 @@ export default async function AdminWorkingGroupsPage() {
     <>
       <PageHero
         back={{ href: "/admin", label: "Admin" }}
-        title="Working groups"
+        title="Council Bodies"
         lead={
           <>
             Members access these by signing in; an <em>Associate-only</em> group

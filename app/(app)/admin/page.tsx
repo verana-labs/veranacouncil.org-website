@@ -42,7 +42,7 @@ const FEATURES: {
     icon: faCheckToSlot,
   },
   {
-    href: "/admin/working-groups",
+    href: "/admin/council-bodies",
     label: "Bodies & committees",
     description: "Create and manage the Council bodies and their meetings.",
     icon: faDiagramProject,
@@ -77,7 +77,7 @@ export default async function AdminPage() {
       <PageHero
         tag="Admin"
         title="Administration"
-        lead="Manage members, billing, working groups, admins, and the Membership Agreement."
+        lead="Manage members, billing, council bodies, admins, and the Membership Agreement."
       />
       <Section bordered={false}>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">

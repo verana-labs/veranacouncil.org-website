@@ -5,11 +5,11 @@ import {
   listWorkingGroupsWithAccess,
   userActiveClasses,
   type WgClass,
-} from "@/app/lib/working-groups";
+} from "@/app/lib/council-bodies";
 import WorkingGroupCards from "@/app/components/WorkingGroupCards";
 
 export const metadata: Metadata = {
-  title: "Working groups",
+  title: "Council Bodies",
   description:
     "The Verana Council's bodies and committees — the General Assembly, Membership & Seats, Technical / Validator. Participation requires Council membership (Founding Member or Observer).",
 };
@@ -34,13 +34,13 @@ export default async function WorkingGroupsPage() {
       {/* Hero */}
       <section className="border-b border-rule">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <p className="tag mb-4">Working groups</p>
+          <p className="tag mb-4">Council Bodies</p>
           <h1 className="display text-4xl sm:text-5xl leading-tight max-w-3xl">
             Where the work happens
           </h1>
           <div className="accent-line mt-6" />
           <p className="mt-8 text-lg text-muted max-w-2xl leading-relaxed">
-            The working groups author the specifications, build and maintain the
+            The council bodies author the specifications, build and maintain the
             open-source software, and shape the open trust layer. Join the ones
             your membership grants — across every organization you belong to —
             and the meetings land straight in your calendar.
@@ -125,7 +125,7 @@ export default async function WorkingGroupsPage() {
               <span className="badge badge-indigo">members</span>
               <h3>Join to contribute</h3>
               <p className="text-sm text-muted leading-relaxed">
-                Participate in a working group and submit formal contributions.
+                Participate in a council body and submit formal contributions.
                 Recurring technical work joins as a{" "}
                 <strong className="text-ink">Contributor Member</strong> (free).
               </p>

@@ -83,12 +83,12 @@ export default function ContactPage() {
               </a>
             </div>
             <div className="card">
-              <h3>Working groups</h3>
+              <h3>Council Bodies</h3>
               <p className="text-sm text-muted">
-                Members participate in the open working groups.
+                Members participate in the open council bodies.
               </p>
-              <a href="/working-groups" className="text-sm text-indigo hover:underline">
-                Explore the working groups →
+              <a href="/council-bodies" className="text-sm text-indigo hover:underline">
+                Explore the council bodies →
               </a>
             </div>
             <div className="card">

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { listHomeWorkingGroups, personName } from "@/app/lib/working-groups";
+import { listHomeWorkingGroups, personName } from "@/app/lib/council-bodies";
 
-// Live data for the home "Working groups" board. The home page is ISR-cached
+// Live data for the home "Council bodies" board. The home page is ISR-cached
 // (and at build there's no DB), so the board is fetched client-side from here —
 // otherwise a stale/empty build snapshot would be served after a container
 // restart until the next on-demand revalidation.

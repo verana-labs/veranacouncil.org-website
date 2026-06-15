@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { joinWg, leaveWg } from "./actions";
 
-// Join/leave a working group. Joining means Calendar invites + appearing in
+// Join/leave a council body. Joining means Calendar invites + appearing in
 // attendance and published minutes — said up front, per ADR-0003.
 export default function JoinControls({
   wgId,
@@ -69,7 +69,7 @@ export default function JoinControls({
             disabled={pending}
             onClick={() => run(() => joinWg(wgId))}
           >
-            {pending ? "Joining…" : "Join this working group"}
+            {pending ? "Joining…" : "Join this council body"}
           </button>
           <p className="text-sm text-muted mt-2">
             You'll be invited to the meetings in your calendar, and your name

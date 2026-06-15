@@ -16,11 +16,14 @@ import {
 export default function MembershipAgreementCard({
   memberId,
   memberName,
+  canSign = true,
   agreementVersion,
   signed,
 }: {
   memberId: string;
   memberName: string;
+  /** Managers may execute the agreement; representatives get a read-only view. */
+  canSign?: boolean;
   /** Active agreement version label, or null if none configured. */
   agreementVersion: string | null;
   /** Already executed? (a signature record exists) */
@@ -70,6 +73,22 @@ export default function MembershipAgreementCard({
         >
           Download signed agreement ↓
         </a>
+      </div>
+    );
+  }
+
+  // Representatives: read-only — they don't execute the agreement.
+  if (!canSign) {
+    return (
+      <div className="card">
+        <span className="badge">Draft — pending incorporation</span>
+        <h3 className="mt-2">Council Membership Agreement</h3>
+        <p className="text-sm text-muted mt-1 leading-relaxed">
+          The binding agreement for {memberName} is a draft pending the
+          Verein&rsquo;s incorporation. An organization manager (authorized
+          signatory) executes it; once signed, it will be available to download
+          here.
+        </p>
       </div>
     );
   }

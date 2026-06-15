@@ -34,14 +34,14 @@ export type MembershipCardData = {
   status?: string | null;
   role?: string | null;
   country?: string | null;
+  /** Organization's entity type (e.g. "corporation", "university"). */
+  entityType?: string | null;
   /** Organization's registered address (shown + editable for managers). */
   address?: string | null;
   /** Serving URL of the uploaded logo (cache-busted), if any. */
   logoUrl?: string | null;
   /** Current display consent — preselects the checkbox when replacing. */
   logoConsent?: boolean;
-  /** When set, a "Download agreement" link to the signed PDF is shown. */
-  agreementHref?: string | null;
   /** When set, a ⋮ actions menu is shown top-right. */
   menu?: MembershipMenu | null;
 };
@@ -68,10 +68,10 @@ export default function MembershipCard({
   status,
   role,
   country,
+  entityType,
   address,
   logoUrl,
   logoConsent,
-  agreementHref,
   menu,
 }: MembershipCardData) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -252,7 +252,7 @@ export default function MembershipCard({
                     className="block w-full px-3 py-2 text-left hover:bg-rule/40"
                     onClick={() => setMenuOpen(false)}
                   >
-                    Manage Participants
+                    Manage representatives
                   </Link>
                 )}
               </div>
@@ -261,60 +261,81 @@ export default function MembershipCard({
         )}
       </div>
 
-      <h3 className="flex items-center gap-2">
-        {logoUrl && (
+      <div className="flex items-start gap-3 mt-1">
+        {logoUrl ? (
           // eslint-disable-next-line @next/next/no-img-element -- served by our
           // own /logo route; next/image can't optimize SVGs anyway.
           <img
             src={logoUrl}
             alt=""
-            className="h-9 w-9 object-contain rounded"
+            className="h-12 w-12 object-contain rounded border border-rule bg-surface p-1 flex-shrink-0"
           />
-        )}
-        <span>{name}</span>
-        {flag ? (
-          <span aria-label={label ?? undefined} title={label ?? undefined}>
-            {flag}
-          </span>
-        ) : label ? (
-          <span className="text-sm font-normal text-muted">{label}</span>
-        ) : null}
-      </h3>
-
-      {(editingAddress ? (
-          <div className="mt-1 grid gap-2">
-            <textarea
-              value={draftAddress}
-              onChange={(e) => setDraftAddress(e.target.value)}
-              rows={3}
-              placeholder="Registered address"
-              className="field w-full text-sm"
-              disabled={pending}
-            />
-            <div className="flex gap-2">
-              <button
-                type="button"
-                className="btn btn-primary text-xs"
-                disabled={pending}
-                onClick={saveAddress}
-              >
-                {pending ? "Saving…" : "Save"}
-              </button>
-              <button
-                type="button"
-                className="btn btn-secondary text-xs"
-                disabled={pending}
-                onClick={() => setEditingAddress(false)}
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
         ) : (
-          <p className="text-sm text-muted whitespace-pre-line">
-            {address || <span className="italic">No registered address</span>}
-          </p>
-        ))}
+          <div className="h-12 w-12 rounded border border-rule bg-surface flex items-center justify-center text-muted text-lg flex-shrink-0">
+            {name.charAt(0).toUpperCase()}
+          </div>
+        )}
+        <h3 className="flex items-center gap-2 mt-1">
+          <span>{name}</span>
+          {flag ? (
+            <span aria-label={label ?? undefined} title={label ?? undefined}>
+              {flag}
+            </span>
+          ) : null}
+        </h3>
+      </div>
+
+      <dl className="mt-3 grid gap-1 text-sm text-muted">
+        {entityType && (
+          <div>
+            <dt className="inline font-medium text-ink">Entity type: </dt>
+            <dd className="inline">{entityType}</dd>
+          </div>
+        )}
+        {label && (
+          <div>
+            <dt className="inline font-medium text-ink">Country: </dt>
+            <dd className="inline">{label}</dd>
+          </div>
+        )}
+        <div>
+          <dt className="font-medium text-ink">Registered address</dt>
+          {editingAddress ? (
+            <dd className="mt-1 grid gap-2">
+              <textarea
+                value={draftAddress}
+                onChange={(e) => setDraftAddress(e.target.value)}
+                rows={3}
+                placeholder="Registered address"
+                className="field w-full text-sm"
+                disabled={pending}
+              />
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  className="btn btn-primary text-xs"
+                  disabled={pending}
+                  onClick={saveAddress}
+                >
+                  {pending ? "Saving…" : "Save"}
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-secondary text-xs"
+                  disabled={pending}
+                  onClick={() => setEditingAddress(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </dd>
+          ) : (
+            <dd className="whitespace-pre-line">
+              {address || <span className="italic">Not set</span>}
+            </dd>
+          )}
+        </div>
+      </dl>
 
       {editingLogo && menu && (
         <form ref={logoFormRef} className="mt-2 grid gap-2 text-sm">
@@ -360,17 +381,6 @@ export default function MembershipCard({
             </button>
           </div>
         </form>
-      )}
-
-      {agreementHref && (
-        <a
-          href={agreementHref}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-sm text-indigo hover:underline mt-auto pt-2"
-        >
-          Agreement PDF ↓
-        </a>
       )}
     </div>
   );

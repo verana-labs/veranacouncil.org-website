@@ -31,11 +31,12 @@ export default async function AccessPage({
     <>
       <PageHero
         back={{ href: "/account", label: "Account" }}
-        title="Manage Participants"
+        title="Manage representatives"
         lead={
           <>
             Manage who can act for <strong>{member.legalName}</strong>. Admins
-            manage this list; representatives get working-group access.
+            manage this list and the candidacy; representatives can access the
+            console, follow candidacy status, and download documents.
           </>
         }
       />

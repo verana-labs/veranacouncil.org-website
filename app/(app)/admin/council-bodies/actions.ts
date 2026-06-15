@@ -31,18 +31,19 @@ function revalidate() {
   revalidatePath("/"); // home page board (showOnHome) is ISR
 }
 
-// Create takes the access level (requiredClass); Edit does not change it.
+// Every council body is open to any Council Member or Observer — there is no
+// per-body access level (the WorkingGroup.requiredClass column stays at its
+// `any` default).
 const createSchema = z.object({
   name: z.string().trim().min(1),
   description: z.string().trim().optional(),
-  requiredClass: z.enum(["any", "associate"]),
   link: z.string().trim().url(),
   showOnHome: z.boolean(),
   state: z.enum(["enabled", "disabled"]).default("enabled"),
   priority: z.coerce.number().int().default(0),
 });
 
-const editSchema = createSchema.omit({ requiredClass: true });
+const editSchema = createSchema;
 
 export async function createWg(
   _prev: WgState,
@@ -53,7 +54,6 @@ export async function createWg(
   const parsed = createSchema.safeParse({
     name: formData.get("name"),
     description: formData.get("description") || undefined,
-    requiredClass: formData.get("requiredClass"),
     link: formData.get("link"),
     showOnHome: formData.get("showOnHome") === "on",
     state: formData.get("state") ?? "enabled",

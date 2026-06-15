@@ -18,10 +18,8 @@ export default function WorkingGroupCards({
   return (
     <div className="space-y-4">
       {groups.map((wg) => {
-        const requires =
-          wg.requiredClass === "associate"
-            ? "Associate only"
-            : "Associate or Contributor";
+        // Every council body is open to any Council Member or Observer.
+        const requires = "Council Member or Observer";
         return (
           <Link
             key={wg.id}
@@ -32,13 +30,7 @@ export default function WorkingGroupCards({
               <p className="display text-lg text-ink">{wg.name}</p>
               <span className="flex items-center gap-2 flex-shrink-0">
                 {wg.joined && <span className="badge badge-indigo">Joined</span>}
-                <span
-                  className={`badge ${
-                    wg.requiredClass === "associate" ? "badge-purple" : ""
-                  }`}
-                >
-                  {requires}
-                </span>
+                <span className="badge">{requires}</span>
               </span>
             </div>
             {wg.description && (

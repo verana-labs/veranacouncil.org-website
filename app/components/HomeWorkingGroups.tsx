@@ -41,15 +41,7 @@ export default function HomeWorkingGroups() {
         >
           <div className="flex items-center justify-between gap-3">
             <p className="font-medium text-ink">{wg.name}</p>
-            <span
-              className={`badge flex-shrink-0 ${
-                wg.requiredClass === "associate" ? "badge-purple" : ""
-              }`}
-            >
-              {wg.requiredClass === "associate"
-                ? "Associate only"
-                : "Associate or Contributor"}
-            </span>
+            <span className="badge flex-shrink-0">Council Member or Observer</span>
           </div>
           {wg.description && (
             <p className="text-sm text-muted mt-1">{wg.description}</p>

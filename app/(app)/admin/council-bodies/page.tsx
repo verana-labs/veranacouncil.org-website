@@ -29,8 +29,8 @@ export default async function AdminWorkingGroupsPage() {
         title="Council Bodies"
         lead={
           <>
-            Members access these by signing in; an <em>Associate-only</em> group
-            requires an active Associate membership.
+            Council bodies are open to any Council Member or Observer; they
+            access them by signing in.
           </>
         }
       />

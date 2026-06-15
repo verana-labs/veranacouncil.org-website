@@ -114,8 +114,8 @@ export default function WorkingGroupAdminCard({ wg }: { wg: AdminWg }) {
   }, [menuOpen]);
 
   const enabled = wg.state === "enabled";
-  const requires =
-    wg.requiredClass === "associate" ? "Associate only" : "Associate or Contributor";
+  // Every council body is open to any Council Member or Observer.
+  const requires = "Council Member or Observer";
 
   function run(fn: () => Promise<void>) {
     startTransition(async () => {
@@ -192,11 +192,7 @@ export default function WorkingGroupAdminCard({ wg }: { wg: AdminWg }) {
           <div className="flex items-start justify-between gap-3">
             <p className="display text-lg text-ink">{wg.name}</p>
             <div className="flex items-center gap-2 flex-shrink-0">
-              <span
-                className={`badge ${wg.requiredClass === "associate" ? "badge-purple" : ""}`}
-              >
-                {requires}
-              </span>
+              <span className="badge">{requires}</span>
               <button
                 type="button"
                 aria-label="Council body actions"

@@ -8,6 +8,11 @@ export const metadata: Metadata = { title: "Members" };
 
 export const dynamic = "force-dynamic";
 
+/** Display form of a stored website URL: drop the scheme and any trailing slash. */
+function websiteLabel(url: string) {
+  return url.replace(/^https?:\/\//, "").replace(/\/$/, "");
+}
+
 export default async function MembersPage() {
   // Admin-curated (`listed`) active members & observers.
   const members = await db.member.findMany({
@@ -77,30 +82,52 @@ export default async function MembersPage() {
             <>
               {founding.length > 0 && (
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {founding.map((m) => (
-                    <div key={m.id} className="card">
-                      <div className="flex items-center gap-3">
-                        {m.logoUri && m.logoDisplayConsent && (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={`/logo/${m.id}?v=${m.updatedAt.getTime()}`}
-                            alt=""
-                            className="h-9 w-9 object-contain rounded"
-                          />
+                  {founding.map((m) => {
+                    const inner = (
+                      <>
+                        <div className="flex items-center gap-4">
+                          {m.logoUri && m.logoDisplayConsent && (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              src={`/logo/${m.id}?v=${m.updatedAt.getTime()}`}
+                              alt=""
+                              className="h-16 w-16 object-contain rounded flex-shrink-0"
+                            />
+                          )}
+                          <h3>{m.legalName}</h3>
+                        </div>
+                        {m.membership?.sector && m.membership?.region && (
+                          <p className="text-sm font-mono mt-2">
+                            {seatLabel(m.membership.sector, m.membership.region)}
+                          </p>
                         )}
-                        <h3>{m.legalName}</h3>
-                      </div>
-                      {m.membership?.sector && m.membership?.region && (
-                        <p className="text-sm font-mono mt-1">
-                          {seatLabel(m.membership.sector, m.membership.region)}
+                        <p className="text-xs text-muted mt-1">
+                          Seated{" "}
+                          {m.membership?.seatedAt?.toISOString().slice(0, 10) ?? "—"}
                         </p>
-                      )}
-                      <p className="text-xs text-muted mt-1">
-                        Seated{" "}
-                        {m.membership?.seatedAt?.toISOString().slice(0, 10) ?? "—"}
-                      </p>
-                    </div>
-                  ))}
+                        {m.website && (
+                          <p className="text-xs text-indigo mt-2 break-all">
+                            {websiteLabel(m.website)} ↗
+                          </p>
+                        )}
+                      </>
+                    );
+                    return m.website ? (
+                      <a
+                        key={m.id}
+                        href={m.website}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="card block hover:border-indigo hover:no-underline transition-colors"
+                      >
+                        {inner}
+                      </a>
+                    ) : (
+                      <div key={m.id} className="card">
+                        {inner}
+                      </div>
+                    );
+                  })}
                 </div>
               )}
               {observers.length > 0 && (
@@ -109,14 +136,46 @@ export default async function MembersPage() {
                     Public-Sector Observers
                   </h3>
                   <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {observers.map((m) => (
-                      <div key={m.id} className="card">
-                        <h3>{m.legalName}</h3>
-                        <p className="text-xs text-muted mt-1">
-                          Observer (non-voting)
-                        </p>
-                      </div>
-                    ))}
+                    {observers.map((m) => {
+                      const inner = (
+                        <>
+                          <div className="flex items-center gap-4">
+                            {m.logoUri && m.logoDisplayConsent && (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img
+                                src={`/logo/${m.id}?v=${m.updatedAt.getTime()}`}
+                                alt=""
+                                className="h-16 w-16 object-contain rounded flex-shrink-0"
+                              />
+                            )}
+                            <h3>{m.legalName}</h3>
+                          </div>
+                          <p className="text-xs text-muted mt-1">
+                            Observer (non-voting)
+                          </p>
+                          {m.website && (
+                            <p className="text-xs text-indigo mt-2 break-all">
+                              {websiteLabel(m.website)} ↗
+                            </p>
+                          )}
+                        </>
+                      );
+                      return m.website ? (
+                        <a
+                          key={m.id}
+                          href={m.website}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="card block hover:border-indigo hover:no-underline transition-colors"
+                        >
+                          {inner}
+                        </a>
+                      ) : (
+                        <div key={m.id} className="card">
+                          {inner}
+                        </div>
+                      );
+                    })}
                   </div>
                 </>
               )}

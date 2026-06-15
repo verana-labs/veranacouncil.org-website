@@ -9,6 +9,7 @@ import {
   leaveOrganization,
   cancelMembership,
   updateOrgAddress,
+  updateOrgWebsite,
   uploadOrgLogo,
   removeOrgLogo,
 } from "@/app/(app)/account/actions";
@@ -19,6 +20,8 @@ export type MembershipMenu = {
   manageHref?: string | null;
   /** Manager-only — offer inline editing of the registered address. */
   canEditAddress?: boolean;
+  /** Manager-only — offer inline editing of the public website. */
+  canEditWebsite?: boolean;
   /** Manager-only — offer logo upload/replace/remove. */
   canEditLogo?: boolean;
   /** Show "Leave Organization" (representatives, or a manager when not the last). */
@@ -38,6 +41,8 @@ export type MembershipCardData = {
   entityType?: string | null;
   /** Organization's registered address (shown + editable for managers). */
   address?: string | null;
+  /** Organization's public website (shown + editable for managers). */
+  website?: string | null;
   /** Serving URL of the uploaded logo (cache-busted), if any. */
   logoUrl?: string | null;
   /** Current display consent — preselects the checkbox when replacing. */
@@ -70,6 +75,7 @@ export default function MembershipCard({
   country,
   entityType,
   address,
+  website,
   logoUrl,
   logoConsent,
   menu,
@@ -77,6 +83,9 @@ export default function MembershipCard({
   const [menuOpen, setMenuOpen] = useState(false);
   const [editingAddress, setEditingAddress] = useState(false);
   const [draftAddress, setDraftAddress] = useState("");
+  const [editingWebsite, setEditingWebsite] = useState(false);
+  const [draftWebsite, setDraftWebsite] = useState("");
+  const [websiteError, setWebsiteError] = useState("");
   const [editingLogo, setEditingLogo] = useState(false);
   const [logoError, setLogoError] = useState("");
   const logoFormRef = useRef<HTMLFormElement>(null);
@@ -108,6 +117,7 @@ export default function MembershipCard({
     (menu.canLeave ||
       menu.canCancel ||
       menu.canEditAddress ||
+      menu.canEditWebsite ||
       menu.canEditLogo ||
       !!menu.manageHref);
 
@@ -115,6 +125,17 @@ export default function MembershipCard({
     startTransition(async () => {
       await updateOrgAddress(menu!.memberId, draftAddress);
       setEditingAddress(false);
+    });
+  }
+
+  function saveWebsite() {
+    startTransition(async () => {
+      const res = await updateOrgWebsite(menu!.memberId, draftWebsite);
+      if (res.error) setWebsiteError(res.error);
+      else {
+        setWebsiteError("");
+        setEditingWebsite(false);
+      }
     });
   }
 
@@ -215,6 +236,22 @@ export default function MembershipCard({
                     }}
                   >
                     Update address
+                  </button>
+                )}
+                {menu!.canEditWebsite && (
+                  <button
+                    type="button"
+                    role="menuitem"
+                    disabled={pending}
+                    className="block w-full px-3 py-2 text-left hover:bg-rule/40"
+                    onClick={() => {
+                      setDraftWebsite(website ?? "");
+                      setWebsiteError("");
+                      setEditingWebsite(true);
+                      setMenuOpen(false);
+                    }}
+                  >
+                    {website ? "Update website" : "Add website"}
                   </button>
                 )}
                 {menu!.canEditLogo && (
@@ -334,6 +371,61 @@ export default function MembershipCard({
           ) : (
             <dd className="whitespace-pre-line">
               {address || <span className="italic">Not set</span>}
+            </dd>
+          )}
+        </div>
+        <div>
+          <dt className="font-medium text-ink">Website</dt>
+          {editingWebsite ? (
+            <dd className="mt-1 grid gap-2">
+              <input
+                type="url"
+                inputMode="url"
+                value={draftWebsite}
+                onChange={(e) => setDraftWebsite(e.target.value)}
+                placeholder="https://example.org"
+                className="field w-full text-sm"
+                disabled={pending}
+              />
+              {websiteError && (
+                <p className="text-xs text-red-600">{websiteError}</p>
+              )}
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  className="btn btn-primary text-xs"
+                  disabled={pending}
+                  onClick={saveWebsite}
+                >
+                  {pending ? "Saving…" : "Save"}
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-secondary text-xs"
+                  disabled={pending}
+                  onClick={() => {
+                    setEditingWebsite(false);
+                    setWebsiteError("");
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </dd>
+          ) : (
+            <dd>
+              {website ? (
+                <a
+                  href={website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-indigo hover:underline break-all"
+                >
+                  {website.replace(/^https?:\/\//, "").replace(/\/$/, "")} ↗
+                </a>
+              ) : (
+                <span className="italic">Not set</span>
+              )}
             </dd>
           )}
         </div>

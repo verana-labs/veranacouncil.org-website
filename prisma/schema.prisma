@@ -117,12 +117,12 @@ model Member {
   primaryEmail String
 
   // One membership per member: the durable party + its current Council status.
-  membership       Membership?
-  access           MemberAccess[]
-  userLinks        UserMember[]
-  signatureRecords SignatureRecord[]
-  candidacies      Candidacy[]
-  ballotVotes      BallotVote[] // admission votes this member (as a seated voter) cast
+  membership           Membership?
+  access               MemberAccess[]
+  userLinks            UserMember[]
+  agreementSignatories AgreementSignatory[] // signature slots on this member's agreement
+  candidacies          Candidacy[]
+  ballotVotes          BallotVote[] // admission votes this member (as a seated voter) cast
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -185,6 +185,8 @@ model MemberAccess {
   votingRep     Boolean      @default(false) // casts the org's admission-ballot vote
   addedByUserId String?
   addedAt       DateTime     @default(now())
+
+  signatories AgreementSignatory[] // agreement signature slots assigned to this person
 
   @@unique([memberId, email])
   @@index([email])
@@ -305,30 +307,51 @@ model AgreementDocument {
   createdAt     DateTime @default(now())
 }
 
-model SignatureRecord {
+// One required signer on a member's Membership Agreement. Bilateral: rows whose
+// `signer.memberId == memberId` are the member's own people; rows whose signer
+// belongs to the configured council org are the council-side countersigners.
+// The agreement is fully executed once every row for the active version is signed.
+model AgreementSignatory {
   id       String @id @default(cuid())
-  memberId String
+  memberId String // the member (org) whose agreement this is
   member   Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
 
-  signerName    String
-  signerTitle   String?
-  emailVerified Boolean @default(false)
+  // The signer — an entry on some org's access list. Their org is signer.memberId,
+  // so the side is derived (== memberId ⇒ member side, else council side); role and
+  // email come from this link rather than being snapshotted.
+  memberAccessId String
+  signer         MemberAccess @relation(fields: [memberAccessId], references: [id], onDelete: Cascade)
 
-  // the AgreementDocument that was accepted (snapshot — survives later config changes)
+  // The AgreementDocument version this signing round is for (snapshot).
   agreementVersion String
   agreementUrl     String
-  agreementHash    String? // sha256 of the signed PDF
 
-  // Storage key (path under STORAGE_DIR volume) of the exact personalised PDF
-  // that was signed, kept verbatim so the member can re-download it and so later
-  // template edits never alter a signed copy.
+  status SignatoryStatus @default(pending)
+
+  // Filled when the person e-signs.
+  signerName  String? // legal name as e-signed (snapshot at signing)
+  signerTitle String?
+  signedAt    DateTime?
+  ip          String?
+  userAgent   String?
+  // Storage key of the exact personalised PDF this signer signed, kept verbatim.
   agreementPdfPath String?
+  agreementHash    String? // sha384 (SRI) of the signed PDF
 
-  signedAt  DateTime @default(now())
-  ip        String?
-  userAgent String?
+  designatedByUserId String?
+  createdAt          DateTime @default(now())
 
+  @@unique([memberId, memberAccessId, agreementVersion])
   @@index([memberId])
+  @@index([memberAccessId, status])
+}
+
+// Generic key/value app configuration (admin-managed). Holds the agreement-
+// signing toggle and the council-side signatory configuration.
+model AppSetting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -527,6 +550,11 @@ enum AdmissionKind {
   seed // steward-designated seed cohort (first 3, published rationale)
   ballot // ⅔ peer vote (provisional mechanism)
   board // observers: steward pre-incorporation, Board thereafter
+}
+
+enum SignatoryStatus {
+  pending // designated, awaiting this person's e-signature
+  signed
 }
 
 enum ValidatorStatus {

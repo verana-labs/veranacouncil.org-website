@@ -21,7 +21,10 @@ export default async function AdminMemberDetail({
     include: {
       membership: true,
       access: { where: { status: { not: "removed" } }, orderBy: { addedAt: "asc" } },
-      signatureRecords: { orderBy: { signedAt: "desc" } },
+      agreementSignatories: {
+        include: { signer: { select: { email: true, role: true, memberId: true } } },
+        orderBy: { createdAt: "asc" },
+      },
     },
   });
   if (!member) notFound();
@@ -69,29 +72,41 @@ export default async function AdminMemberDetail({
         {member.access.length === 0 && <li className="text-muted">None.</li>}
       </ul>
 
-      <h2 className="display text-xl mt-8">Signatures</h2>
+      <h2 className="display text-xl mt-8">Agreement signatories</h2>
       <ul className="mt-2 grid gap-1 text-sm">
-        {member.signatureRecords.map((s) => (
-          <li key={s.id}>
-            {s.signerName} signed <strong>{s.agreementVersion}</strong> on{" "}
-            {s.signedAt.toISOString().slice(0, 10)}
-            {s.agreementPdfPath && (
-              <>
-                {" — "}
+        {member.agreementSignatories.map((s) => {
+          const side = s.signer.memberId === member.id ? "organization" : "council";
+          return (
+            <li key={s.id} className="flex flex-wrap items-center gap-2">
+              <span>
+                {s.signerName ?? s.signer.email}{" "}
+                <span className="text-xs text-muted">
+                  ({s.signer.role} · {side})
+                </span>
+              </span>
+              {s.status === "signed" ? (
+                <span className="badge badge-green">
+                  Signed {s.agreementVersion}
+                  {s.signedAt ? ` · ${s.signedAt.toISOString().slice(0, 10)}` : ""}
+                </span>
+              ) : (
+                <span className="badge badge-amber">Pending {s.agreementVersion}</span>
+              )}
+              {s.agreementPdfPath && (
                 <a
-                  href={`/account/agreement/${member.id}`}
+                  href={`/account/agreement/${member.id}?s=${s.id}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-indigo hover:underline"
+                  className="text-indigo hover:underline text-xs"
                 >
-                  Signed PDF ↓
+                  PDF ↓
                 </a>
-              </>
-            )}
-          </li>
-        ))}
-        {member.signatureRecords.length === 0 && (
-          <li className="text-muted">None.</li>
+              )}
+            </li>
+          );
+        })}
+        {member.agreementSignatories.length === 0 && (
+          <li className="text-muted">None designated.</li>
         )}
       </ul>
       </Section>

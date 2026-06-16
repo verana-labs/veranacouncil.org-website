@@ -283,23 +283,9 @@ model RecordEntry {
   @@index([publishedAt])
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// ECS Ecosystem Participant — expressions of interest (non-binding waitlist).
-// The formal selection process opens once the Council delivers the ECS-EGF.
-// ─────────────────────────────────────────────────────────────────────────────
-
-model EcsInterest {
-  id           String  @id @default(cuid())
-  orgName      String
-  sector       String
-  intendedRole String // e.g. issuer / grantor / orchestrator per ECS-EGF draft roles
-  contactName  String
-  contactEmail String
-  message      String? @db.Text
-  userId       String? // set when submitted signed-in
-
-  createdAt DateTime @default(now())
-}
+// ECS Ecosystem Participant expressions of interest are collected through the
+// internally-routed contact form (topic "ecs-participant"); there is no
+// dedicated waitlist table. The formal selection opens with the ECS-EGF.
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Membership Agreement (admin-configurable PDF) + e-signature record

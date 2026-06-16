@@ -37,6 +37,12 @@ const nextConfig: NextConfig = {
       },
       { source: "/working-groups", destination: "/council-bodies", permanent: true },
       { source: "/governance", destination: "/council-bodies", permanent: true },
+      // ECS interest is now collected on the contact form (topic preselected).
+      {
+        source: "/ecs-interest",
+        destination: "/contact?topic=ecs-participant",
+        permanent: true,
+      },
     ];
   },
 

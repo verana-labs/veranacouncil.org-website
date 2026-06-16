@@ -198,7 +198,10 @@ export default async function GovernancePage() {
             recruitment governed by the ECS-EGF, opening as the framework ships
             (target Q4 2026), with initial participants permissioned in time for
             mainnet.{" "}
-            <Link href="/ecs-interest" className="text-indigo hover:underline">
+            <Link
+              href="/contact?topic=ecs-participant"
+              className="text-indigo hover:underline"
+            >
               Express interest →
             </Link>
           </p>

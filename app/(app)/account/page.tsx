@@ -20,6 +20,19 @@ const CANDIDACY_LABEL: Record<string, string> = {
   withdrawn: "Withdrawn",
 };
 
+// Colour the status: in-flight = amber, live ballot = indigo, success = green,
+// terminal-negative = red, neutral exits = plain.
+const CANDIDACY_BADGE: Record<string, string> = {
+  applied: "badge-amber",
+  signed: "badge-amber",
+  queued: "badge-amber",
+  ballot_open: "badge-indigo",
+  accepted: "badge-green",
+  refused: "badge-red",
+  lapsed: "",
+  withdrawn: "",
+};
+
 const VALIDATOR_LABEL: Record<string, string> = {
   none: "not started",
   in_progress: "in progress",
@@ -198,7 +211,7 @@ export default async function AccountPage() {
                 <p className="tag mb-3">Membership Agreement</p>
                 <h2 className="display text-3xl">The binding agreement</h2>
                 <div className="accent-line mt-4 mb-8" />
-                <div className="grid sm:grid-cols-2 gap-6 max-w-4xl">
+                <div className="grid gap-6">
                   {seats.map((m) => {
                     const sig = signatureFor(m.memberId);
                     const canSign =
@@ -240,12 +253,16 @@ export default async function AccountPage() {
                       <p className="text-sm font-mono mt-1">
                         {seatLabel(c.sector, c.region)}
                       </p>
-                      <p className="text-sm text-muted mt-2">
-                        {CANDIDACY_LABEL[c.status] ?? c.status}
-                        {c.status === "ballot_open" && c.ballot
-                          ? ` — closes ${c.ballot.closesAt.toISOString().slice(0, 10)}`
-                          : ""}
-                      </p>
+                      <div className="mt-2 flex flex-wrap items-center gap-2">
+                        <span className={`badge ${CANDIDACY_BADGE[c.status] ?? ""}`}>
+                          {CANDIDACY_LABEL[c.status] ?? c.status}
+                        </span>
+                        {c.status === "ballot_open" && c.ballot && (
+                          <span className="text-xs text-muted">
+                            closes {c.ballot.closesAt.toISOString().slice(0, 10)}
+                          </span>
+                        )}
+                      </div>
                       {(c.status === "lapsed" || c.status === "refused") && (
                         <p className="text-sm mt-2">
                           <Link href="/apply" className="text-indigo hover:underline">

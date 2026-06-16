@@ -28,7 +28,7 @@ export default function SettingsForm({
         />
       </div>
       <p className="text-sm text-muted mt-1">
-        Shown on working-group pages, attendance lists and published minutes.
+        Shown on council-bodies pages, attendance lists and published minutes.
         Leave empty to use the name from your sign-in provider
         {providerName ? ` (${providerName})` : ""}.
       </p>

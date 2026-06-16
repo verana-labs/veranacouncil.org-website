@@ -39,17 +39,22 @@ export default async function AdminMembersPage({
     <>
       <PageHero back={{ href: "/admin", label: "Admin" }} title="Members" />
       <Section bordered={false}>
-        <form className="flex gap-2">
-          <input
-            name="q"
-            defaultValue={q ?? ""}
-            placeholder="Search name or email"
-            className="field w-64"
-          />
-          <button type="submit" className="btn">
-            Search
-          </button>
-        </form>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <form className="flex gap-2">
+            <input
+              name="q"
+              defaultValue={q ?? ""}
+              placeholder="Search name or email"
+              className="field w-64"
+            />
+            <button type="submit" className="btn">
+              Search
+            </button>
+          </form>
+          <Link href="/admin/members/new-observer" className="btn btn-secondary">
+            Add Public-Sector Observer
+          </Link>
+        </div>
 
         {members.length === 0 ? (
           <p className="text-muted mt-6">No members found.</p>

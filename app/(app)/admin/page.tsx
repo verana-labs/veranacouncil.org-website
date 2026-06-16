@@ -78,14 +78,14 @@ export default async function AdminPage() {
             <Link
               key={f.href}
               href={f.href}
-              className="card group transition-colors hover:border-purple"
+              className="card group transition-colors hover:border-indigo"
             >
               <FontAwesomeIcon
                 icon={f.icon}
-                className="text-2xl text-purple"
+                className="text-2xl text-indigo"
                 aria-hidden="true"
               />
-              <h3 className="mt-3 transition-colors group-hover:text-purple">{f.label}</h3>
+              <h3 className="mt-3 transition-colors group-hover:text-indigo">{f.label}</h3>
               <p className="text-sm text-muted leading-relaxed">{f.description}</p>
             </Link>
           ))}

@@ -21,7 +21,7 @@ export function PageHero({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
         {back ? (
           <p className="mb-4">
-            <Link href={back.href} className="tag hover:text-purple transition-colors">
+            <Link href={back.href} className="tag hover:text-indigo transition-colors">
               ← {back.label}
             </Link>
           </p>

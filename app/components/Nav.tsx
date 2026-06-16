@@ -100,11 +100,11 @@ export default function Nav() {
                 aria-hidden="true"
               >
                 <path
-                  fill="var(--color-indigo)"
+                  fill="var(--color-ink)"
                   d="M26.9932 51.6972L5.805 11.0977L2.91263 16.2161L0 10.6048L5.98725 0L26.9932 40.2483L47.9993 0L54 10.6217L51.0773 16.2161L48.1849 11.0977L26.9932 51.6972Z"
                 />
                 <path
-                  fill="var(--color-purple)"
+                  fill="var(--color-ink)"
                   d="M13.696 0L26.9935 25.4637L39.9367 0H13.696Z"
                 />
               </svg>

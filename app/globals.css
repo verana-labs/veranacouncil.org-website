@@ -4,10 +4,11 @@
    Verana Council — design tokens.
 
    Sister sub-brand of the Foundation, with its own "constitution / governance
-   body" personality: deep indigo as the PRIMARY (authority, permanence),
-   Verana purple demoted to accent, NO green anywhere, all-Inter type
-   (no display face — that absence is the signal), IBM Plex Mono used
-   sparingly (seat-matrix states, schema names, dates of record).
+   body" personality: deep indigo as the PRIMARY (authority, permanence) used
+   for every interactive accent (links, hovers, focus), NO green anywhere,
+   Space Grotesk for display/headings, IBM Plex Mono used sparingly (seat-matrix
+   states, schema names, dates of record). Purple survives only as a static
+   categorical accent (track badges, avatar fallbacks).
 
    Tokens live in @theme so the matching utilities (bg-surface, text-ink,
    text-muted, border-rule, bg-indigo, text-purple, …) are generated AND the
@@ -28,9 +29,8 @@
   --color-elevated: #ffffff;
 
   --font-sans: var(--font-inter), "Inter", ui-sans-serif, system-ui, sans-serif;
-  /* All-Inter: the Council has no display face (vs. the Foundation's
-     Space Grotesk) — .display stays as a weight/tracking treatment only. */
-  --font-display: var(--font-inter), "Inter", ui-sans-serif, system-ui,
+  /* Display/headings — Space Grotesk (matches the Foundation platform). */
+  --font-display: var(--font-space-grotesk), "Space Grotesk", var(--font-inter),
     sans-serif;
   --font-mono: var(--font-ibm-plex-mono), "IBM Plex Mono", ui-monospace,
     monospace;
@@ -68,7 +68,7 @@ body {
   font-feature-settings: "ss01" 1, "cv11" 1;
 }
 
-/* Display type — Inter, tight tracking (all-Inter institutional look) ----- */
+/* Display type — Space Grotesk, tight tracking --------------------------- */
 .display {
   font-family: var(--font-display);
   letter-spacing: -0.02em;
@@ -84,7 +84,7 @@ body {
   white-space: nowrap;
 }
 .wordmark .dot {
-  color: var(--color-purple);
+  color: var(--color-ink);
 }
 
 /* Accent line — solid indigo, the Council's austere rule ------------------ */
@@ -148,13 +148,13 @@ body {
   margin-top: 0.375rem;
 }
 .prose-body a {
-  color: var(--color-purple);
+  color: var(--color-indigo);
   text-decoration: underline;
   text-underline-offset: 2px;
   text-decoration-thickness: 1px;
 }
 .prose-body a:hover {
-  color: var(--color-purple-dark);
+  color: var(--color-indigo-dark);
   text-decoration-thickness: 2px;
 }
 .prose-body hr {
@@ -282,8 +282,8 @@ body {
 }
 .site-header a.nav-link:hover,
 .site-header a.nav-link[aria-current="page"] {
-  border-bottom-color: var(--color-purple);
-  color: var(--color-purple);
+  border-bottom-color: var(--color-indigo);
+  color: var(--color-indigo);
 }
 
 /* Announcement bar ------------------------------------------------ */
@@ -321,7 +321,7 @@ body {
   font-size: inherit;
 }
 .site-footer a:hover {
-  color: var(--color-purple);
+  color: var(--color-indigo);
   text-decoration: underline;
 }
 
@@ -353,7 +353,7 @@ body {
   transition: border-color 120ms ease, transform 120ms ease;
 }
 .repo-card:hover {
-  border-color: var(--color-purple);
+  border-color: var(--color-indigo);
   transform: translateY(-2px);
 }
 .repo-card .repo-name {
@@ -444,9 +444,9 @@ body {
   transition: border-color 120ms ease, color 120ms ease;
 }
 .logo-tile:hover {
-  border-color: var(--color-purple);
+  border-color: var(--color-indigo);
   border-style: solid;
-  color: var(--color-purple);
+  color: var(--color-indigo);
 }
 
 /* Logo wall — member / founder logos on a steady light chip so colored or
@@ -463,7 +463,7 @@ body {
   transition: border-color 120ms ease, transform 120ms ease;
 }
 .logo-wall-item:hover {
-  border-color: var(--color-purple);
+  border-color: var(--color-indigo);
   transform: translateY(-2px);
 }
 .logo-wall-item img {
@@ -558,7 +558,7 @@ body {
 .form-field select:focus,
 .form-field textarea:focus,
 .field:focus {
-  outline: 2px solid var(--color-purple);
+  outline: 2px solid var(--color-indigo);
   outline-offset: 2px;
 }
 .form-field .hint {
@@ -572,7 +572,7 @@ button:focus-visible,
 input:focus-visible,
 textarea:focus-visible,
 select:focus-visible {
-  outline: 2px solid var(--color-purple);
+  outline: 2px solid var(--color-indigo);
   outline-offset: 2px;
   border-radius: 4px;
 }
@@ -611,8 +611,8 @@ select:focus-visible {
     color 120ms ease;
 }
 .theme-toggle:hover {
-  border-color: var(--color-purple);
-  color: var(--color-purple);
+  border-color: var(--color-indigo);
+  color: var(--color-indigo);
 }
 .theme-toggle .icon-sun {
   display: none;

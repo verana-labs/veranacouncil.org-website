@@ -103,7 +103,7 @@ export default function LoginForm({ callbackUrl }: { callbackUrl: string }) {
         <div className="flex justify-between text-xs text-muted mt-3">
           <button
             type="button"
-            className="hover:text-purple underline-offset-2 hover:underline"
+            className="hover:text-indigo underline-offset-2 hover:underline"
             onClick={() => {
               setSent(false);
               setCode("");
@@ -115,7 +115,7 @@ export default function LoginForm({ callbackUrl }: { callbackUrl: string }) {
           </button>
           <button
             type="button"
-            className="hover:text-purple underline-offset-2 hover:underline disabled:opacity-50"
+            className="hover:text-indigo underline-offset-2 hover:underline disabled:opacity-50"
             disabled={pending || resent}
             onClick={async () => {
               await sendCode();

@@ -28,12 +28,8 @@ export default async function AdminMembersPage({
       : undefined,
     include: {
       membership: true,
-      // Whether a signed agreement PDF exists, for the download link.
-      signatureRecords: {
-        where: { agreementPdfPath: { not: null } },
-        select: { id: true },
-        take: 1,
-      },
+      // Signing progress on the agreement (across designated signatories).
+      agreementSignatories: { select: { status: true } },
     },
     orderBy: { createdAt: "desc" },
     take: 200,
@@ -73,6 +69,10 @@ export default async function AdminMembersPage({
             <tbody>
               {members.map((m) => {
                 const ms = m.membership;
+                const sigTotal = m.agreementSignatories.length;
+                const sigSigned = m.agreementSignatories.filter(
+                  (s) => s.status === "signed",
+                ).length;
                 return (
                   <tr key={m.id} className="border-t border-rule">
                     <td className="p-2">
@@ -86,15 +86,17 @@ export default async function AdminMembersPage({
                     </td>
                     <td className="p-2 text-muted">{m.primaryEmail}</td>
                     <td className="p-2">
-                      {m.signatureRecords.length > 0 ? (
-                        <a
-                          href={`/account/agreement/${m.id}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-indigo hover:underline"
+                      {sigTotal > 0 ? (
+                        <Link
+                          href={`/admin/members/${m.id}`}
+                          className={
+                            sigSigned === sigTotal
+                              ? "text-green-700 hover:underline"
+                              : "text-indigo hover:underline"
+                          }
                         >
-                          PDF ↓
-                        </a>
+                          {sigSigned}/{sigTotal} signed
+                        </Link>
                       ) : (
                         <span className="text-muted">—</span>
                       )}

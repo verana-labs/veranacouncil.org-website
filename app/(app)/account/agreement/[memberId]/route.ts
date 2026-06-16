@@ -2,32 +2,45 @@ import { NextRequest, NextResponse } from "next/server";
 import { currentUser, isAdmin, isManagerOf } from "@/app/lib/authz";
 import { db } from "@/app/lib/db";
 import { getFile } from "@/app/lib/storage";
+import { userAccessIds } from "@/app/lib/agreement-signing";
 
 /**
- * Stream a member's signed Membership Agreement PDF. Access is restricted to:
- *   - a Council admin (the exception, for support/audit);
- *   - otherwise, a `manager` of the member.
- * The signer is always created as a manager at signing, and an individual member
- * has exactly one manager (themselves), so "manager" means: individuals → only
- * the signer; organizations → the signer or any manager (representatives cannot).
+ * Stream a signed Membership Agreement PDF. With `?s=<signatoryId>`, the named
+ * signatory's copy; otherwise the requesting user's own signed copy for this
+ * member. Access: a Council admin, a manager of the member, or the signatory.
  */
 export async function GET(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: Promise<{ memberId: string }> },
 ) {
   const { memberId } = await params;
   const user = await currentUser();
   if (!user?.id) return new NextResponse("Unauthorized", { status: 401 });
 
-  const allowed = (await isAdmin(user.email)) || (await isManagerOf(user.id, memberId));
-  if (!allowed) return new NextResponse("Forbidden", { status: 403 });
+  const signatoryId = req.nextUrl.searchParams.get("s");
+  const admin = await isAdmin(user.email);
+  const manager = await isManagerOf(user.id, memberId);
+  const myAccessIds = await userAccessIds(user.email);
 
-  const sig = await db.signatureRecord.findFirst({
-    where: { memberId, agreementPdfPath: { not: null } },
-    orderBy: { signedAt: "desc" },
-    select: { agreementPdfPath: true, agreementVersion: true },
-  });
+  const sig = signatoryId
+    ? await db.agreementSignatory.findFirst({
+        where: { id: signatoryId, memberId, agreementPdfPath: { not: null } },
+        select: { agreementPdfPath: true, agreementVersion: true, memberAccessId: true },
+      })
+    : await db.agreementSignatory.findFirst({
+        where: {
+          memberId,
+          agreementPdfPath: { not: null },
+          memberAccessId: { in: [...myAccessIds] },
+        },
+        orderBy: { signedAt: "desc" },
+        select: { agreementPdfPath: true, agreementVersion: true, memberAccessId: true },
+      });
+
   if (!sig?.agreementPdfPath) return new NextResponse("Not found", { status: 404 });
+
+  const allowed = admin || manager || myAccessIds.has(sig.memberAccessId);
+  if (!allowed) return new NextResponse("Forbidden", { status: 403 });
 
   let bytes: Buffer;
   try {

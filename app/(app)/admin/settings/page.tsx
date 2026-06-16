@@ -3,8 +3,12 @@ import { notFound } from "next/navigation";
 import { currentUser, isAdmin } from "@/app/lib/authz";
 import { listVersions, readVersionFile } from "@/app/lib/agreement-versions";
 import { renderTemplateHtml } from "@/app/lib/agreement-html";
+import { db } from "@/app/lib/db";
+import { isAgreementSigningEnabled, getCouncilSignatoryConfig } from "@/app/lib/settings";
+import { loadOrgPeople } from "@/app/lib/agreement-signing";
 import { PageHero, Section } from "@/app/components/PageHero";
 import VersionSelector from "./VersionSelector";
+import AgreementSigningSettings from "./AgreementSigningSettings";
 
 export const metadata: Metadata = { title: "Settings" };
 
@@ -27,6 +31,23 @@ export default async function SettingsPage() {
     active && active.currentHash ? await readVersionFile(active.filename).catch(() => null) : null;
   const activeHtml = activeContent ? renderTemplateHtml(activeContent) : null;
   const activeDrifted = !!active && active.currentHash !== active.pinnedHash;
+
+  // Agreement-signing config: master toggle + council-side signatory.
+  const [signingEnabled, councilConfig, orgs] = await Promise.all([
+    isAgreementSigningEnabled(),
+    getCouncilSignatoryConfig(),
+    db.member.findMany({
+      where: { type: "organization" },
+      select: { id: true, legalName: true },
+      orderBy: { legalName: "asc" },
+    }),
+  ]);
+  const peopleByOrg: Record<string, { email: string; name: string; role: string }[]> = {};
+  await Promise.all(
+    orgs.map(async (o) => {
+      peopleByOrg[o.id] = await loadOrgPeople(o.id);
+    }),
+  );
 
   return (
     <>
@@ -83,6 +104,20 @@ export default async function SettingsPage() {
           selectable: v.selectable,
           note: STATUS_NOTE[v.status] ?? v.status,
         }))}
+      />
+
+      <h2 className="display text-xl mt-12">Agreement signing</h2>
+      <p className="text-muted text-sm">
+        Turn signing on when the agreement is final, and configure who signs on
+        behalf of the Council. Members&rsquo; own signers are chosen by each
+        organization in its account.
+      </p>
+      <AgreementSigningSettings
+        enabled={signingEnabled}
+        councilMemberId={councilConfig.memberId}
+        councilEmails={councilConfig.emails}
+        orgs={orgs.map((o) => ({ id: o.id, name: o.legalName }))}
+        peopleByOrg={peopleByOrg}
       />
       </Section>
     </>

@@ -3,7 +3,13 @@ import Link from "next/link";
 import { currentUser, effectiveMemberships } from "@/app/lib/authz";
 import { db } from "@/app/lib/db";
 import { seatLabel } from "@/app/lib/seats";
-import { getActiveAgreement } from "@/app/lib/agreement";
+import { isAgreementSigningEnabled } from "@/app/lib/settings";
+import {
+  loadAgreementSigning,
+  loadOrgPeople,
+  councilCountersignaturesFor,
+  userAccessIds,
+} from "@/app/lib/agreement-signing";
 import MembershipCard from "@/app/components/MembershipCard";
 import MembershipAgreementCard from "@/app/components/MembershipAgreementCard";
 
@@ -69,18 +75,36 @@ export default async function AccountPage() {
     ? await db.ballot.count({ where: { status: "open" } })
     : 0;
 
-  // Membership Agreement (binding, post-seating): active version + which seated
-  // orgs have already executed it (a signature record exists).
+  // Membership Agreement (binding, post-seating) — bilateral multi-party signing.
   const seatedIds = seats.map((m) => m.memberId);
-  const activeAgreement = seatedIds.length ? await getActiveAgreement() : null;
-  const signatures = seatedIds.length
-    ? await db.signatureRecord.findMany({
-        where: { memberId: { in: seatedIds } },
-        orderBy: { signedAt: "desc" },
-      })
-    : [];
-  const signatureFor = (memberId: string) =>
-    signatures.find((s) => s.memberId === memberId) ?? null;
+  const signingEnabled = await isAgreementSigningEnabled();
+  const viewerAccessIds = user ? await userAccessIds(user.email) : new Set<string>();
+
+  // One signing card per seated org the user belongs to.
+  const agreementCards = await Promise.all(
+    seats.map(async (m) => ({
+      memberId: m.memberId,
+      memberName: m.member.legalName,
+      view: await loadAgreementSigning(m.memberId, viewerAccessIds),
+      orgPeople: await loadOrgPeople(m.memberId),
+      canDesignate:
+        links.find((l) => l.memberId === m.memberId)?.role === "manager",
+    })),
+  );
+
+  // Council countersignatures: other members' agreements with a slot for this
+  // user (e.g. they're a rep of the configured council org). Exclude own seats.
+  const counters = user ? await councilCountersignaturesFor(user.email) : [];
+  const counterMemberIds = [
+    ...new Set(counters.map((c) => c.memberId).filter((id) => !seatedIds.includes(id))),
+  ];
+  const counterCards = await Promise.all(
+    counterMemberIds.map(async (id) => {
+      const view = await loadAgreementSigning(id, viewerAccessIds);
+      const name = counters.find((c) => c.memberId === id)?.memberName ?? "Member";
+      return { memberId: id, memberName: name, view };
+    }),
+  );
 
   // Active manager / representative counts per org, to decide which menu actions
   // are offered (the actions re-check server-side before mutating).
@@ -203,37 +227,60 @@ export default async function AccountPage() {
             </section>
           )}
 
-          {/* Membership Agreement (binding) — seated orgs. Managers sign;
-              representatives see status and can download once signed. */}
-          {seats.length > 0 && (
+          {/* Membership Agreement (binding) — bilateral, multi-party signing.
+              A manager designates the org's signers; each designated person and
+              each council signatory signs their own slot. */}
+          {agreementCards.length > 0 && (
             <section className="border-b border-rule">
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
                 <p className="tag mb-3">Membership Agreement</p>
                 <h2 className="display text-3xl">The binding agreement</h2>
                 <div className="accent-line mt-4 mb-8" />
                 <div className="grid gap-6">
-                  {seats.map((m) => {
-                    const sig = signatureFor(m.memberId);
-                    const canSign =
-                      links.find((l) => l.memberId === m.memberId)?.role === "manager";
-                    return (
-                      <MembershipAgreementCard
-                        key={m.memberId}
-                        memberId={m.memberId}
-                        memberName={m.member.legalName}
-                        canSign={canSign}
-                        agreementVersion={activeAgreement?.version ?? null}
-                        signed={
-                          sig
-                            ? {
-                                version: sig.agreementVersion,
-                                at: sig.signedAt.toISOString().slice(0, 10),
-                              }
-                            : null
-                        }
-                      />
-                    );
-                  })}
+                  {agreementCards.map((a) => (
+                    <MembershipAgreementCard
+                      key={a.memberId}
+                      memberId={a.memberId}
+                      memberName={a.memberName}
+                      signingEnabled={signingEnabled}
+                      agreementVersion={a.view.version}
+                      signatories={a.view.signatories}
+                      total={a.view.total}
+                      signed={a.view.signed}
+                      fullyExecuted={a.view.fullyExecuted}
+                      canDesignate={a.canDesignate}
+                      orgPeople={a.orgPeople}
+                    />
+                  ))}
+                </div>
+              </div>
+            </section>
+          )}
+
+          {/* Council countersignatures — other members' agreements awaiting this
+              user's council-side signature. */}
+          {counterCards.length > 0 && (
+            <section className="border-b border-rule">
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+                <p className="tag mb-3">Council countersignatures</p>
+                <h2 className="display text-3xl">Agreements awaiting your signature</h2>
+                <div className="accent-line mt-4 mb-8" />
+                <div className="grid gap-6">
+                  {counterCards.map((a) => (
+                    <MembershipAgreementCard
+                      key={a.memberId}
+                      memberId={a.memberId}
+                      memberName={a.memberName}
+                      signingEnabled={signingEnabled}
+                      agreementVersion={a.view.version}
+                      signatories={a.view.signatories}
+                      total={a.view.total}
+                      signed={a.view.signed}
+                      fullyExecuted={a.view.fullyExecuted}
+                      canDesignate={false}
+                      orgPeople={[]}
+                    />
+                  ))}
                 </div>
               </div>
             </section>

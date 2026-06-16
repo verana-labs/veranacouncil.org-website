@@ -5,7 +5,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faUsers,
   faUserCheck,
-  faCheckToSlot,
   faDiagramProject,
   faUserShield,
   faGear,
@@ -34,12 +33,6 @@ const FEATURES: {
     label: "Candidacies",
     description: "Vetting, the FIFO queues, ballots, and seed designations.",
     icon: faUserCheck,
-  },
-  {
-    href: "/admin/ecs-interest",
-    label: "ECS interest",
-    description: "Expressions of interest for ECS Ecosystem Participant recruitment.",
-    icon: faCheckToSlot,
   },
   {
     href: "/admin/council-bodies",

@@ -85,16 +85,21 @@ export default async function MembersPage() {
                   {founding.map((m) => {
                     const inner = (
                       <>
-                        <div className="flex items-center gap-4">
-                          {m.logoUri && m.logoDisplayConsent && (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img
-                              src={`/logo/${m.id}?v=${m.updatedAt.getTime()}`}
-                              alt=""
-                              className="h-16 w-16 object-contain rounded flex-shrink-0"
-                            />
-                          )}
-                          <h3>{m.legalName}</h3>
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex items-center gap-4">
+                            {m.logoUri && m.logoDisplayConsent && (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img
+                                src={`/logo/${m.id}?v=${m.updatedAt.getTime()}`}
+                                alt=""
+                                className="h-16 w-16 object-contain rounded flex-shrink-0"
+                              />
+                            )}
+                            <h3>{m.legalName}</h3>
+                          </div>
+                          <span className="badge badge-purple flex-shrink-0">
+                            Founding Member
+                          </span>
                         </div>
                         {m.membership?.sector && m.membership?.region && (
                           <p className="text-sm font-mono mt-2">
@@ -139,16 +144,19 @@ export default async function MembersPage() {
                     {observers.map((m) => {
                       const inner = (
                         <>
-                          <div className="flex items-center gap-4">
-                            {m.logoUri && m.logoDisplayConsent && (
-                              // eslint-disable-next-line @next/next/no-img-element
-                              <img
-                                src={`/logo/${m.id}?v=${m.updatedAt.getTime()}`}
-                                alt=""
-                                className="h-16 w-16 object-contain rounded flex-shrink-0"
-                              />
-                            )}
-                            <h3>{m.legalName}</h3>
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex items-center gap-4">
+                              {m.logoUri && m.logoDisplayConsent && (
+                                // eslint-disable-next-line @next/next/no-img-element
+                                <img
+                                  src={`/logo/${m.id}?v=${m.updatedAt.getTime()}`}
+                                  alt=""
+                                  className="h-16 w-16 object-contain rounded flex-shrink-0"
+                                />
+                              )}
+                              <h3>{m.legalName}</h3>
+                            </div>
+                            <span className="badge flex-shrink-0">Observer</span>
                           </div>
                           <p className="text-xs text-muted mt-1">
                             Observer (non-voting)

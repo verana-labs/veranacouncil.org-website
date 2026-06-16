@@ -8,6 +8,7 @@ import { saveMemberLogo } from "@/app/lib/logo";
 import { sendEmail, escapeHtml } from "@/app/lib/email";
 import { emailLayout } from "@/app/lib/email-layout";
 import { seatLabel } from "@/app/lib/seats";
+import { normalizeWebsite } from "@/app/lib/website";
 import { Sector, Region } from "@prisma/client";
 
 const SITE_URL = process.env.AUTH_URL ?? "https://veranacouncil.org";
@@ -42,6 +43,7 @@ const eoiSchema = z.object({
   entityType: z.string().trim().optional(),
   jurisdiction: z.string().trim().min(1, "Select the country"),
   registeredAddress: z.string().trim().optional(),
+  website: z.string().trim().max(300).optional(),
   contactName: z.string().trim().min(1, "Required"),
   contactRole: z.string().trim().optional(),
   socialAnnouncementConsent: z.boolean(),
@@ -76,6 +78,7 @@ export async function applyCandidacy(
     entityType: formData.get("entityType") || undefined,
     jurisdiction: formData.get("jurisdiction"),
     registeredAddress: formData.get("registeredAddress") || undefined,
+    website: formData.get("website") || undefined,
     contactName: formData.get("contactName"),
     contactRole: formData.get("contactRole") || undefined,
     socialAnnouncementConsent: formData.get("socialAnnouncementConsent") === "on",
@@ -85,6 +88,10 @@ export async function applyCandidacy(
     return { error: parsed.error.issues[0]?.message ?? "Please check the form." };
   }
   const d = parsed.data;
+
+  // Optional public website: normalize a bare host to https:// and validate.
+  const web = normalizeWebsite(d.website ?? "");
+  if (web.error) return { error: web.error };
 
   // Consider every organization this user belongs to (manager OR
   // representative), not just one they manage: a person who already
@@ -116,6 +123,7 @@ export async function applyCandidacy(
       entityType: d.entityType ?? null,
       jurisdiction: d.jurisdiction,
       registeredAddress: d.registeredAddress ?? null,
+      website: web.url,
       primaryEmail: user.email!,
       socialAnnouncementConsent: d.socialAnnouncementConsent,
     };

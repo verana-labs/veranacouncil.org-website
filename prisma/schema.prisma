@@ -627,6 +627,9 @@ enum RecordEntryType {
   member_seated
   observer_accepted
   seed_designation
+  member_departed // a seated member left (resignation / term non-renewal / removal for cause)
+  member_suspended // a seated member's status was suspended (temporary vacancy)
+  member_reinstated // a suspended member was restored to active
   minutes_published
   framework
   milestone

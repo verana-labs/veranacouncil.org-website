@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { latestRecord } from "@/app/lib/record";
 import SeatBoard from "@/app/components/SeatBoard";
+import HeroRing from "@/app/components/HeroRing";
 
 // Live data (seat board / record) on every request — never prerender.
 export const dynamic = "force-dynamic";
@@ -11,8 +12,12 @@ export default async function HomePage() {
   return (
     <>
       {/* Hero */}
-      <section className="border-b border-rule">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+      <section className="hero-glow relative overflow-hidden border-b border-rule">
+        <HeroRing />
+        {/* Surface wash above the canvas, below the copy, so the headline
+            reads while the council ring stays full-bleed on the right. */}
+        <div className="hero-vignette" />
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
           <p className="tag mb-4">Verana Council</p>
           <h1 className="display text-4xl sm:text-6xl leading-tight max-w-4xl">
             The governance body of the open public trust layer.

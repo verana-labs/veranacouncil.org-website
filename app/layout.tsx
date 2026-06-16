@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, IBM_Plex_Mono } from "next/font/google";
+import { Inter, IBM_Plex_Mono, Space_Grotesk } from "next/font/google";
 import { config } from "@fortawesome/fontawesome-svg-core";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import "./globals.css";
@@ -9,12 +9,19 @@ import Footer from "./components/Footer";
 // We import the Font Awesome CSS ourselves (above); stop it auto-injecting.
 config.autoAddCss = false;
 
-// All-Inter: the Council has no display face (the absence is the signal vs.
-// the Foundation's Space Grotesk).
+// Inter for body, Space Grotesk for display/headings (matches the Foundation
+// platform's type system), IBM Plex Mono for code/labels.
 const inter = Inter({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   variable: "--font-inter",
+  display: "swap",
+});
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
+  variable: "--font-space-grotesk",
   display: "swap",
 });
 
@@ -83,7 +90,7 @@ export default function RootLayout({
       // hydrates, so the attribute intentionally differs from the server HTML.
       // Scope hydration-mismatch suppression to this element only.
       suppressHydrationWarning
-      className={`${inter.variable} ${ibmPlexMono.variable}`}
+      className={`${inter.variable} ${spaceGrotesk.variable} ${ibmPlexMono.variable}`}
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />

@@ -45,7 +45,7 @@ export default function ContactPage() {
               </ul>
               <p className="text-xs text-muted mt-8">
                 Full details in the{" "}
-                <a href="/privacy" className="text-purple underline">
+                <a href="/privacy" className="text-indigo underline">
                   Privacy Policy
                 </a>
                 .

@@ -320,7 +320,7 @@ export default function ContactForm() {
           I consent to the Verana Council Association (in formation,
           represented by 2060 OÜ) storing this inquiry to respond to me. See
           the{" "}
-          <a href="/privacy" className="text-purple underline">
+          <a href="/privacy" className="text-indigo underline">
             Privacy Policy
           </a>
           . <span className="req">*</span>

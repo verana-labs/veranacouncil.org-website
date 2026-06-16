@@ -4,6 +4,8 @@ import { revalidatePath } from "next/cache";
 import { db } from "@/app/lib/db";
 import { currentUser } from "@/app/lib/authz";
 import { saveMemberLogo, removeMemberLogo, LogoError } from "@/app/lib/logo";
+import { addRecord } from "@/app/lib/record";
+import { membershipLabel, departedTitle, wasNamed } from "@/app/lib/exits";
 
 /** Count active (non-removed) access entries of a role, optionally excluding an email. */
 async function roleCount(
@@ -73,7 +75,7 @@ export async function cancelMembership(memberId: string) {
 
   const member = await db.member.findUnique({
     where: { id: memberId },
-    include: { userLinks: { where: { userId: user.id } } },
+    include: { userLinks: { where: { userId: user.id } }, membership: true },
   });
   if (!member || member.userLinks.length === 0) throw new Error("Forbidden");
 
@@ -93,6 +95,28 @@ export async function cancelMembership(memberId: string) {
       where: { memberId, status: { not: "ended" } },
       data: { status: "ended" },
     });
+    // A seated org that cancels is a resignation — close it out on the public
+    // record (symmetric with seating). A mere candidate has no membership /
+    // was never named, so this stays silent for them.
+    if (member.membership && wasNamed(member.membership.status)) {
+      await addRecord(
+        {
+          type: "member_departed",
+          title: departedTitle(
+            member.legalName,
+            "resignation",
+            membershipLabel(
+              member.membership.track,
+              member.membership.sector,
+              member.membership.region,
+            ),
+          ),
+          refType: "member",
+          refId: memberId,
+        },
+        tx,
+      );
+    }
     // Withdraw any in-flight candidacy so it stops counting as "under review"
     // on the public seat board. (A candidate has no membership yet — this is
     // what "cancel candidacy" actually does.)

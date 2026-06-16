@@ -26,6 +26,7 @@ export default function ApplyForm({
     entityType: string | null;
     jurisdiction: string | null;
     registeredAddress: string | null;
+    website: string | null;
   } | null;
 }) {
   const [state, formAction, pending] = useActionState<ApplyState, FormData>(
@@ -97,6 +98,13 @@ export default function ApplyForm({
           label="Registered address"
           name="registeredAddress"
           defaultValue={prefill?.registeredAddress ?? ""}
+        />
+        <Field
+          label="Website"
+          name="website"
+          type="url"
+          placeholder="https://example.org"
+          defaultValue={prefill?.website ?? ""}
         />
         <LogoField hasLogo={hasLogo} onPick={setHasLogo} />
       </fieldset>
@@ -252,12 +260,14 @@ function Field({
   required,
   placeholder,
   defaultValue,
+  type = "text",
 }: {
   label: string;
   name: string;
   required?: boolean;
   placeholder?: string;
   defaultValue?: string;
+  type?: string;
 }) {
   return (
     <div className="form-field">
@@ -267,6 +277,7 @@ function Field({
       <input
         id={name}
         name={name}
+        type={type}
         required={required}
         placeholder={placeholder}
         defaultValue={defaultValue}

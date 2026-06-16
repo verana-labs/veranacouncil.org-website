@@ -44,6 +44,7 @@ export default async function ApplyPage({
         entityType: link.member.entityType,
         jurisdiction: link.member.jurisdiction,
         registeredAddress: link.member.registeredAddress,
+        website: link.member.website,
       }
     : null;
 

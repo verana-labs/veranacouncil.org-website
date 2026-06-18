@@ -1,10 +1,25 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <!-- Background + top brand rule -->
   <rect width="1200" height="630" fill="#FAFAF8"/>
-  <rect x="0" y="0" width="1200" height="8" fill="#2E2A8F"/>
-  <g transform="translate(80, 120)">
-    <path d="M0 0 L40 76 L80 0" fill="none" stroke="#2E2A8F" stroke-width="18" stroke-linecap="square" stroke-linejoin="miter"/>
+  <rect x="0" y="0" width="1200" height="10" fill="#2E2A8F"/>
+
+  <!-- Verana mark (the real logo path from verana-logo.svg), in brand indigo.
+       Source viewBox is 54×52; scaled ~2.31× to ~120px tall, baseline-aligned
+       with the wordmark. -->
+  <g transform="translate(80, 150) scale(2.315)" fill="#2E2A8F">
+    <path d="M26.9932 51.6972L5.805 11.0977L2.91263 16.2161L0 10.6048L5.98725 0L26.9932 40.2483L47.9993 0L54 10.6217L51.0773 16.2161L48.1849 11.0977L26.9932 51.6972Z"/>
+    <path d="M13.696 0L26.9935 25.4637L39.9367 0H13.696Z"/>
   </g>
-  <text x="80" y="300" font-family="Inter, system-ui, sans-serif" font-size="64" font-weight="600" letter-spacing="-1" fill="#111111">verana<tspan fill="#2E2A8F">.</tspan>council</text>
-  <text x="80" y="360" font-family="Inter, system-ui, sans-serif" font-size="28" font-weight="400" fill="#5B5B5B">The governance body of the open public trust layer.</text>
-  <text x="80" y="540" font-family="IBM Plex Mono, monospace" font-size="20" font-weight="400" fill="#5B5B5B">veranacouncil.org · Swiss Verein (in formation) · Incorporates Q3 2026</text>
+
+  <!-- Wordmark -->
+  <text x="230" y="232" font-family="Space Grotesk, Inter, system-ui, sans-serif" font-size="76" font-weight="700" letter-spacing="-2" fill="#111111">verana<tspan fill="#2E2A8F">.</tspan>council</text>
+
+  <!-- Lead / value proposition -->
+  <text x="80" y="392" font-family="Inter, system-ui, sans-serif" font-size="40" font-weight="600" letter-spacing="-0.5" fill="#111111">The governance body of the open public trust layer</text>
+  <text x="80" y="446" font-family="Inter, system-ui, sans-serif" font-size="28" font-weight="400" fill="#5B5B5B">One member, one vote. Authors and operates the frameworks. Sole securer of the network.</text>
+
+  <!-- Footer rule + meta line -->
+  <rect x="80" y="540" width="1040" height="2" fill="#E8E6E0"/>
+  <text x="80" y="588" font-family="IBM Plex Mono, monospace" font-size="22" font-weight="400" fill="#5B5B5B">veranacouncil.org</text>
+  <text x="1120" y="588" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="22" font-weight="400" fill="#2E2A8F">Swiss Verein · in formation</text>
 </svg>

@@ -61,11 +61,12 @@ export default function JoinPage() {
               <p className="text-sm text-muted leading-relaxed mt-3">
                 Sovereigns and multilateral bodies that cannot join a Swiss
                 Verein under procurement or sovereign-immunity rules.
-                Contractual participation: attendance and voice, no vote.
-                Accepted by steward decision pre-incorporation, by the Board
-                thereafter. Convertible to membership.{" "}
-                <Link href="/contact" className="text-indigo hover:underline">
-                  Start via the contact form →
+                Contractual participation: attendance and voice, no vote, no
+                seat. Submit a non-binding application — no sector, region, or
+                ballot; the Council reviews and accepts it (steward
+                pre-incorporation, Board thereafter). Convertible to membership.{" "}
+                <Link href="/apply-observer" className="text-indigo hover:underline">
+                  Apply as Observer →
                 </Link>
               </p>
             </div>

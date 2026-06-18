@@ -105,19 +105,29 @@ export default async function AdminMembersPage({
                       {ms ? (
                         <form action={toggleListed} className="flex items-center gap-2">
                           <input type="hidden" name="membershipId" value={ms.id} />
-                          <span className={`badge ${ms.listed ? "badge-indigo" : ""}`}>
-                            {ms.listed ? "Listed" : "Not listed"}
-                          </span>
+                          {ms.status === "pending" ? (
+                            <span className="badge badge-amber">Pending</span>
+                          ) : (
+                            <span className={`badge ${ms.listed ? "badge-indigo" : ""}`}>
+                              {ms.listed ? "Listed" : "Not listed"}
+                            </span>
+                          )}
                           <button
                             type="submit"
                             className="text-indigo hover:underline"
                             title={
-                              ms.listed
-                                ? "Remove from the public /members page"
-                                : "Show on the public /members page"
+                              ms.status === "pending"
+                                ? "Accept this application and show it on /members"
+                                : ms.listed
+                                  ? "Remove from the public /members page"
+                                  : "Show on the public /members page"
                             }
                           >
-                            {ms.listed ? "Unlist" : "List"}
+                            {ms.status === "pending"
+                              ? "Accept & list"
+                              : ms.listed
+                                ? "Unlist"
+                                : "List"}
                           </button>
                         </form>
                       ) : (

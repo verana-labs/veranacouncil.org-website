@@ -1,10 +1,13 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, IBM_Plex_Mono, Space_Grotesk } from "next/font/google";
 import { config } from "@fortawesome/fontawesome-svg-core";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import "./globals.css";
 import Nav from "./components/Nav";
 import Footer from "./components/Footer";
+import Analytics from "./components/Analytics";
+import JsonLd from "./components/JsonLd";
+import { SITE_URL, SITE_NAME, SITE_DESCRIPTION, OG_IMAGE } from "./lib/site";
 
 // We import the Font Awesome CSS ourselves (above); stop it auto-injecting.
 config.autoAddCss = false;
@@ -32,38 +35,63 @@ const ibmPlexMono = IBM_Plex_Mono({
   display: "swap",
 });
 
-const SITE_URL = "https://veranacouncil.org";
+const HOME_TITLE =
+  "Verana Council: the governance body of the open public trust layer";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Verana Council: the governance body of the open public trust layer",
+    default: HOME_TITLE,
     template: "%s · Verana Council",
   },
-  description:
-    "The Verana Council Association authors and operates the governance frameworks of the Verana network and is the sole body that governs and secures it. Non-profit Swiss Verein, in formation, stewarded by 2060 OÜ. Founding Council recruitment open through Q4 2026.",
+  description: SITE_DESCRIPTION,
+  applicationName: SITE_NAME,
   alternates: { canonical: "/" },
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    title: "Verana",
+    statusBarStyle: "default",
+  },
   icons: {
-    icon: [{ url: "/assets/img/favicon.svg", type: "image/svg+xml" }],
+    icon: [
+      { url: "/assets/img/favicon.svg", type: "image/svg+xml" },
+      { url: "/assets/img/favicon-32.png", type: "image/png", sizes: "32x32" },
+      { url: "/assets/img/favicon-16.png", type: "image/png", sizes: "16x16" },
+    ],
+    shortcut: ["/assets/img/favicon.ico"],
   },
   openGraph: {
     type: "website",
     url: SITE_URL,
-    title: "Verana Council: the governance body of the open public trust layer",
+    siteName: SITE_NAME,
+    title: HOME_TITLE,
     description:
       "One member, one vote. Authors and operates the frameworks. Sole securer of the network. Membership is free — apply for a Founding Council Seat.",
     images: [
       {
-        url: "/assets/img/og-default.svg",
+        url: OG_IMAGE,
         width: 1200,
         height: 630,
+        type: "image/jpeg",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    images: ["/assets/img/og-default.svg"],
+    title: HOME_TITLE,
+    description: SITE_DESCRIPTION,
+    images: [OG_IMAGE],
   },
+};
+
+// Browser UI tinting — matches the manifest theme_color (brand indigo), per
+// light/dark scheme.
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#2e2a8f" },
+    { media: "(prefers-color-scheme: dark)", color: "#0d0d11" },
+  ],
 };
 
 // Set the theme before paint to avoid a flash of the wrong color scheme.
@@ -94,8 +122,10 @@ export default function RootLayout({
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+        <JsonLd />
       </head>
       <body className="bg-surface text-ink">
+        <Analytics />
         <Nav />
         <main>{children}</main>
         <Footer />

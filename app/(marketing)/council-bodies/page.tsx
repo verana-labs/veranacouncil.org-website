@@ -18,25 +18,32 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 const GOV_REPO = "https://github.com/verana-labs/verana-council-gov";
+const GOV_DOCS = {
+  networkGf: `${GOV_REPO}/tree/main/network-gf`,
+  ecsEgf: `${GOV_REPO}/tree/main/ecs-egf`,
+  templateEgf: `${GOV_REPO}/tree/main/template-egf`,
+  bylaws: `${GOV_REPO}/tree/main/bylaws`,
+  codeOfConduct: `${GOV_REPO}/tree/main/code-of-conduct`,
+};
 const SCHEMAS = "https://verana-labs.github.io/verifiable-trust-spec/schemas/v4";
 
 const ECS_ROWS = [
   {
     schema: "Service",
     identifies: "Verifiable Services (incl. AI agents)",
-    mode: "ECOSYSTEM_VALIDATION_PROCESS",
+    mode: "ECOSYSTEM_ONBOARDING_PROCESS",
     file: "service.json",
   },
   {
     schema: "Organization",
     identifies: "Legal entities controlling services",
-    mode: "GRANTOR_VALIDATION_PROCESS",
+    mode: "GRANTOR_ONBOARDING_PROCESS",
     file: "org.json",
   },
   {
     schema: "Persona",
     identifies: "Individuals controlling services",
-    mode: "GRANTOR_VALIDATION_PROCESS",
+    mode: "GRANTOR_ONBOARDING_PROCESS",
     file: "persona.json",
   },
   {
@@ -102,7 +109,7 @@ export default async function GovernancePage() {
                 Framework (EGF) on Verana must respect.
               </p>
               <p className="text-sm mt-3">
-                <a href={GOV_REPO} rel="noopener" className="text-indigo hover:underline">
+                <a href={GOV_DOCS.networkGf} rel="noopener" className="text-indigo hover:underline">
                   Read the Network GF ↗
                 </a>
               </p>
@@ -115,7 +122,7 @@ export default async function GovernancePage() {
                 Essential Credential Schemas that make the trust layer work.
               </p>
               <p className="text-sm mt-3">
-                <a href={GOV_REPO} rel="noopener" className="text-indigo hover:underline">
+                <a href={GOV_DOCS.ecsEgf} rel="noopener" className="text-indigo hover:underline">
                   Read the ECS-EGF ↗
                 </a>
               </p>
@@ -128,7 +135,7 @@ export default async function GovernancePage() {
                 Council provides the template; it is not a sector-EGF authority.
               </p>
               <p className="text-sm mt-3">
-                <a href={GOV_REPO} rel="noopener" className="text-indigo hover:underline">
+                <a href={GOV_DOCS.templateEgf} rel="noopener" className="text-indigo hover:underline">
                   Read the Template EGF ↗
                 </a>
               </p>
@@ -143,11 +150,11 @@ export default async function GovernancePage() {
                 Assembly.
               </p>
               <p className="text-sm mt-3">
-                <a href={GOV_REPO} rel="noopener" className="text-indigo hover:underline">
+                <a href={GOV_DOCS.bylaws} rel="noopener" className="text-indigo hover:underline">
                   Bylaws ↗
                 </a>{" "}
                 ·{" "}
-                <a href={GOV_REPO} rel="noopener" className="text-indigo hover:underline">
+                <a href={GOV_DOCS.codeOfConduct} rel="noopener" className="text-indigo hover:underline">
                   Code of Conduct ↗
                 </a>
               </p>
@@ -165,7 +172,7 @@ export default async function GovernancePage() {
                   <tr className="text-left text-muted">
                     <th className="p-2">Schema</th>
                     <th className="p-2">Identifies</th>
-                    <th className="p-2">Permission mode</th>
+                    <th className="p-2">Issuer onboarding mode</th>
                     <th className="p-2">Definition</th>
                   </tr>
                 </thead>

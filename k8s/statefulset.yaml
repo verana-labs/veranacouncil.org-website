@@ -59,6 +59,13 @@ spec:
                   # Optional so the pod still starts if the secret is absent;
                   # the contact route degrades to best-effort (logs only).
                   optional: true
+            # Ops alert webhook (Discord-shaped); alertOps() no-ops when unset.
+            - name: ALERT_WEBHOOK_URL
+              valueFrom:
+                secretKeyRef:
+                  name: veranacouncil-website-secrets
+                  key: ALERT_WEBHOOK_URL
+                  optional: true
             # ── Membership / candidacies / accounts ──────────────────────────
             # Secrets come from veranacouncil-website-secrets (CI-injected from
             # GitHub Actions secrets). optional:true keeps the pod bootable

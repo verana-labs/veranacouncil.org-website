@@ -1,6 +1,10 @@
 import { db } from "@/app/lib/db";
 import { addRecord } from "@/app/lib/record";
 import { seatLabel, COUNCIL_SEAT_CAP } from "@/app/lib/seats";
+import {
+  convertWgInvitesForEmails,
+  memberReachableEmails,
+} from "@/app/lib/wg-invites";
 
 /**
  * The provisional admission-ballot mechanism (pre-mainnet only — sunsets at
@@ -178,6 +182,14 @@ export async function settleBallot(ballotId: string) {
       );
     }
   });
+
+  // The member was just seated: convert any pending council-body invites
+  // addressed to its people (best-effort, never throws).
+  if (accepted) {
+    await convertWgInvitesForEmails(
+      await memberReachableEmails(candidacy.memberId),
+    );
+  }
 
   return db.ballot.findUnique({ where: { id: ballot.id } });
 }

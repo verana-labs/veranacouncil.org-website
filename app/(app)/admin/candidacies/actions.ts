@@ -6,6 +6,10 @@ import { currentUser, isAdmin } from "@/app/lib/authz";
 import { openBallotForCandidacy, seatedCount } from "@/app/lib/ballots";
 import { addRecord } from "@/app/lib/record";
 import { seatLabel, COUNCIL_SEAT_CAP } from "@/app/lib/seats";
+import {
+  convertWgInvitesForEmails,
+  memberReachableEmails,
+} from "@/app/lib/wg-invites";
 
 /** Seed designations end as soon as the ⅔ mechanism can function. */
 const SEED_COHORT_MAX = 3;
@@ -161,6 +165,9 @@ export async function designateSeed(candidacyId: string, rationale: string) {
       },
     });
   });
+  // The member was just seated: convert any pending council-body invites
+  // addressed to its people.
+  await convertWgInvitesForEmails(await memberReachableEmails(c.memberId));
   revalidatePath("/admin/candidacies");
   revalidatePath("/members");
 }
@@ -200,6 +207,9 @@ export async function makeObserver(memberId: string) {
       },
     });
   });
+  // The observer is active now: convert any pending council-body invites
+  // addressed to its people.
+  await convertWgInvitesForEmails(await memberReachableEmails(memberId));
   revalidatePath("/admin/members");
 }
 

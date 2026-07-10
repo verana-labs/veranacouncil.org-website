@@ -375,6 +375,7 @@ model WorkingGroup {
 
   leads        WgLead[]
   participants WgParticipant[]
+  invites      WgInvite[]
   schedule     WgSchedule?
   sessions     WgSession[]
 
@@ -385,6 +386,32 @@ model WorkingGroup {
 enum WorkingGroupState {
   enabled
   disabled
+}
+
+// An email invited into a council body (as lead or participant) by an admin or
+// a lead — possibly before any account or membership exists. The invite
+// converts into a WgLead/WgParticipant row only once a user with that verified
+// email holds an active membership satisfying the body's requiredClass (strict
+// gate); until then the person is nudged by email to join the Council (or to
+// be added to a member organization's access list). Pending = null acceptedAt;
+// revocation deletes the row (audited in AdminAction).
+model WgInvite {
+  id              String       @id @default(cuid())
+  wgId            String
+  wg              WorkingGroup @relation(fields: [wgId], references: [id], onDelete: Cascade)
+  email           String // lowercased verified-email key
+  role            WgInviteRole
+  invitedByUserId String?
+  createdAt       DateTime     @default(now())
+  acceptedAt      DateTime? // set when converted into a lead/participant row
+
+  @@unique([wgId, email])
+  @@index([email])
+}
+
+enum WgInviteRole {
+  lead
+  participant
 }
 
 // Leads run the body. Invariant (enforced in actions): never zero leads.

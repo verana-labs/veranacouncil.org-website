@@ -13,6 +13,10 @@ import {
   isDepartureReason,
   type DepartureReason,
 } from "@/app/lib/exits";
+import {
+  convertWgInvitesForEmails,
+  memberReachableEmails,
+} from "@/app/lib/wg-invites";
 import { MEMBERSHIP_TRANSITIONS, type MembershipStatus } from "./transitions";
 
 async function assertAdmin() {
@@ -111,6 +115,12 @@ export async function setMembershipStatus(
       );
     }
   });
+
+  // An activation (incl. reinstatement) counts like any other: convert any
+  // pending council-body invites addressed to the member's people.
+  if (status === "active") {
+    await convertWgInvitesForEmails(await memberReachableEmails(memberId));
+  }
 
   revalidatePath(`/admin/members/${memberId}`);
   revalidatePath("/");

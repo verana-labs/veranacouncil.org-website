@@ -21,6 +21,9 @@
   --color-purple: #763ef0; /* accent — the shared Verana purple */
   --color-purple-dark: #5b2fc9; /* accent hover */
 
+  /* Functional status green (open / success signals — not a brand accent). */
+  --color-green: #047857;
+
   --color-surface: #fafaf8;
   --color-ink: #111111;
   --color-muted: #5b5b5b;
@@ -45,6 +48,7 @@
   --color-indigo-dark: #a6a2ff;
   --color-purple: #a892ff;
   --color-purple-dark: #c4b6ff;
+  --color-green: #34d399;
 
   --color-surface: #0d0d11;
   --color-ink: #ececec;

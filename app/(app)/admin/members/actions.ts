@@ -4,6 +4,10 @@ import { revalidatePath } from "next/cache";
 import { db } from "@/app/lib/db";
 import { currentUser, isAdmin } from "@/app/lib/authz";
 import { addRecord } from "@/app/lib/record";
+import {
+  convertWgInvitesForEmails,
+  memberReachableEmails,
+} from "@/app/lib/wg-invites";
 
 /**
  * Toggle a membership's presence on the public /members directory. Listing a
@@ -56,6 +60,14 @@ export async function toggleListed(formData: FormData) {
       },
     });
   });
+
+  // Listing a pending application accepts it: convert any pending council-body
+  // invites addressed to the member's people.
+  if (accepting) {
+    await convertWgInvitesForEmails(
+      await memberReachableEmails(membership.memberId),
+    );
+  }
 
   revalidatePath("/admin/members");
   revalidatePath("/members");

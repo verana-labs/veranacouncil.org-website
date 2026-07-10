@@ -16,7 +16,11 @@ The site is two things at once (see [`spec.md`](spec.md)):
    ballots** (one ballot per candidate, ⅔ of seated members, async 14-day
    window — sunsets at mainnet, when Council voting moves on-chain),
    organization access lists, and Council bodies/meetings with published
-   minutes.
+   minutes. Leads and admins can invite **any email address** into a Council
+   body (as lead or participant), including people who aren't members yet:
+   the person is emailed to join the Council and enters the body
+   automatically once their membership is active (pending invites are listed
+   with resend/revoke).
 
 Built on the [veranafoundation.org](https://github.com/verana-labs/veranafoundation.org-website)
 platform: Next.js 15 + Tailwind v4 + Prisma/Postgres + Auth.js v5 (passwordless),

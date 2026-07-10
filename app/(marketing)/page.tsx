@@ -64,7 +64,7 @@ export default async function HomePage() {
             <div className="card">
               <h3>Authors &amp; operates the frameworks</h3>
               <p className="text-sm text-muted leading-relaxed">
-                The Network GF, the ECS-EGF covering the four Essential
+                The Network GF, the ECS-EGF covering the five Essential
                 Credential Schemas, and the Template EGF for sector ecosystems.
               </p>
             </div>

@@ -40,7 +40,7 @@ this exactly; it is the spine of the whole site:
   (Indexer, Trust Resolver, Graph, …) are permissionless, since their data is
   derived from the ledger.
 - **Authors and operates the governance frameworks** — the **Network GF** (the
-  constitutional layer every EGF must respect), the **ECS-EGF** (the four
+  constitutional layer every EGF must respect), the **ECS-EGF** (the five
   Essential Credential Schemas), and the **Template EGF** (a scaffold for sector
   ecosystems).
 - **One-member-one-vote**, seat-diversity rule (broad spread across sectors and
@@ -70,7 +70,8 @@ ecosystem growth are the Foundation's domain (→ `veranafoundation.org`).
 - `verana.io` — the network / product site and **the** "how to build on Verana"
   surface. This site links there; it does not reproduce build content.
 - `docs.verana.io` — technical documentation and API reference.
-- `verana-labs.github.io/verifiable-trust-spec/` — Verifiable Trust spec v4.
+- `verana-labs.github.io/verifiable-trust-spec/versions/v4/` — Verifiable Trust
+  spec v4 (stable; the repo root serves the v5 draft).
 - `verana-labs.github.io/verifiable-trust-vpr-spec/` — VPR spec v4.
 - `github.com/verana-labs/verana-council-gov` — the Council's governance
   documents (frameworks, bylaws, code of conduct). **Normative text lives there;
@@ -127,7 +128,7 @@ accessibility baseline.
   Mono**, used sparingly — seat-board figures, schema names, dates of record.
 - **Layout** — formal, generous whitespace, predominantly **one-column
   institutional prose blocks** and tables; no card mosaics, no contributor
-  avatars, no activity feeds. The seat board and the four-schema table are the
+  avatars, no activity feeds. The seat board and the five-schema table are the
   only dense visual structures.
 - **Imagery & motion** — minimal to none: no stock photos, no illustration
   system, no scroll animations. Structure (tables, rules, numbering) *is* the
@@ -227,17 +228,21 @@ A single summary page. **No normative text on-site** — every item links to
 
 - **Network GF** — the constitutional layer every EGF on Verana must respect.
   1 sentence + link.
-- **ECS-EGF** — the Council's ecosystem framework covering the four Essential
-  Credential Schemas. Includes the four-schema table:
+- **ECS-EGF** — the Council's ecosystem framework covering the five Essential
+  Credential Schemas. Includes the five-schema table:
 
-  | Schema | Identifies | Permission mode | Definition |
+  | Schema | Identifies | Issuer onboarding mode | Definition |
   | --- | --- | --- | --- |
-  | `Service` | Verifiable Services (incl. AI agents) | `ECOSYSTEM_VALIDATION_PROCESS` | service.json |
-  | `Organization` | Legal entities controlling services | `GRANTOR_VALIDATION_PROCESS` | org.json |
-  | `Persona` | Individuals controlling services | `GRANTOR_VALIDATION_PROCESS` | persona.json |
+  | `Service` | Verifiable Services (incl. AI agents) | `ECOSYSTEM_ONBOARDING_PROCESS` | service.json |
+  | `Organization` | Legal entities controlling services | `GRANTOR_ONBOARDING_PROCESS` | org.json |
+  | `Persona` | Individuals controlling services | `GRANTOR_ONBOARDING_PROCESS` | persona.json |
   | `UserAgent` | End-user wallets and applications | `OPEN` | ua.json |
+  | `Badge` | Humans (e.g. employees) behind a Verifiable Service | `OPEN` | badge.json |
 
   Schema links → `verana-labs.github.io/verifiable-trust-spec/schemas/v4/*.json`.
+  The `OPEN` issuer mode of `Badge` is fixed by the Verifiable Trust spec
+  ([VT-ECS-JSON-SCHEMA-VPR-CONFIG]); the other issuer onboarding modes are
+  ECS-EGF choices.
 - **ECS Ecosystem Participants** *(forward note + waitlist)* — ECS Ecosystem
   Participants are required for running Verifiable Services on Verana. Their
   selection is a **separate process, governed by the ECS-EGF**: recruitment

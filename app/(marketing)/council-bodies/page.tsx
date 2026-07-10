@@ -52,6 +52,12 @@ const ECS_ROWS = [
     mode: "OPEN",
     file: "ua.json",
   },
+  {
+    schema: "Badge",
+    identifies: "Humans (e.g. employees) behind a Verifiable Service",
+    mode: "OPEN",
+    file: "badge.json",
+  },
 ];
 
 export default async function GovernancePage() {
@@ -118,7 +124,7 @@ export default async function GovernancePage() {
             <div className="card">
               <h3>ECS-EGF</h3>
               <p className="text-sm text-muted leading-relaxed mt-1">
-                The Council&rsquo;s own ecosystem framework, covering the four
+                The Council&rsquo;s own ecosystem framework, covering the five
                 Essential Credential Schemas that make the trust layer work.
               </p>
               <p className="text-sm mt-3">
@@ -164,7 +170,7 @@ export default async function GovernancePage() {
           {/* The ECS schemas, tucked under the summary as compact reference */}
           <details className="mt-6 max-w-4xl">
             <summary className="cursor-pointer text-sm text-indigo hover:underline">
-              The four Essential Credential Schemas
+              The five Essential Credential Schemas
             </summary>
             <div className="overflow-x-auto mt-4">
               <table className="w-full border-collapse text-sm min-w-[640px]">
@@ -196,6 +202,11 @@ export default async function GovernancePage() {
                 </tbody>
               </table>
             </div>
+            <p className="text-xs text-muted mt-3">
+              The <code>OPEN</code> issuer mode of <code>Badge</code> is fixed
+              by the Verifiable Trust specification; the other issuer
+              onboarding modes are set by the ECS-EGF.
+            </p>
           </details>
 
           {/* ECS participants — separate recruitment, kept as a one-line note */}

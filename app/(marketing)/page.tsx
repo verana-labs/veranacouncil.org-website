@@ -49,7 +49,7 @@ export default async function HomePage() {
             <div className="card">
               <h3>Non-profit Swiss Verein</h3>
               <p className="text-sm text-muted leading-relaxed">
-                Art. 60 ZGB, in formation — target incorporation Q3 2026.
+                Art. 60 ZGB, in formation — target incorporation Q4 2026.
                 General Assembly, Board, committees. Membership is free.
               </p>
             </div>

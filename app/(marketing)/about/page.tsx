@@ -46,7 +46,7 @@ export default function AboutPage() {
           <h2 className="display text-3xl">A non-profit Swiss Verein</h2>
           <div className="accent-line mt-4 mb-6" />
           <p className="max-w-3xl leading-relaxed text-sm text-muted mb-8">
-            Art. 60 ZGB, in formation; target incorporation Q3 2026. Statutes
+            Art. 60 ZGB, in formation; target incorporation Q4 2026. Statutes
             and bylaws live in the public governance repository.
           </p>
           <div className="grid sm:grid-cols-3 gap-6">

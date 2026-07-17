@@ -28,7 +28,7 @@ This site is two things at once:
    transparency is the exhaust of the machine, not an editorial task.
 
 **The Council is in formation.** Non-profit Swiss Verein (Art. 60 ZGB), target
-incorporation Q3 2026; while in formation, 2060 OÜ acts as steward
+incorporation Q4 2026; while in formation, 2060 OÜ acts as steward
 (pre-incorporation). The site states this plainly wherever entity status is
 described.
 
@@ -191,7 +191,7 @@ Who the Council is and how it runs.
   governance frameworks; the sole body that governs and secures the live
   network; structurally uncapturable.
 - **Structure** — non-profit Swiss Verein (Art. 60 ZGB), in formation, target
-  incorporation Q3 2026. The three organs, one line each:
+  incorporation Q4 2026. The three organs, one line each:
   - **General Assembly** — the supreme organ; all seated Founding Members, one
     vote each; Observers attend and speak, no vote.
   - **Board** — small, GA-elected, fixed staggered terms; runs and legally
@@ -422,7 +422,7 @@ personal data of representatives is not.
 ## 9. Legal & licensing
 
 - **Entity:** Verana Council Association, non-profit Swiss Verein (Art. 60
-  ZGB), **in formation**; target incorporation Q3 2026; stewarded by 2060 OÜ
+  ZGB), **in formation**; target incorporation Q4 2026; stewarded by 2060 OÜ
   pre-incorporation. Seat: `[SEAT_CITY]`, `[CANTON]` — placeholders until fixed.
 - **No securities framing.** VNA appears only in the hard-limits context (the
   Council does not issue or own it). No tokenomics, price, returns, or offering

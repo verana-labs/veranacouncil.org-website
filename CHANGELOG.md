@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.4.0](https://github.com/verana-labs/veranacouncil.org-website/compare/veranacouncil-website-v0.3.0...veranacouncil-website-v0.4.0) (2026-08-03)
+## [0.4.0](https://github.com/verana-labs/veranacouncil.org-website/compare/veranacouncil-website-v0.3.0...veranacouncil-website-v0.4.0) (2026-09-09)
 
 
 ### ⚠ BREAKING CHANGES

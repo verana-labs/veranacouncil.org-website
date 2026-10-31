@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.4.1](https://github.com/verana-labs/veranacouncil.org-website/compare/veranacouncil-website-v0.4.0...veranacouncil-website-v0.4.1) (2026-10-31)
+
+
+### Bug Fixes
+
+* **contact:** label the honeypot as a required field so agents fill it in ([1e3a6d9](https://github.com/verana-labs/veranacouncil.org-website/commit/1e3a6d9d1952d9b3097fe198309cceb03d761f7c))
+* **contact:** label the honeypot as a required field so agents fill it in ([c63cabd](https://github.com/verana-labs/veranacouncil.org-website/commit/c63cabddbb350726306953b49c474375709320e6))
+
 ## [0.4.0](https://github.com/verana-labs/veranacouncil.org-website/compare/veranacouncil-website-v0.3.0...veranacouncil-website-v0.4.0) (2026-09-09)
 
 
